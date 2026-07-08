@@ -48,8 +48,8 @@ gh repo create getailab --private --source=. --remote=origin --push
 ## 4. Push
 
 ```bash
-git remote add origin git@github.com:YOUR_USERNAME/getailab.git
-# or HTTPS: https://github.com/YOUR_USERNAME/getailab.git
+git remote add origin git@github.com:deadlylab/getailab.git
+# or HTTPS: https://github.com/deadlylab/getailab.git
 
 git push -u origin main
 ```
@@ -78,7 +78,7 @@ In **Settings → Branches** (optional but good):
 Share with testers:
 
 ```
-git clone git@github.com:YOUR_USERNAME/getailab.git
+git clone git@github.com:deadlylab/getailab.git
 cd getailab
 cp .env.example .env
 pip install -r requirements.txt
@@ -97,10 +97,6 @@ git push origin v0.1.0-alpha
 ```
 
 Then GitHub → **Releases → Draft new release** from tag `v0.1.0-alpha`.
-
-## 8. CI status badge (after first push)
-
-Replace `YOUR_USERNAME` in `README.md` badge URL with your org/user.
 
 ## Troubleshooting
 

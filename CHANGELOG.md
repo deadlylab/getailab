@@ -19,5 +19,5 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning foll
 
 First tagged alpha for external peer review. Gate: [`release/ALPHA_CHECKLIST.md`](release/ALPHA_CHECKLIST.md).
 
-[Unreleased]: https://github.com/YOUR_ORG/getailab/compare/v0.1.0-alpha...main
-[0.1.0-alpha]: https://github.com/YOUR_ORG/getailab/releases/tag/v0.1.0-alpha
+[Unreleased]: https://github.com/deadlylab/getailab/compare/v0.1.0-alpha...main
+[0.1.0-alpha]: https://github.com/deadlylab/getailab/releases/tag/v0.1.0-alpha

@@ -119,7 +119,7 @@ git status                     # no .env, no *.db, no loop_*_report.md staged
 ## 10. Post-publish smoke (tester simulates)
 
 ```bash
-git clone git@github.com:YOUR_ORG/getailab.git
+git clone git@github.com:deadlylab/getailab.git
 cd getailab
 cp .env.example .env
 pip install -r requirements.txt

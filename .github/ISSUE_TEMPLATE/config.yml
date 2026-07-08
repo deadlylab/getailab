@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Peer review quickstart
-    url: https://github.com/YOUR_USERNAME/getailab/blob/main/docs/peer-review/QUICKSTART_15MIN.md
+    url: https://github.com/deadlylab/getailab/blob/main/docs/peer-review/QUICKSTART_15MIN.md
     about: 15-minute evaluator path before opening issues
   - name: Repository checklist
-    url: https://github.com/YOUR_USERNAME/getailab/blob/main/docs/REPOSITORY_CHECKLIST.md
+    url: https://github.com/deadlylab/getailab/blob/main/docs/REPOSITORY_CHECKLIST.md
     about: What a publish-ready GetAiLab repo needs

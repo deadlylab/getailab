@@ -1,6 +1,6 @@
 # GetAiLab Live — Project Chimera
 
-[![CI](https://github.com/YOUR_USERNAME/getailab/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/getailab/actions/workflows/ci.yml)
+[![CI](https://github.com/deadlylab/getailab/actions/workflows/ci.yml/badge.svg)](https://github.com/deadlylab/getailab/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
 **Official build.** This directory (`getailab_live`) is the working lab, the git source, and what testers receive.
@@ -14,7 +14,7 @@ GetAiLab is a **self-hosted research operating system**: eleven specialist scien
 ## Clone from GitHub (testers)
 
 ```bash
-git clone git@github.com:YOUR_USERNAME/getailab.git
+git clone git@github.com:deadlylab/getailab.git
 cd getailab
 cp .env.example .env          # set LLM_MODEL=minimax-m2.5:cloud
 pip install -r requirements.txt
