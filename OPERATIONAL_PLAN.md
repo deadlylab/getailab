@@ -40,7 +40,7 @@ The team in `personas/chimera_squad.yaml` is the **reference implementation**. P
 
 ## Scope (unchanged)
 
-**In:** 6-phase loops, sandbox, tickets, library provenance, self-host, SQLite/file only.
+**In:** Five-stage dialectic loops (hypothesis → implement → execute → synthesize → direction), sandbox, per-stage tickets, library provenance, self-host, SQLite/file only.
 
 **Out:** Postgres, unrelated side projects, fake verification scripts.
 

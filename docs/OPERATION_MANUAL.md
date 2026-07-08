@@ -8,14 +8,23 @@ Working handbook for the current build (updated **8 July 2026**). Covers archite
 
 GetAiLab Live is a **local-first research operating system** built around the Chimera squad: eleven specialist scientist personas, one Oracle, a sandbox lab, and a persistent vault.
 
-A full research loop:
+A full research loop — **five work stages**, plus intake and optional vault archive:
 
-1. Problem intake (user, Muse, or chained from prior Oracle direction)
-2. Hypothesis phase — each scientist contributes (with book context + optional literature inject)
-3. Implement phase — experiment code per scientist
-4. Execute phase — lab sandbox runs code, writes artifacts
-5. Synthesis phase — Oracle consensus with preserved dissent
-6. Phase 4 — three ranked next directions; researcher or Oracle picks the next loop
+| Stage | What happens | CLI header | Job ticket tag |
+|-------|----------------|------------|----------------|
+| Intake | Problem registered with Oracle; optional Sauron URL + literature grounding | *(not numbered)* | `phase:loop` (parent) |
+| 1. Hypothesis | Each scientist contributes (book context + literature) | **Phase 1** | `hypothesis` |
+| 2. Implement | Experiment code per scientist | **Phase 2** *(bundled)* | `implement` |
+| 3. Execute | Lab sandbox runs code, writes artifacts | **Phase 2** *(bundled)* | `execute` |
+| 4. Synthesize | Oracle consensus with preserved dissent | **Phase 3** | `synthesize` |
+| Archive | Vault ingest when synthesis archives to library | *(not shown)* | `archive` *(optional)* |
+| 5. Direction | Three ranked next problems; you or Oracle pick the next loop or quit | **Phase 4** | *(not ticketed)* |
+
+```
+Intake → Hypothesis (×11) → Implement → Execute → Synthesize → [Archive] → Direction picker
+```
+
+The terminal shows **four phase headers** because implement and execute run under one banner: *Phase 2: Experiment & Artifact Audit*.
 
 **Evidence it works:** 18 loop reports, loops 29–33 complete end-to-end on `minimax-m2.5:cloud`, ~9,800 vault page files, ~400 sandbox artifacts.
 
@@ -161,23 +170,27 @@ python3 run_chimera.py --no-idea
 python3 run_chimera.py --chat
 ```
 
-### Phase 4 (next loop)
+### Direction picker (CLI Phase 4)
 
-At the end of a loop: pick direction `1`/`2`/`3`, Oracle pick `o`, custom `c`, or quit `q`/`stop`. Report is saved either way.
+At the end of a loop: pick direction `1`/`2`/`3`, Oracle pick `o`, custom `c`, or quit `q`/`stop`. Report is saved either way. This is the fifth work stage; the CLI labels it Phase 4 because Phases 1–3 cover hypothesis, experiment, and synthesis.
 
 ---
 
-## 6. What happens in each phase
+## 6. What happens in each stage
 
-**Hypothesis:** POST `/hypothesis` per scientist. Book context + skills injected. Literature search may auto-run. On LLM failure → HTTP **503** + `"LLM unavailable"` — no corrupted prose in report.
+**Intake:** `POST /initiate_loop` on Oracle. Optional Sauron URL scrape + literature search injected before hypotheses.
 
-**Implement:** POST `/implement` — Python experiment code.
+**Hypothesis:** `POST /hypothesis` per scientist. Book context + skills injected. On LLM failure → HTTP **503** + `"LLM unavailable"` — no corrupted prose in report.
+
+**Implement:** `POST /implement` — Python experiment code per scientist.
 
 **Execute:** Lab sandbox runs code; STDOUT/STDERR and artifacts logged to report.
 
 **Synthesize:** Oracle builds consensus artefact with dissent, metric tables, artifact inventory.
 
-**Phase 4:** Three next directions + Oracle recommendation.
+**Archive:** When synthesis archives to GetAiLabLibrary — ticketed, not a separate CLI banner.
+
+**Direction:** Oracle `recommend_next` → three options + researcher choice for chained loops.
 
 ---
 
@@ -189,7 +202,7 @@ When Ollama credits expire, the endpoint is down, or the model errors:
 - Commander prints `❌ {Name} — LLM unavailable.`
 - Report records the failure — **no tool-call sludge**
 - Systemic failure (all scientists same error) → early abort with fix hints
-- User can **Ctrl+C** or `q` at Phase 4 — partial report preserved
+- User can **Ctrl+C** or `q` at the direction picker (CLI Phase 4) — partial report preserved
 
 **Observed:** Loop 34 (8 Jul 2026) — Albert hypothesis succeeded; remaining scientists 503 when cloud credits exhausted.
 

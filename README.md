@@ -32,7 +32,7 @@ Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 | Layer | Status |
 |-------|--------|
-| Full dialectic loop (hypothesis → implement → execute → synthesize → directions) | ✅ |
+| Full dialectic loop (hypothesis → implement → execute → synthesize → direction picker) | ✅ |
 | 11 scientists + Oracle + lab sandbox | ✅ 13/13 when booted |
 | Per-scientist books + skills retrieval in loops | ✅ |
 | Literature search (PubMed / arXiv / Semantic Scholar) | ✅ Auto at hypothesis |
@@ -101,8 +101,10 @@ Flagship falsification story: **Loop 29** (Oracle rejects demonstratable κ_c re
 ## Architecture
 
 ```
-Problem → Hypothesis (×11) → Implement → Sandbox execute → Oracle synthesize → Researcher picks next direction
+Intake → Hypothesis (×11) → Implement → Execute → Oracle synthesize → [Vault archive] → Pick next direction or stop
 ```
+
+Terminal shows **four phase headers** (implement + execute share Phase 2). Job tickets track five work tags: `hypothesis`, `implement`, `execute`, `synthesize`, `archive` (when library ingests). Details: [`docs/OPERATION_MANUAL.md`](docs/OPERATION_MANUAL.md) §1.
 
 | Component | Location |
 |-----------|----------|
@@ -136,7 +138,7 @@ Ports: see [`docs/BOOT_MANUAL.md`](docs/BOOT_MANUAL.md).
 
 ## Scope
 
-**In:** Chimera fixed squad, 6-phase loops, sandbox + artifacts, tickets, GetAiLabLibrary provenance, self-host, file/SQLite only.
+**In:** Chimera fixed squad, structured dialectic loops (five stages + intake), sandbox + artifacts, per-stage job tickets, GetAiLabLibrary provenance, self-host, file/SQLite only.
 
 **Out (for this build):** Postgres, unrelated side projects, fake verification scripts. Real loops + real outputs = proof.
 

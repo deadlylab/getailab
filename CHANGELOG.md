@@ -13,6 +13,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning foll
 - `docs/REPOSITORY_CHECKLIST.md` — publish gate for GitHub testers
 
 ### Changed
+- Docs, dashboard, and CLI copy: accurate dialectic loop description (five stages + intake; four CLI headers; per-stage tickets) — removed misleading "6-phase" marketing
 - Dashboard inspiration resonance wired to real per-lab data
 
 ## [0.1.0-alpha] — TBD

@@ -88,7 +88,7 @@ Open `loop_N_report.md`. Check:
 1. **Hypotheses** — distinct voices, not copy-paste?
 2. **Experiments** — code ran? STDOUT/STDERR present?
 3. **Oracle synthesis** — consensus + dissent?
-4. **Phase 4** — three next directions at the end?
+4. **Direction picker** (CLI Phase 4) — three next directions at the end?
 
 Optional: inspect artifacts in `lab/artifacts/N/`.
 
@@ -108,7 +108,7 @@ python3 -c "from getailab.integrity.verify import full_integrity_report; import 
 
 ## Ending the loop chain
 
-At Phase 4 (Researcher Input):
+At the direction picker (CLI Phase 4 — Researcher Input):
 
 | Choice | Action |
 |--------|--------|

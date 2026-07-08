@@ -11,8 +11,10 @@ GetAiLab is a **self-hostable research operating system**: eleven specialist sci
 It is not a chatbot. The **process** is the product:
 
 ```
-Problem → Hypothesis (×11) → Implement → Execute → Synthesize → Next direction
+Intake → Hypothesis (×11) → Implement → Execute → Synthesize → [Archive] → Next direction
 ```
+
+CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPERATION_MANUAL.md` §1.
 
 ---
 
@@ -20,7 +22,7 @@ Problem → Hypothesis (×11) → Implement → Execute → Synthesize → Next 
 
 ### Research loop
 
-- Full dialectic: hypothesis, implement, sandbox execute, Oracle synthesis, Phase 4 directions
+- Full dialectic: hypothesis, implement, sandbox execute, Oracle synthesis, direction picker (CLI Phase 4)
 - Live markdown report (`loop_N_report.md`) written as each phase completes
 - Chained loops — Oracle pick seeds the next problem (loops 24→33 demonstrated)
 - No-idea / Muse onboarding for problem generation

@@ -1,7 +1,7 @@
 # Peer Review FAQ
 
 **Is this just ChatGPT with eleven tabs?**  
-No. Fixed personas, structured phases (hypothesis → implement → execute → synthesize), sandbox artifacts, library vault, ticket provenance. The *process* is the product.
+No. Fixed personas, structured dialectic (hypothesis → implement → execute → synthesize → direction picker), sandbox artifacts, library vault, per-stage job tickets. The *process* is the product.
 
 **Do my documents leave my machine?**  
 Self-hosted: data stays local unless you use a cloud LLM API (then prompts go to that provider). You control `.env`.
@@ -16,7 +16,7 @@ Self-hosted: data stays local unless you use a cloud LLM API (then prompts go to
 Scientists return HTTP 503 with `LLM unavailable`. The Commander prints clear errors. The report stays clean — no corrupted output. Resume when credits return. Loop 34 (8 Jul 2026) demonstrates this.
 
 **What if I stop at the end?**  
-Type `q` or `stop` at Phase 4. Report saves; squad keeps running. Ctrl+C during a loop also preserves partial report.
+Type `q` or `stop` at the direction picker (the CLI labels this Phase 4). Report saves; squad keeps running. Ctrl+C during a loop also preserves partial report.
 
 **Do I need to be a developer?**  
 Peer review quickstart assumes you can open a terminal. See `QUICKSTART_15MIN.md`.

@@ -1,7 +1,7 @@
 # GetAiLab Competitive Dossier — Deep Dive on Industry Leaders (June 2026)
 
 **Prepared for study.**  
-Focus: Understanding the current giants in AI agents, agent platforms, AI dev tools, coding agents, and voice/agentic interfaces. Context: GetAiLab as a self-hostable, research-oriented multi-agent orchestration platform (6-phase loops, personas/teams, sandbox execution, native provenance via autonomous tickets + doccontrol, adaptive learning, one-command Docker self-host, strong audit/repro moat).
+Focus: Understanding the current giants in AI agents, agent platforms, AI dev tools, coding agents, and voice/agentic interfaces. Context: GetAiLab as a self-hostable, research-oriented multi-agent orchestration platform (five-stage dialectic loops: hypothesis → implement → execute → synthesize → direction; personas/teams; sandbox execution; per-stage job tickets + library provenance; adaptive learning; one-command Docker self-host).
 
 **Tone note (per bruz):** These are insanely successful players in exploding adjacent spaces. "Competition" framing is loose — many are complementary or in different verticals (generic frameworks, coding IDEs, voice). GetAiLab's edge is depth in *research* workflows + self-host sovereignty + integrated audit/traceability. Your "ace up the sleeve" (whatever it is) + execution can carve a real slice. Stranger things *have* happened.
 
@@ -55,7 +55,7 @@ Focus: Understanding the current giants in AI agents, agent platforms, AI dev to
 
 **Vs. GetAiLab**:
 - **Similarities**: Persistent/growing agent, sandbox/tool use, multi-interface, autonomous execution, open/self-host friendly.
-- **Differences**: Hermes is more general-purpose personal assistant/agent (lifestyle + automation). GetAiLab is *research-orchestration* specific (structured 6-phase loops, team personas from YAML, hypothesis→experiment→refine, built-in provenance via tickets + doccontrol, adaptive learning as core loop).
+- **Differences**: Hermes is more general-purpose personal assistant/agent (lifestyle + automation). GetAiLab is *research-orchestration* specific (structured dialectic loops with ticketed stages, team personas from YAML, hypothesis→implement→execute→synthesize→direction, built-in provenance via tickets + library vault, adaptive learning as core loop).
 - **Opportunity**: Hermes shows demand for "agent that lives with you and gets smarter." GetAiLab can differentiate by making the *research process* itself agentic + auditable (every phase/contribution ticketed + documented with checksums). Combine ideas (e.g., Hermes-style persistence + your loops + sub-agents for research sub-tasks).
 - **Threat level**: Low direct (different primary use case). Complementary potential (use Hermes-style agents *inside* GetAiLab research teams?).
 
@@ -90,8 +90,8 @@ Focus: Understanding the current giants in AI agents, agent platforms, AI dev to
 
 **Vs. GetAiLab**:
 - **Similarities**: Local/self-host first, persistent memory/context/skills that compound, full tool/sandbox access, multi-channel chat (Telegram etc.), proactive/background execution, multi-agent, self-building/extensible skills, "personal OS" / assistant that *does stuff* autonomously. Huge emphasis on control + hackability.
-- **Differences**: OpenClaw is general-purpose personal/company assistant (email, calendar, ops, life admin, coding loops, hardware control). GetAiLab is *specialized research platform* (structured dialectic loops, dynamic research teams/personas, hypothesis-experiment-refine with sandbox, native research artifacts + provenance, adaptive *learning* loop for users/teams, dashboard + validation oracles, tickets/doccontrol as first-class for audit in R&D).
-- **Huge overlap in spirit**: Both reject "walled garden cloud agent." Both feel like "the future is here." OpenClaw's viral personal experience is exactly the energy GetAiLab can borrow for research users ("my research lobster that runs full 6-phase loops with perfect provenance").
+- **Differences**: OpenClaw is general-purpose personal/company assistant (email, calendar, ops, life admin, coding loops, hardware control). GetAiLab is *specialized research platform* (structured dialectic loops: hypothesis → implement → execute → synthesize → direction; dynamic research teams/personas; sandbox artifacts + per-stage tickets; adaptive learner for users/teams; dashboard + validation oracles).
+- **Huge overlap in spirit**: Both reject "walled garden cloud agent." Both feel like "the future is here." OpenClaw's viral personal experience is exactly the energy GetAiLab can borrow for research users ("my research lobster that runs full dialectic loops with ticketed provenance").
 - **Opportunity/Threat**: Massive validation of the "local persistent agent with tools + chat interfaces + self-extension" model. OpenClaw shows distribution power of one-liner + chat apps + fun branding. GetAiLab can differentiate by being the *research specialist* version (deeper on loops, audit, team coordination, adaptive education). Potential synergy: OpenClaw-style agents *as* GetAiLab researchers or for personal research ops. Your ace (self-host research moat + integrations) directly counters the "generalist" wave.
 
 **Strategic Note**: This is the closest "vibe" competitor in spirit (local, persistent, tool-using, chat-driven autonomy). Study the install/onboard flow, skill system, and community flywheel. The testimonials prove demand for exactly the "it just works and compounds" experience. GetAiLab wins by making the *research process* the killer app.
@@ -120,7 +120,7 @@ Focus: Understanding the current giants in AI agents, agent platforms, AI dev to
 
 **Vs. GetAiLab**:
 - **Similarities**: Agent orchestration, multi-step/reliable agents, observability/evals, deployment, production-grade (memory, human-in-loop, scaling). Strong on iteration and reliability.
-- **Differences**: LangChain/LangSmith is the *general toolkit/platform* for anyone building agents (framework + observability layer). GetAiLab is an *opinionated end-to-end application* for research teams (pre-built 6-phase research loops, persona-based dynamic teams, integrated sandbox + research-specific tools like tickets/doccontrol/adaptive). LangSmith is infra/observability you layer on top; GetAiLab is the research "product" with audit/provenance baked into the domain.
+- **Differences**: LangChain/LangSmith is the *general toolkit/platform* for anyone building agents (framework + observability layer). GetAiLab is an *opinionated end-to-end application* for research teams (pre-built dialectic loop runner, persona-based dynamic teams, integrated sandbox + research-specific tools like per-stage tickets, library vault, adaptive learner). LangSmith is infra/observability you layer on top; GetAiLab is the research "product" with audit/provenance baked into the domain.
 - **Opportunity**: GetAiLab can *use* LangGraph/LangSmith under the hood or position as "LangChain for research teams" (higher-level, research-native abstractions + self-host + moat features). Or compete on vertical depth (no one else ships research loops + provenance out of the box).
 - **Threat level**: High in the "how do I build reliable agents" mindshare. But GetAiLab's self-host + research vertical + integrated moat (tickets + docs + adaptive) is a different wedge. Enterprises using LangSmith still need *applications* on top — that's your opening.
 
@@ -189,7 +189,7 @@ Focus: Understanding the current giants in AI agents, agent platforms, AI dev to
 | **Deployment**     | Self-host / server    | Local (your machine), on-prem, hackable | Cloud + self-host options, frameworks | Desktop IDE + CLI + cloud agents | Cloud + API (strong enterprise) | Self-host Docker-first (one-command), local data |
 | **Key Moat**       | Persistent memory + skills + sandbox | Local control + self-building skills + chat interfaces | Observability/evals + community + enterprise | Speed + context + agent autonomy in code | Voice quality + research + scale | Structured research loops + tickets/doccontrol + adaptive + audit |
 | **Interfaces**     | Multi-chat (TG etc.) + CLI | Any chat app (WhatsApp etc.) + proactive | SDKs, LangSmith UI, no-code | IDE, CLI, Slack, PRs | Voice/phone + chat + API | Dashboard, CLI/assistant, APIs (future voice channel) |
-| **Autonomy**       | High (scheduled, delegates, grows) | Very high (background, self-extends) | High (with Graph + deployment) | Very high (full agents for features) | High (conversational agents) | High (6-phase loops + sub-agents) |
+| **Autonomy**       | High (scheduled, delegates, grows) | Very high (background, self-extends) | High (with Graph + deployment) | Very high (full agents for features) | High (conversational agents) | High (dialectic loops + sub-agents) |
 | **Traction**       | Community/open        | Viral explosion (devs love it) | Unicorn ($1.25B), huge OSS | Hyper-growth ($2B+ ARR, $29B+ val) | $500M ARR, $11B val | Early (ship readiness, strong oracles) |
 | **Openness**       | Open-source (MIT)     | Open/hackable core    | Strong OSS + enterprise | Closed (but powerful)  | Closed (API)          | Self-host + open integrations focus |
 | **Pricing vibe**   | Free/open + ?         | Free core + potential premium | OSS free + paid LangSmith | Paid (very high willingness) | Freemium + enterprise | Self-host (infra cost) + future tiers |
@@ -203,7 +203,7 @@ Focus: Understanding the current giants in AI agents, agent platforms, AI dev to
 - Don't fight LangChain head-on in "general agent platform."
 - Don't fight Cursor in "coding velocity."
 - Don't fight ElevenLabs in "voice."
-- **Win where they don't play deeply**: Research as a first-class vertical. Full provenance/audit (every contribution ticketed + checksummed document). Structured scientific method (your 6 phases). Adaptive improvement for the *humans* doing the research. Self-host sovereignty (air-gapped R&D, data control, no vendor lock-in). One-command + validation oracles for "it just works" in complex environments.
+- **Win where they don't play deeply**: Research as a first-class vertical. Full provenance/audit (every stage ticketed + checksummed vault pages). Structured scientific method (hypothesis → implement → execute → synthesize → direction). Adaptive improvement for the *humans* doing the research. Self-host sovereignty (air-gapped R&D, data control, no vendor lock-in). One-command + validation oracles for "it just works" in complex environments.
 - OpenClaw/Hermes are the closest spiritual cousins (local persistent agents). Study their UX (one-liner + chat + self-extension) and *beat them at research depth*.
 
 **Ace Up Your Sleeve**:

@@ -41,7 +41,7 @@ This is **not** a chatbot. You're evaluating a **research operating system**.
 
 ### 5. Researcher control
 
-- Phase 4 offers three directions + Oracle decide + custom input + clean stop
+- Direction picker (CLI Phase 4) offers three options + Oracle decide + custom input + clean stop
 - You choose the next problem; the system doesn't trap you in a chain
 
 ---

@@ -15,7 +15,7 @@ Score **1** (poor) to **5** (excellent). N/A if not tested.
 | 3 | **Experiment execution** — code ran, artifacts useful | | | | | | |
 | 4 | **Oracle synthesis** — integrates evidence, preserves dissent | | | | | | |
 | 5 | **Provenance** — report + artifacts traceable, inspectable | | | | | | |
-| 6 | **Next directions** — Phase 4 options actionable | | | | | | |
+| 6 | **Next directions** — direction picker options actionable | | | | | | |
 | 7 | **UX / boot** — could run without author on call? | | | | | | |
 | 8 | **Would use for real research** — grant, thesis, R&D ideation | | | | | | |
 

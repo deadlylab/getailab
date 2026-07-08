@@ -16,7 +16,7 @@
 | Scientists | 10/10 hypotheses + experiments |
 | Report size | ~3,580 lines |
 | Wall time | ~record on next run (`date` at start/end) |
-| Notable | Full consensus + dissent; Phase 4 directions logged |
+| Notable | Full consensus + dissent; direction picker logged |
 
 **Strengths observed:**
 - Complete squad participation

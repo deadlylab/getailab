@@ -1081,11 +1081,11 @@ def load_user_directives(limit=6):
         if os.path.exists(readme_path):
             with open(readme_path, 'r', encoding='utf-8', errors='ignore') as fh:
                 r = fh.read()
-            if "6-phase" in r.lower() or "research loops" in r.lower():
+            if "dialectic loop" in r.lower() or "research loops" in r.lower():
                 directives.append({
                     "loop": 0,
                     "time": "reference",
-                    "note": "Structured research loops: hypothesise, synthesise, implement, experiment, review, refine.",
+                    "note": "Dialectic loop: hypothesis → implement → execute → synthesize → direction picker. Per-stage job tickets.",
                     "type": "reference",
                     "source": "README"
                 })

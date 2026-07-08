@@ -348,8 +348,7 @@ def print_welcome_splash():
     print(c("  ║                                                                      ║", "c"))
     lab_label = LAB_CONFIG.get("display_name") or ACTIVE_LAB_ID
     print(c(f"  ║   Lab: {lab_label[:58]:<58}  ║", "c"))
-    print(c("  ║   Dialectic loop · Hypothesis → Experiment → Synthesis              ║", "c"))
-    print(c("  ║   Hypothesis → Experiment → Artifacts → Oracle Synthesis             ║", "c"))
+    print(c("  ║   Loop: Hypothesis → Implement → Execute → Synthesize → Direction    ║", "c"))
     print(c("  ║                                                                      ║", "c"))
     print(c("  ╚══════════════════════════════════════════════════════════════════════╝", "c"))
     print(c(f"  {plat['system']} {plat['release']} · {plat['machine']} · Python {plat['python']}", "w"))
@@ -1046,7 +1045,8 @@ def _phase4_researcher_input(
     report_path: str,
 ) -> tuple:
     """
-    Phase 4 — researcher chooses what happens next.
+    Direction picker — fifth work stage; CLI labels it Phase 4 (after hypothesis,
+    experiment audit, synthesis). Researcher chooses next loop or quits.
     Returns (next_problem, markdown_note) or (None, '') to end the chain.
     """
     print_header("Phase 4: Researcher Input — What's Next?")

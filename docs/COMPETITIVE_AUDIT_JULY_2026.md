@@ -97,7 +97,7 @@ Scores: **1** = far behind · **3** = parity · **5** = leader · **—** = not 
 | Self-host / data sovereignty | **5** | 1 | 2 | 3 | 5 | Core moat for R&D, academia, regulated sectors |
 | Operational reliability | **4** | 4 | 4 | 5 | 3 | Graceful 503 degradation proven; m2.5 stable loops 29–33; `--status` fixed |
 | End-user UX (onboard → wow) | **2** | 3 | 3 | 4 | 5 | CLI strong; web secondary; no one-liner viral moment |
-| Iterative loop chaining | **4** | 4 | 5 | 3 | 3 | Phase 4 directions + Oracle decide (new, working) |
+| Iterative loop chaining | **4** | 4 | 5 | 3 | 3 | Direction picker + Oracle decide (working) |
 | Document ingestion / collab review | **4** | 3 | 2 | 2 | 2 | New collaborative review script — underused so far |
 | Published credibility | **1** | 5 | 5 | 4 | 3 | No paper, benchmark, or external case study yet |
 | Vertical depth (research method) | **5** | 4 | 5 | 2 | 1 | Dialectic structure is the product |
