@@ -282,7 +282,7 @@ def _loop_report_path(loop_id: int) -> str:
 
 ORACLE_URL = os.getenv("ORACLE_URL", _oracle_default).rstrip("/")
 LAB_URL = os.getenv("LAB_URL", _lab_default).rstrip("/")
-DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://localhost:5035/")
+DASHBOARD_URL = os.getenv("DASHBOARD_URL", f"{LAB_URL}/")
 SCIENTIST_HOST_MODE = os.getenv("SCIENTIST_HOST_MODE", "localhost").strip().lower()
 SCIENTIST_HTTP_TIMEOUT = int(os.getenv("SCIENTIST_HTTP_TIMEOUT", "600"))
 ORACLE_SYNTH_TIMEOUT = int(os.getenv("ORACLE_SYNTH_TIMEOUT", "300"))
@@ -324,7 +324,10 @@ def print_platform_support_matrix():
     ]
     for name, status in matrix:
         print(c(f"  • {name}: {status}", "reset"))
-    print(c("\nBackend: lab :5035, oracle :5024, scientist agents :5025-5040.", "m"))
+    lab_port = LAB_URL.rsplit(":", 1)[-1].rstrip("/")
+    ora_port = ORACLE_URL.rsplit(":", 1)[-1].rstrip("/")
+    sci_ports = ", ".join(f"{n}:{p}" for n, p in sorted(SCIENTISTS.items())) or "(none)"
+    print(c(f"\nBackend (LAB_ID={ACTIVE_LAB_ID}): lab :{lab_port}, oracle :{ora_port}, scientists: {sci_ports}.", "m"))
     print(c("Docker: Universal portable backend on any host with Docker (Linux native, Win/Mac via Docker Desktop).", "b"))
     print(c("CLI Chat: run_chimera.py --chat works identically, tags source/platform for server.", "y"))
     print(c("="*80 + "\n", "c"))
@@ -1803,13 +1806,14 @@ def main():
 
     if args.support:
         print_platform_support_matrix()
+        _lab_port = LAB_URL.rsplit(":", 1)[-1].rstrip("/")
         print(c("HOW TO RUN — EXACT COMMANDS PER PLATFORM (no compromises):", "c"))
-        print(c("  Web (any): python run_chimera.py --web   OR open http://localhost:5035 after lab boot", "reset"))
+        print(c(f"  Web (any): python run_chimera.py --web   OR open {LAB_URL} after lab boot", "reset"))
         print(c("  Windows:   python run_chimera.py   |   python run_chimera.py --chat   |   python desktop_launcher.py", "reset"))
         print(c("  macOS:     python3 run_chimera.py  |   ./boot_example.sh (or python3)   |   python3 desktop_launcher.py", "reset"))
         print(c("  Linux:     python3 run_chimera.py  |   ./boot_example.sh   |   python3 desktop_launcher.py", "reset"))
-        print(c("  Android/iOS: Browser to host:5035 -> Add to Home (PWA)   OR load dashboard/frontend/mobile_chat_stub.html in WebView. Use /api/mobile/chat", "reset"))
-        print(c("  Docker (all hosts): docker compose up -d   ;   docker compose run --rm cli   ; web at :5035", "reset"))
+        print(c(f"  Android/iOS: Browser to {LAB_URL} -> Add to Home (PWA)   OR load dashboard/frontend/mobile_chat_stub.html in WebView.", "reset"))
+        print(c(f"  Docker (all hosts): docker compose up -d   ;   docker compose run --rm cli   ; web at :{_lab_port}", "reset"))
         print(c("  Full status: python run_chimera.py --status ; services health + unified chat.", "m"))
         print(c("  Beef up brains: python3 run_chimera.py --beef-up albert --file paper.md --title 'Background'", "m"))
         return

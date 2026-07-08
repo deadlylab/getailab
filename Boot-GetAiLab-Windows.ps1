@@ -1,4 +1,4 @@
-# GetAiLab — Windows boot (Chimera squad + Commander Console)
+# GetAiLab — Windows boot (lab launcher + Commander Console)
 $ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $Root

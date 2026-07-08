@@ -29,7 +29,7 @@ python3 scripts/lab_launcher.py
 ### Multi-lab safety
 
 Boot/stop uses **port-scoped** shutdown (`fuser` / Windows port kill).  
-Running **rf_research on :5135** while you reboot **the example lab on :5035** — rf_research stays up.
+Running **my_lab on :5155** while you reboot **the example lab on :5135** — my_lab stays up.
 
 ---
 

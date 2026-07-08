@@ -1,9 +1,9 @@
 #!/bin/bash
-# Double-click in Finder to boot Project Chimera on macOS.
+# Double-click in Finder to launch GetAiLab on macOS.
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
-osascript -e 'display notification "Igniting Chimera squad…" with title "GetAiLab"' 2>/dev/null || true
+osascript -e 'display notification "Starting GetAiLab…" with title "GetAiLab"' 2>/dev/null || true
 
 PY="python3"
 [[ -f .venv/bin/python ]] && PY=".venv/bin/python"
