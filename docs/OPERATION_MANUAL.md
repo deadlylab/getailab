@@ -109,9 +109,9 @@ python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists hea
 ### Docker
 
 ```bash
-docker compose build
-docker compose squad
-docker compose status
+./docker.sh build
+./docker.sh up
+./docker.sh status
 ```
 
 ### Health check

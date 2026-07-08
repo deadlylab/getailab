@@ -70,7 +70,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 - CLI / Commander Console (`run_chimera.py`)
 - Web dashboard PWA (`http://localhost:5035`)
 - Desktop launcher (`desktop_launcher.py`)
-- Docker full squad (`docker compose squad`)
+- Docker example lab (`./docker.sh up` or `docker compose up -d`)
 - Mobile chat stub + `/api/mobile/chat`
 
 ### LLM backends

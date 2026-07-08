@@ -27,6 +27,8 @@ python3 run_chimera.py --status   # expect lab + oracle + 2 scientists
 
 Dashboard: **http://localhost:5135**
 
+**Docker:** `./docker.sh up` → same ports, full example lab in containers.
+
 ---
 
 ## Forge your own lab

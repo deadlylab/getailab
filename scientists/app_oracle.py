@@ -16,14 +16,19 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from base_agent import create_agent_app, run_agent  # type: ignore
 from personas.loader import build_agent_config, get_persona
 
-_LAB_ID = os.getenv('LAB_ID', 'example').strip() or 'example'
-if _LAB_ID == 'example':
-    DB_PATH = os.getenv('AGORA_DB', os.path.join(os.getcwd(), 'chimera_lab.db'))
-else:
+try:
+    from getailab.lab_config import agora_db_path, get_lab_id, load_lab_config
+    _LAB_ID = get_lab_id()
+    DB_PATH = os.getenv('AGORA_DB', str(agora_db_path(_LAB_ID)))
+    _cfg = load_lab_config(_LAB_ID)
+    _oracle_port = int(os.getenv('ORACLE_PORT', _cfg.get('oracle_port', 5124)))
+except Exception:
+    _LAB_ID = os.getenv('LAB_ID', 'example').strip() or 'example'
     DB_PATH = os.getenv(
         'AGORA_DB',
         os.path.join(os.getcwd(), 'data', 'labs', _LAB_ID, 'agora.db'),
     )
+    _oracle_port = int(os.getenv('ORACLE_PORT', '5124'))
 os.makedirs(os.path.dirname(DB_PATH) or '.', exist_ok=True)
 
 # Library — auto-archive every completed loop to data/labs/<lab_id>/
@@ -55,7 +60,6 @@ def _init_db():
 
 _init_db()
 
-_oracle_port = int(os.getenv('ORACLE_PORT', '5024'))
 _base_oracle = build_agent_config('oracle', overrides={'port': _oracle_port})
 AGENT_CONFIG = {
     'name': _base_oracle['name'],

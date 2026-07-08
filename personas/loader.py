@@ -1,7 +1,7 @@
 """
 personas/loader.py
 GetAiLab - Single Source of Truth Loader for Revived Personalities
-Production-ready central loader. Do not dilute. All squad definitions flow from chimera_squad.yaml.
+Production-ready central loader. Squad definitions flow from personas/<lab_id>_squad.yaml.
 
 Usage:
     from personas.loader import get_persona, build_agent_config, get_system_prompt
@@ -46,7 +46,7 @@ def sanitize_albert_persona_labels(text: str) -> str:
         fixed_lines.append(line)
     return "\n".join(fixed_lines)
 
-_DEFAULT_PERSONAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chimera_squad.yaml")
+_DEFAULT_PERSONAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "example_squad.yaml")
 
 _cached_data: Optional[Dict[str, Any]] = None
 _cached_path: Optional[str] = None

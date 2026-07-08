@@ -100,7 +100,7 @@ def _llm_fix_suggestions(sample_error: str = "") -> list:
 def _service_fix_suggestions() -> list:
     return [
         "./boot_example.sh   — start native squad",
-        "docker compose squad   — start Docker squad",
+        "docker compose up -d   — start example lab in Docker",
         "python3 run_chimera.py --status   — see what is offline",
         "tail -f logs/app_oracle.log   — oracle errors",
     ]

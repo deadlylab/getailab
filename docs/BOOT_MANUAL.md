@@ -14,7 +14,7 @@ Use this before your first boot and keep it handy when something feels “off.�
 | Fastest dev loop, full control, logs on disk | **Native** → `./boot_example.sh` |
 | Isolated environment, same setup on any machine | **Docker** → `docker compose` |
 | Dashboard + chat only (no full research loop) | Either path — lab + oracle is enough |
-| Full dialectic loop (your squad) | Native: `boot_example.sh` · Docker: `docker compose squad` |
+| Full dialectic loop (your squad) | Native: `boot_example.sh` · Docker: `./docker.sh up` |
 
 **Rule:** never run **native and Docker at the same time**. They fight over the same ports.
 
@@ -87,8 +87,8 @@ If `libreadline-dev` not found: `sudo apt update` first. Package exists on Kali 
 
 ```bash
 ./scripts/ollama_for_docker.sh
-docker compose squad
-docker compose loop
+./docker.sh up
+./docker.sh loop
 ```
 
 ### Project setup (one-time)
@@ -110,29 +110,20 @@ playwright install chromium
 
 ### Pre-flight port check
 
-the example lab reserves these ports on **localhost**:
+The shipped **example lab** reserves these ports on **localhost**:
 
 | Port | Service |
 |------|---------|
-| 5035 | Lab (dashboard + sandbox) |
-| 5024 | Oracle (synthesis + loop DB) |
-| 5025 | Albert |
-| 5026 | Andrew |
-| 5027 | Alan |
-| 5028 | Carl |
-| 5029 | Emmy |
-| 5030 | Tesla |
-| 5032 | Brian |
-| 5034 | Neil |
-| 5038 | Roger |
-| 5039 | Bohr |
-| 5040 | Heisenberg |
-| 11434 | Ollama (host, not the shipped example lab) |
+| 5135 | Lab (dashboard + sandbox) |
+| 5124 | Oracle (synthesis + loop DB) |
+| 5125 | Researcher |
+| 5126 | Critic |
+| 11434 | Ollama (host, not GetAiLab) |
 
-Check nothing else is listening:
+Forged labs use other blocks (5144+, etc.). Check nothing is listening on your block:
 
 ```bash
-ss -tlnp | grep -E ':50(2[4-9]|3[0-9]|4[0-0])\b'
+ss -tlnp | grep -E ':51(2[4-9]|3[0-9]|4[0-9]|5[0-9])\b'
 ```
 
 No output = good. If something is listed, stop it before booting (see §5).
@@ -165,12 +156,12 @@ No output = good. If something is listed, stop it before booting (see §5).
    - Kills stale `python3.*app_*` processes
    - Loads `.env`
    - Prints LLM health check
-   - Starts lab, oracle, and all scientists **in the background**
+   - Starts lab, oracle, and example scientists **in the background**
    - Launches `run_chimera.py` (Commander Console) in the **foreground**
 
 5. **Open the dashboard** (new tab/terminal):
    ```
-   http://localhost:5035
+   http://localhost:5135
    ```
 
 6. **Run a research loop** from the Commander Console, or:
@@ -205,42 +196,31 @@ No output = good. If something is listed, stop it before booting (see §5).
    ```
    First build can take several minutes (Playwright/Chromium download).
 
-4. **Choose how much to start:**
-
-   **Dashboard + APIs only:**
+4. **Start the example lab** (full stack — needed for dialectic loops):
    ```bash
-   docker compose up
+   ./docker.sh up
    ```
+   Dashboard-only (no scientists): `./docker.sh minimal`
 
-   **Full squad (needed for dialectic loops in Docker):**
-   ```bash
-   docker compose squad
-   ```
+5. **Open dashboard:** `http://localhost:5135`
 
-5. **Open dashboard:**
-   ```
-   http://localhost:5035
-   ```
-   (or `http://localhost:5036` if you set `LAB_HOST_PORT=5036` in `.env`)
-
-6. **Check health:**
-   ```bash
-   docker compose status
-   ```
+6. **Check health:** `./docker.sh status`
 
 ### Docker command reference
 
 | Command | What it does |
 |---------|----------------|
-| `docker compose build` | Build `getailab:latest` image |
-| `docker compose up` | Lab + Oracle |
-| `docker compose squad` | Lab + Oracle + all 10 scientists |
-| `docker compose down` | Stop stack |
-| `docker compose clean` | Stop + remove orphans (keeps `./data` on host) |
-| `docker compose status` | Health-check endpoints |
-| `docker compose logs` | Tail lab logs (`logs oracle`, etc.) |
-| `docker compose cli` | Interactive chat in container |
-| `docker compose loop` | Full dialectic loop (starts squad if needed) |
+| `./docker.sh build` | Build `getailab:latest` image |
+| `./docker.sh up` | Oracle + lab + researcher + critic |
+| `./docker.sh minimal` | Oracle + lab only |
+| `./docker.sh down` | Stop stack |
+| `./docker.sh clean` | Stop + remove orphans (keeps `./data` on host) |
+| `./docker.sh status` | Health-check + `run_chimera.py --status` |
+| `./docker.sh logs` | Tail lab logs (`./docker.sh logs oracle`, etc.) |
+| `./docker.sh cli` | Interactive Commander chat |
+| `./docker.sh loop` | Full dialectic loop in container |
+
+Raw compose equivalents: `docker compose up -d`, `docker compose --profile cli run --rm -it loop`
 
 ### Ollama + Docker
 
@@ -339,7 +319,7 @@ docker compose down 2>/dev/null || true
 
 ### “Address already in use” / port clash
 
-**Cause:** Another the example lab instance, old `astel_*` containers, or another app on 5024–5040.
+**Cause:** Another lab instance, old containers, or another app on the example port block (5124–5135).
 
 **Fix:**
 
@@ -351,7 +331,7 @@ docker compose down 2>/dev/null || true
 3. Stop Docker: `docker compose down`
 4. If another Docker project holds the port:
    ```bash
-   docker ps --format '{{.Names}} {{.Ports}}' | grep 5035
+   docker ps --format '{{.Names}} {{.Ports}}' | grep 5135
    docker stop <container_name>
    ```
 5. For Docker only — use alternate host port in `.env`:
@@ -417,7 +397,7 @@ docker compose loop
 **Fix:**
 
 ```bash
-docker compose squad
+./docker.sh up
 docker compose status
 ```
 
@@ -434,7 +414,7 @@ Full loops in Docker also need `SCIENTIST_HOST_MODE=docker` (set automatically o
 ```bash
 docker compose build
 docker compose down
-docker compose squad
+./docker.sh up
 ```
 
 ---
@@ -443,7 +423,7 @@ docker compose squad
 
 **Checks:**
 
-1. Lab healthy: `curl http://localhost:5035/health`
+1. Lab healthy: `curl http://localhost:5135/health`
 2. Writable dirs: `lab/artifacts/`, `data/labs/<your_lab>/`
 3. LLM reachable (hypothesis/implement calls will fail silently or log errors)
 4. Inspect `logs/app_lab.log` for execute errors
@@ -512,7 +492,7 @@ pip install -r lab/requirements.txt -r scientists/requirements.txt
 ollama serve          # separate terminal
 ollama pull dolphin3:latest
 ./boot_example.sh
-# Browser → http://localhost:5035
+# Browser → http://localhost:5135
 ```
 
 ### First boot ever (Docker)
@@ -522,15 +502,15 @@ cd getailab_live
 cp .env.example .env
 ollama serve          # host — required for local LLM
 docker compose build
-docker compose squad
-# Browser → http://localhost:5035
+./docker.sh up
+# Browser → http://localhost:5135
 ```
 
 ### Switch from native to Docker
 
 ```bash
 pkill -f 'python3.*app_'
-docker compose squad
+./docker.sh up
 ```
 
 ### Switch from Docker to native
@@ -558,7 +538,8 @@ docker compose down 2>/dev/null || true
 | `boot_example.sh` | Native boot script |
 | `doctor.sh` | One-command health (stack + Ollama + squad status) |
 | `stop_example.sh` | Native shutdown script |
-| `docker compose` | Docker build & run script |
+| `docker.sh` | Docker helper (build, up, loop, status) |
+| `docker-compose.yml` | Compose service definitions |
 | `run_chimera.py` | Commander Console / CLI |
 | `logs/` | Native service logs |
 | `data/labs/<your_lab>/` | Library vault, tickets, signing keys |
@@ -577,9 +558,9 @@ docker compose down 2>/dev/null || true
 │  □ ports free (example: 5124-5135)  □ not mixing native+docker │
 ├─────────────────────────────────────────────────────────────┤
 │  NATIVE          ./boot_example.sh                          │
-│  DOCKER BUILD    docker compose build                  │
-│  DOCKER UP       docker compose up                     │
-│  DOCKER SQUAD    docker compose squad                  │
+│  DOCKER BUILD    ./docker.sh build                     │
+│  DOCKER UP       ./docker.sh up                        │
+│  DOCKER MINIMAL  ./docker.sh minimal                   │
 │  DASHBOARD       http://localhost:5135                      │
 ├─────────────────────────────────────────────────────────────┤
 │  STOP NATIVE     ./stop_example.sh                          │

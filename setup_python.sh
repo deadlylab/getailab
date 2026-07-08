@@ -118,7 +118,7 @@ if ! pyenv versions --bare 2>/dev/null | grep -qx "$PYVER"; then
             echo "     sudo apt update"
             echo "     sudo apt install libreadline-dev"
             echo "   Ensure /etc/apt/sources.list has Kali main repo enabled."
-            echo "   Or use Docker instead: docker compose squad"
+            echo "   Or use Docker instead: ./docker.sh up"
         fi
         exit 1
     fi

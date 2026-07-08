@@ -67,4 +67,4 @@ python3 scripts/create_lab.py --list-labs
 
 - `./boot_example.sh` — lab-specific bash boot
 - `./boot_<lab_id>.sh` — per-forged-lab bash boot
-- `docker compose squad` — Docker stack
+- `docker compose up -d` or `./docker.sh up` — example lab in Docker

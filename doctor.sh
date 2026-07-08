@@ -61,5 +61,5 @@ echo
 echo "Fix hints:"
 echo "  ./boot_example.sh              — start full squad"
 echo "  pip install -r lab/requirements.txt   — fix pandas/pyarrow warnings"
-echo "  docker compose build && docker compose up -d   — rebuild image with pyarrow"
+echo "  ./docker.sh build && ./docker.sh up   — example lab in Docker"
 echo "  python3 run_chimera.py --status"
