@@ -1,8 +1,9 @@
 """
 Lab configuration — multi-lab support for GetAiLab / Project Chimera.
 
-Chimera remains the default reference lab. Forged labs live under
-data/labs/<lab_id>/config/lab.yaml with scientist apps in scientists/forges/<lab_id>/.
+Shipped labs live under data/labs/<lab_id>/config/lab.yaml with scientist apps in
+scientists/forges/<lab_id>/. The public repo defaults to the example lab; Chimera
+is a private local reference lab when present (not published).
 """
 
 from __future__ import annotations
@@ -45,7 +46,7 @@ def get_project_root() -> Path:
 
 
 def get_lab_id() -> str:
-    return os.getenv("LAB_ID", "chimera").strip() or "chimera"
+    return os.getenv("LAB_ID", "example").strip() or "example"
 
 
 def is_chimera_lab(lab_id: Optional[str] = None) -> bool:
@@ -232,24 +233,15 @@ def lab_port_map(lab_id: Optional[str] = None) -> Dict[str, int]:
 
 
 def enumerate_all_labs() -> List[Dict[str, Any]]:
-    """Chimera + every forged lab with live port status."""
+    """Every lab with config/lab.yaml on disk (+ legacy Chimera defaults if no yaml)."""
     labs: List[Dict[str, Any]] = []
-    chimera = _chimera_default_config()
-    chimera["vault"] = str(DATA_LABS / "chimera")
-    chimera["boot_script"] = "boot_chimera.sh"
-    ports = lab_port_map("chimera")
-    chimera["ports"] = ports
-    chimera["oracle_live"] = port_listening(ports["oracle"])
-    chimera["lab_live"] = port_listening(ports["lab"])
-    chimera["any_live"] = chimera["oracle_live"] or chimera["lab_live"] or any(
-        port_listening(p) for k, p in ports.items() if k not in ("oracle", "lab")
-    )
-    labs.append(chimera)
+    seen: set = set()
 
     for cfg in list_forged_labs():
         lid = cfg.get("lab_id", "")
-        if not lid or lid == "chimera":
+        if not lid or lid in seen:
             continue
+        seen.add(lid)
         entry = dict(cfg)
         entry.setdefault("vault", str(DATA_LABS / lid))
         boot = PROJECT_ROOT / f"boot_{lid}.sh"
@@ -262,6 +254,23 @@ def enumerate_all_labs() -> List[Dict[str, Any]]:
             port_listening(p) for k, p in ports.items() if k not in ("oracle", "lab")
         )
         labs.append(entry)
+
+    # Local-only Chimera: list if config/yaml missing from disk but legacy defaults apply
+    if "chimera" not in seen and (
+        personas_yaml_path("chimera").is_file() or (PROJECT_ROOT / "boot_chimera.sh").is_file()
+    ):
+        chimera = _chimera_default_config()
+        chimera["vault"] = str(DATA_LABS / "chimera")
+        chimera["boot_script"] = "boot_chimera.sh" if (PROJECT_ROOT / "boot_chimera.sh").is_file() else None
+        ports = lab_port_map("chimera")
+        chimera["ports"] = ports
+        chimera["oracle_live"] = port_listening(ports["oracle"])
+        chimera["lab_live"] = port_listening(ports["lab"])
+        chimera["any_live"] = chimera["oracle_live"] or chimera["lab_live"] or any(
+            port_listening(p) for k, p in ports.items() if k not in ("oracle", "lab")
+        )
+        labs.insert(0, chimera)
+
     return labs
 
 

@@ -1,7 +1,0 @@
-{
-  "kappa_c_per_substrate": {
-    "silica": 0.15,
-    "fibroblast": 0.35,
-    "microtubule": 0.08
-  },
-  "substrate_independent": 

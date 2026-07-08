@@ -1,0 +1,11 @@
+lab_id: example
+display_name: "Example Research Lab"
+research_agenda: "Starter lab — learn the forge, then build your own division"
+build_profile: research
+personas_yaml: personas/example_squad.yaml
+oracle_port: 5124
+lab_port: 5135
+oracle_app: scientists/app_oracle.py
+scientists:
+  researcher: { port: 5125, app: scientists/forges/example/app_researcher.py }
+  critic:     { port: 5126, app: scientists/forges/example/app_critic.py }

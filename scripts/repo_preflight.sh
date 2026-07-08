@@ -50,6 +50,22 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   else
     ok "no loop reports in index"
   fi
+  MOAT_PATHS=(
+    personas/chimera_squad.yaml
+    data/labs/chimera/config/lab.yaml
+    outreach/Outreach_Contacts_List.md
+    legal/Beta_Trial_Terms_and_Conditions.md
+    docs/COMPETITIVE_DOSSIER_GETAILAB_2026.md
+    boot_chimera.sh
+  )
+  for p in "${MOAT_PATHS[@]}"; do
+    if git ls-files --error-unmatch "$p" >/dev/null 2>&1; then
+      bad "private moat file tracked: $p — git rm --cached"
+    fi
+  done
+  if [[ -f personas/example_squad.yaml ]] && git ls-files --error-unmatch personas/example_squad.yaml >/dev/null 2>&1; then
+    ok "example lab persona shipped"
+  fi
 else
   warn "not a git repo yet — run: git init -b main"
 fi

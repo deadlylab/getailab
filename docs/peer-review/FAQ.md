@@ -24,7 +24,7 @@ Peer review quickstart assumes you can open a terminal. See `QUICKSTART_15MIN.md
 **How do I verify the squad is up?**  
 ```bash
 ./doctor.sh
-python3 run_chimera.py --status   # expect 13/13: lab + oracle + 11 scientists
+python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists
 ```
 
 **What's the flagship example?**  

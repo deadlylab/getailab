@@ -86,3 +86,34 @@ Thumbs.db
 
 # ── Docker local overrides ────────────────────────────────────────────────────
 docker-compose.override.yml
+
+# ── Private workspace / CryptO'Brien moat (local only — never push) ─────────
+personas/chimera_squad.yaml
+personas/environmental_squad.yaml
+personas/rf_research_squad.yaml
+data/labs/chimera/
+data/labs/environmental/
+data/labs/rf_research/
+scientists/forges/*
+!scientists/forges/example/
+chimera/
+chimera_log.csv
+outreach/
+legal/
+docs/investor/
+docs/COMPETITIVE_AUDIT_JULY_2026.md
+docs/COMPETITIVE_DOSSIER_GETAILAB_2026.md
+docs/BETA_TESTER_AGREEMENT.md
+docs/loops/
+OPERATIONAL_PLAN.md
+boot_chimera.sh
+boot_environmental.sh
+boot_rf_research.sh
+stop_chimera.sh
+stop_environmental.sh
+stop_rf_research.sh
+docker_chimera.sh
+patch_chimera_lab.py
+scientists/app_*.py
+!scientists/app_oracle.py
+examples/loop_23_showcase/

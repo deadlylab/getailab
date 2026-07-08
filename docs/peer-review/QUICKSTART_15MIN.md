@@ -16,7 +16,7 @@
 
 ```bash
 cd getailab_live
-./boot_chimera.sh
+./boot_example.sh
 ```
 
 Wait for Commander Console menu. In another terminal:
@@ -25,7 +25,7 @@ Wait for Commander Console menu. In another terminal:
 python3 run_chimera.py --status
 ```
 
-**Target:** **13/13** — lab `active`, oracle + **11 scientists** `healthy` (incl. Tesla :5030). If not, see `docs/BOOT_MANUAL.md`.
+**Target:** lab `active`, oracle + **2 example scientists** `healthy` (ports 5124–5135). Forge a bigger squad with `scripts/create_lab.py`. See `docs/BOOT_MANUAL.md`.
 
 ```bash
 ./doctor.sh   # optional one-liner before --status
@@ -56,7 +56,7 @@ LLM_MODEL=gemini-2.0-flash
 Restart squad after `.env` changes:
 
 ```bash
-./boot_chimera.sh
+./boot_example.sh
 ```
 
 ---
@@ -98,7 +98,7 @@ Optional: inspect artifacts in `lab/artifacts/N/`.
 
 ```bash
 # Library page counts
-ls data/labs/chimera/scientists/*/book/pages | wc -l
+ls data/labs/example/scientists/*/book/pages 2>/dev/null | wc -l
 
 # Integrity (optional)
 python3 -c "from getailab.integrity.verify import full_integrity_report; import json; print(json.dumps(full_integrity_report(), indent=2)[:2000])"
@@ -127,7 +127,7 @@ At the direction picker (CLI Phase 4 — Researcher Input):
 | 503 on hypothesis | Ollama down, credits exhausted, or wrong model — report stays clean; resume when fixed |
 | Partial loop (credits) | Expected — scientists show `LLM unavailable`; partial report saved |
 | Oracle offline | `tail -f logs/app_oracle.log` |
-| Docker | `./docker_chimera.sh squad` instead of native |
+| Docker | `docker-compose.yml` (configure for your lab) |
 
 Full manual: `docs/BOOT_MANUAL.md`
 
