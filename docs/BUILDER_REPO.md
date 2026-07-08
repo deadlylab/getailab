@@ -2,16 +2,17 @@
 
 ## Two layers — don't mix them
 
-| | **GitHub `deadlylab/getailab`** | **Your local `getailab_live` workspace** |
-|---|--------------------------------|------------------------------------------|
-| Purpose | Lab **builder** — engine + forge + example lab | CryptO'Brien **live R&D** — Chimera moat |
-| Personas | `example_squad.yaml` + **your** forged squads you choose to commit | `chimera_squad.yaml`, rich prompts, loop-tuned voices |
-| Vault / loops | Empty example vault; testers build their own | `data/labs/chimera/scientists/**/book/`, loop reports, artifacts |
-| Boot | `./boot_example.sh` or `./boot_<your_lab>.sh` | `./boot_chimera.sh` (local only, gitignored) |
+| | **GitHub `deadlylab/getailab`** | **Your local workspace** |
+|---|--------------------------------|--------------------------|
+| Purpose | Lab **builder** — engine + forge + example lab | **Live R&D** — operator data you never push |
+| Personas | `example_squad.yaml` + squads **you** forge and choose to commit | Rich, loop-tuned squad YAML, custom voices |
+| Vault / loops | Empty example vault; testers build their own | `data/labs/<your_lab>/scientists/**/book/`, loop reports, artifacts |
+| Boot | `./boot_example.sh` or `./boot_<your_lab>.sh` | `./boot_<your_lab>.sh` for any lab you run locally |
 | Business | Public engine + docs | Outreach, investor, competitive intel — **never push** |
 
-The public repo answers: *"How do I run GetAiLab and forge **my** research division?"*  
-It does **not** ship Project Chimera's research history, personas, or vault.
+The public repo answers: *"How do I run GetAiLab and forge **my** research division?"*
+
+It does **not** ship a mature operational lab's research history, tuned personas, or vault bulk. That kind of output is what you produce **after** you run the builder — it stays on your machine.
 
 ## What ships on GitHub
 
@@ -23,18 +24,22 @@ It does **not** ship Project Chimera's research history, personas, or vault.
 ## What stays local (gitignored)
 
 ```
-personas/chimera_squad.yaml
-data/labs/chimera/
-chimera/
+personas/<private_lab>_squad.yaml    # operator-tuned squads (not example)
+data/labs/<your_lab>/scientists/     # vault bulk
+data/labs/<your_lab>/artifacts/
+data/labs/<your_lab>/codex/
 loop_*_report.md
 lab/artifacts/
 outreach/
 legal/
 docs/investor/
 docs/COMPETITIVE_*
-boot_chimera.sh
-scientists/app_albert.py … app_heisenberg.py  # Chimera reference apps
+boot_<private_lab>.sh                # e.g. large local deployments
+scientists/app_*.py                  # legacy root-level scientist stubs
+*.db
 ```
+
+The shipped `boot_example.sh` and `personas/example_squad.yaml` **are** tracked — they are the public starter kit.
 
 ## First run (clone)
 
@@ -44,7 +49,7 @@ cd getailab
 cp .env.example .env
 pip install -r requirements.txt
 ./boot_example.sh
-python3 run_chimera.py --status
+python3 run_chimera.py --status   # lab + oracle + 2 scientists
 ```
 
 ## Forge your lab
@@ -57,11 +62,11 @@ python3 run_chimera.py --forge-lab
 
 Then `source .env.<lab_id>` and `./boot_<lab_id>.sh`.
 
-## Accidentally committed moat?
+## Accidentally committed private data?
 
 ```bash
 ./scripts/repo_preflight.sh
-git rm -r --cached data/labs/chimera outreach legal  # etc.
+git rm -r --cached data/labs/<your_lab>/scientists outreach legal  # etc.
 git commit -m "chore: remove private workspace files from public repo"
 git push
 ```

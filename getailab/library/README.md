@@ -10,14 +10,14 @@ The provenance and persistent memory engine for GetAiLab.
 - **Each scientist has their own book** (persistent research knowledge base).
   - Gets smarter from loops (ingest research artifacts, synthesis, etc. into their book only).
 - **Each lab has its own section** with its own books + codex.
-- **Scale**: Users have multiple labs (Chimera model or custom). Different configs. Pre-builts or generated.
-- **Chimera quantum research division** is the fixed model. Personalities and structure not changed. Get it working, then generator from it.
+- **Scale**: Users have multiple labs (the example lab model or custom). Different configs. Pre-builts or generated.
+- **the example lab quantum research division** is the fixed model. Personalities and structure not changed. Get it working, then generator from it.
 - File/SQLite based. Clean. Hand-picked from old library, adapted.
 
 ## Directory Layout in data/ (for isolation)
 data/
   labs/
-    <lab_id>/          # e.g. "chimera" (the model)
+    <lab_id>/          # e.g. "example" (the model)
       scientists/
         <scientist>/   # e.g. "albert"
           book/        # this scientist's research memory KB
@@ -34,4 +34,4 @@ data/
 Scientists only ever see their book + lab codex (research knowledge).
 Gabby/Oracle mediate everything else.
 
-This is built for the Chimera model first, then generator.
+This is built for the the example lab model first, then generator.

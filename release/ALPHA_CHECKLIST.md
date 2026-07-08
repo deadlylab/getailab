@@ -4,8 +4,8 @@ Gate before sending **Package 2** (Beta Pilot) to anyone.
 
 ## Infrastructure
 
-- [ ] `./boot_chimera.sh` → Commander loads
-- [ ] `python3 run_chimera.py --status` → **13/13** (lab + oracle + 11 scientists)
+- [ ] `./boot_example.sh` → Commander loads
+- [ ] `python3 run_chimera.py --status` → example lab healthy (lab + oracle + 2 scientists)
 - [ ] `./doctor.sh` passes
 - [ ] `evals/smoke_test.sh` passes (or manual status + dry-run review)
 - [ ] `.env.example` documents Ollama + Google blocks (no real keys)

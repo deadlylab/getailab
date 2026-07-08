@@ -6,7 +6,7 @@
 
 ## Before first pilot
 
-- [ ] `./doctor.sh` → 13/13 squad
+- [ ] `./doctor.sh` → example squad healthy
 - [ ] Evaluator completed `QUICKSTART_15MIN.md` without a call
 - [ ] Loop model locked: `minimax-m2.5:cloud`
 - [ ] Credit/budget note in onboarding (Ollama cloud limits)

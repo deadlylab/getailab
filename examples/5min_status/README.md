@@ -1,33 +1,27 @@
-# 5-Minute Status Demo
+# 5-minute status check
 
-**Purpose:** Show a stranger the squad is real infrastructure, not a slide deck.
+Verify the example lab is up before a demo or peer-review session.
 
-## Run
+## Steps
 
 ```bash
-cd getailab_live
+./boot_example.sh
 ./doctor.sh
 python3 run_chimera.py --status
 ```
 
-## Expected output (8 July 2026 build)
+## Pass criteria (example lab)
 
-- **13/13 healthy:** `lab` (active), `oracle`, and 11 scientists including `tesla`
-- Ollama reachable at `http://localhost:11434`
-- Scientific stack OK (numpy, pandas, pyarrow, …)
-- Each scientist shows `book.pages` ~500+ and `skills` ~350+
+- **4 services healthy:** `lab` (active), `oracle`, `researcher`, `critic`
+- Dashboard loads at **http://localhost:5135**
+- Oracle health: `curl -s http://localhost:5124/health`
 
-## Screenshot checklist
-
-- [ ] `doctor.sh` green checks
-- [ ] `--status` JSON showing all scientist names
-- [ ] Dashboard http://localhost:5035 loading
-
-## If not 13/13
+## If not healthy
 
 ```bash
-./boot_chimera.sh
-# wait 10s, re-run doctor.sh
+./stop_example.sh
+./boot_example.sh
+python3 run_chimera.py --status
 ```
 
-See `docs/BOOT_MANUAL.md` for port conflicts.
+Check `logs/example_*.log` for scientist startup errors. Ensure Ollama or your configured cloud model is reachable per `.env`.

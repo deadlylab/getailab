@@ -122,7 +122,7 @@ def crush_test_page(path: Path, book_id: str) -> Dict[str, Any]:
 
 
 def crush_test_vault(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     book_id: Optional[str] = None,
     project_root: Optional[Path] = None,
@@ -209,7 +209,7 @@ def crush_test_vault(
 
 
 def crush_test_indexes(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     project_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
@@ -289,7 +289,7 @@ def crush_test_indexes(
 
 
 def scan_integrity_targets(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     vault: bool = True,
     artifacts: bool = True,
@@ -347,7 +347,7 @@ def scan_integrity_targets(
     }
 
 
-def merkle_status(lab_id: str = "chimera") -> Dict[str, Any]:
+def merkle_status(lab_id: str = "example") -> Dict[str, Any]:
     """Report saved Merkle trees and change counts vs previous snapshots."""
     names = ["vault", "lab_artifacts"]
     trees: Dict[str, Any] = {}
@@ -367,7 +367,7 @@ def merkle_status(lab_id: str = "chimera") -> Dict[str, Any]:
 
 
 def verify_full(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     book_id: Optional[str] = None,
     merkle_scan: bool = False,
@@ -434,14 +434,14 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("GetAiLab Integrity Verify")
         print("Usage:")
-        print("  python3 -m getailab.integrity.verify crush [--lab chimera] [--book albert]")
-        print("  python3 -m getailab.integrity.verify index [--lab chimera]")
-        print("  python3 -m getailab.integrity.verify scan [--lab chimera] [--loop N]")
-        print("  python3 -m getailab.integrity.verify full [--lab chimera] [--book albert] [--scan]")
+        print("  python3 -m getailab.integrity.verify crush [--lab example] [--book albert]")
+        print("  python3 -m getailab.integrity.verify index [--lab example]")
+        print("  python3 -m getailab.integrity.verify scan [--lab example] [--loop N]")
+        print("  python3 -m getailab.integrity.verify full [--lab example] [--book albert] [--scan]")
         sys.exit(0)
 
     cmd = sys.argv[1]
-    lab_id = "chimera"
+    lab_id = "example"
     book_id: Optional[str] = None
     loop_id: Optional[int] = None
     merkle_scan = "--scan" in sys.argv

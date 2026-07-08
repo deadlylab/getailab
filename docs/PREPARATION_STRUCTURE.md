@@ -192,7 +192,7 @@ getailab_live/
 docs/peer-review/README.md
 docs/peer-review/QUICKSTART_15MIN.md
 docs/peer-review/HOW_TO_EVALUATE.md
-legal/NDA_Beta_Tester_Chimera_DocuSign_Ready.txt   (if needed)
+legal/NDA templates   (if needed — keep local, not in public builder repo)
 examples/loop_23_showcase/
 ```
 
@@ -245,11 +245,11 @@ examples/loop_23_showcase/
 | Asset | Location |
 |-------|----------|
 | Full loop proof | `loop_23_report.md` |
-| 5,180+ book pages | `data/labs/chimera/scientists/` |
+| 5,180+ book pages | `data/labs/<your_lab>/scientists/` |
 | Legal drafts | `legal/` |
 | Outreach lists | `outreach/Trial_Testers_Compiled.md` |
 | Competitive analysis | `docs/COMPETITIVE_AUDIT_JULY_2026.md` |
-| Boot + ops | `boot_chimera.sh`, `docs/BOOT_MANUAL.md` |
+| Boot + ops | `boot_example.sh`, `docs/BOOT_MANUAL.md` |
 | Collaborative review | `scripts/collaborative_review.py` |
 
 You're not starting from zero. You're **packaging** what exists.

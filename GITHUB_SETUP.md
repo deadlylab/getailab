@@ -82,7 +82,7 @@ git clone git@github.com:deadlylab/getailab.git
 cd getailab
 cp .env.example .env
 pip install -r requirements.txt
-./boot_chimera.sh
+./boot_example.sh
 ./doctor.sh
 ```
 

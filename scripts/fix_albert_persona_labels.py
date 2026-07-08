@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
 
 from personas.loader import sanitize_albert_persona_labels
 
-BOOK_PAGES = ROOT / "data" / "labs" / "chimera" / "scientists" / "albert" / "book" / "pages"
+BOOK_PAGES = ROOT / "data" / "labs" / "example" / "scientists" / "albert" / "book" / "pages"
 
 
 def main():

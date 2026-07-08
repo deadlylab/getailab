@@ -31,7 +31,7 @@ _INSTANCE_LAB_ID: Optional[str] = None
 
 def _active_lab_id(lab_id: Optional[str] = None) -> str:
     if lab_id:
-        return lab_id.strip() or "chimera"
+        return lab_id.strip() or "example"
     from getailab.lab_config import get_lab_id
     return get_lab_id()
 

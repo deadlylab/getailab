@@ -21,7 +21,7 @@ python3 scripts/lab_launcher.py
 ## Interactive launcher menu
 
 1. **Setup environment** — `.venv`, pip deps, `.env`
-2. **Boot a lab** — pick Chimera or any forged lab; **only that lab's ports are restarted**
+2. **Boot a lab** — pick the example lab or any forged lab; **only that lab's ports are restarted**
 3. **Forge NEW lab** — name, squad, agenda → auto port scan + `data/labs/<id>/`
 4. **Stop a lab** — port-scoped; **other labs keep running**
 5. **Commander console** — `run_chimera.py` for chosen `LAB_ID`
@@ -29,7 +29,7 @@ python3 scripts/lab_launcher.py
 ### Multi-lab safety
 
 Boot/stop uses **port-scoped** shutdown (`fuser` / Windows port kill).  
-Running **rf_research on :5135** while you reboot **Chimera on :5035** — rf_research stays up.
+Running **rf_research on :5135** while you reboot **the example lab on :5035** — rf_research stays up.
 
 ---
 
@@ -65,6 +65,6 @@ python3 scripts/create_lab.py --list-labs
 
 ## Legacy
 
-- `./boot_chimera.sh` — Chimera-only bash boot
+- `./boot_example.sh` — lab-specific bash boot
 - `./boot_<lab_id>.sh` — per-forged-lab bash boot
-- `./docker_chimera.sh squad` — Docker stack
+- `docker compose squad` — Docker stack

@@ -73,7 +73,7 @@ Pure vision: research process as the killer app. Local, compounds, auditable, do
 
 **For codex + ingest (getailab/library/codex/ + ingest/)**:
 - Lab-level codex aggregates scientist books + shared synthesis pages.
-- Ingest pulls from Chimera outputs (artifacts, reports, DBs) exactly like the backup loop_ingester, but scoped per-scientist.
+- Ingest pulls from GetAiLab outputs (artifacts, reports, DBs) exactly like the backup loop_ingester, but scoped per-scientist.
 - Post-loop: Oracle calls ingest → updates only the participating scientists' books (research knowledge only).
 
 **For scale + isolation (data/ layout + lab/lab.py)**:

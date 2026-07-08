@@ -10,9 +10,9 @@
 | Loop reports (`loop_*_report.md`) | **18** |
 | Complete recent arc | Loops **29–33** (κ_c → Orch-OR → Q≈0) |
 | Partial / degraded mode | Loop **34** (credits exhausted — clean 503s) |
-| Vault page files | **~9,800** in `data/labs/chimera/scientists/*/book/pages/` |
+| Vault page files | **~9,800** in `data/labs/<your_lab>/scientists/*/book/pages/` |
 | Sandbox artifacts | **~400** in `lab/artifacts/` |
-| Squad | **13/13** when booted (11 scientists + Oracle + lab) |
+| Squad | All services in active `LAB_ID` healthy when booted |
 
 ## Planned evidence (priority order)
 

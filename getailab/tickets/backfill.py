@@ -16,7 +16,7 @@ from getailab.tickets.tickets import TicketPriority, TicketStatus, TicketType
 
 
 def backfill_loop_tickets_from_vault(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     skip_existing: bool = True,
 ) -> Dict[str, Any]:
@@ -110,5 +110,5 @@ def backfill_loop_tickets_from_vault(
 
 if __name__ == "__main__":
     import sys
-    lab = sys.argv[1] if len(sys.argv) > 1 else "chimera"
+    lab = sys.argv[1] if len(sys.argv) > 1 else "example"
     print(json.dumps(backfill_loop_tickets_from_vault(lab), indent=2))

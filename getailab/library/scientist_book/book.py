@@ -518,7 +518,7 @@ class ScientistBook:
 
 def get_scientist_book(
     scientist_name: str,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     base_path: Optional[Path] = None,
 ) -> ScientistBook:
     """Factory for a scientist's book under data/labs/<lab_id>/scientists/<name>/book/."""

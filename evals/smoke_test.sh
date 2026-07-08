@@ -17,17 +17,17 @@ d=json.load(sys.stdin)
 print(sum(1 for k,v in d.items() if isinstance(v,dict) and v.get('status')=='healthy' and k not in ('lab','oracle')))
 ")
 
-echo "    Scientists healthy: $HEALTHY/10"
-if [[ "$HEALTHY" -lt 10 ]]; then
-  echo "WARN: squad not full — run ./boot_chimera.sh before peer review sends"
+echo "    Scientists healthy: $HEALTHY"
+if [[ "$HEALTHY" -lt 2 ]]; then
+  echo "WARN: example squad not up — run ./boot_example.sh before peer review sends"
 fi
 
 echo "[2/3] Collaborative review dry-run..."
 python3 scripts/collaborative_review.py --dry-run --text "smoke test" -q "ok?" >/dev/null
 
 echo "[3/3] Oracle health..."
-curl -sf http://localhost:5024/health >/dev/null || {
-  echo "WARN: Oracle not reachable on :5024"
+curl -sf http://localhost:5124/health >/dev/null || {
+  echo "WARN: Oracle not reachable on :5124 (example lab)"
 }
 
 echo "=== Smoke complete ==="

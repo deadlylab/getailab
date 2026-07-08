@@ -1,5 +1,5 @@
 """
-Per-lab inspiration resonance + activity streak — grounded in vault data, not Chimera defaults.
+Per-lab inspiration resonance + activity streak — grounded in vault data, not example lab defaults.
 
 Stored under data/labs/<lab_id>/config/resonance.json (engagement boosts + activity dates).
 Streak = consecutive calendar days (ending today) with a completed loop and/or dashboard activity.

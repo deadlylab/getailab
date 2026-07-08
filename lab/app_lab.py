@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CryptO'Brien Pty Ltd - Lab Agent V2 (The Research Sandbox)
-Port: 5035 | Division: R&D (Project Chimera)
+Port: 5035 | Division: R&D (GetAiLab)
 Role: High-Performance Execution & Artifact Storage
 """
 import os
@@ -55,7 +55,7 @@ try:
         reindex_library,
         valid_scientist_name,
     )
-    _active_lab = os.getenv("LAB_ID", "chimera").strip() or "chimera"
+    _active_lab = os.getenv("LAB_ID", "example").strip() or "example"
     GETAILAB_LIB = get_library(lab_id=_active_lab)
     GETAILAB_LIBRARY_ENABLED = True
 except Exception as _lib_e:
@@ -136,7 +136,7 @@ ROOT_DIR = os.path.dirname(BASE_DIR)  # for loading user notes / loop reports
 
 
 def _resolve_lab_paths() -> tuple:
-    """Per-lab sandbox DB + artifacts — Chimera uses lab/; forged labs use data/labs/<id>/."""
+    """Per-lab sandbox DB + artifacts — the example lab uses lab/; forged labs use data/labs/<id>/."""
     try:
         from getailab.lab_config import lab_artifacts_dir, lab_results_db_path, get_lab_id
         lid = get_lab_id()
@@ -155,7 +155,7 @@ try:
     ACTIVE_LAB_ID = get_lab_id()
     LAB_PATHS = resolve_lab_paths(ACTIVE_LAB_ID)
 except Exception:
-    ACTIVE_LAB_ID = os.getenv("LAB_ID", "chimera").strip() or "chimera"
+    ACTIVE_LAB_ID = os.getenv("LAB_ID", "example").strip() or "example"
     LAB_PATHS = {
         "lab_id": ACTIVE_LAB_ID,
         "artifacts": ARTIFACTS_DIR,
@@ -284,8 +284,8 @@ def _load_agent_personas() -> Dict[str, Dict[str, str]]:
 
 AGENT_PERSONAS = _load_agent_personas()
 
-# Chimera-only curated voices — never used for other labs
-_CHIMERA_CURATED_QUOTES: Dict[str, str] = {
+# Legacy local reference-lab curated voices — not used for example or forged labs
+_REFERENCE_LAB_CURATED_QUOTES: Dict[str, str] = {
     "albert": (
         "Bohr, my dear friend... 'God does not play dice with the universe — and neither should our agents.' "
         "The geometry must be felt. Show me the manifold or we describe shadows."
@@ -369,15 +369,15 @@ def _extract_quote_from_persona(name: str, persona: Dict[str, Any]) -> str:
 
 
 def _get_lab_quotes() -> List[tuple]:
-    """Quotes restricted to the active lab's squad — no Chimera bleed on forged labs."""
+    """Quotes restricted to the active lab's squad — no the example lab bleed on forged labs."""
     from personas.loader import get_persona
 
     _refresh_agent_personas()
     quotes: List[tuple] = []
-    use_curated = ACTIVE_LAB_ID == "chimera"
+    use_curated = is_chimera_lab(ACTIVE_LAB_ID)
     for name in AGENT_PERSONAS:
-        if use_curated and name in _CHIMERA_CURATED_QUOTES:
-            quotes.append((name, _CHIMERA_CURATED_QUOTES[name]))
+        if use_curated and name in _REFERENCE_LAB_CURATED_QUOTES:
+            quotes.append((name, _REFERENCE_LAB_CURATED_QUOTES[name]))
             continue
         try:
             p = get_persona(name)
@@ -1028,7 +1028,7 @@ def load_user_directives(limit=6):
     except Exception:
         pass
 
-    # Supplement with loop reports from *this lab only* (forged labs never read Chimera root reports)
+    # Supplement with loop reports from *this lab only* (forged labs never read the example lab root reports)
     report_files = []
     if is_chimera_lab(ACTIVE_LAB_ID):
         try:
@@ -1173,7 +1173,7 @@ def generate_pdf_export(loop_data):
     pdf.cell(0, 12, title, ln=True, align='C')
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(100, 100, 120)
-    pdf.cell(0, 8, "Project Chimera | GetAiLab Research Export", ln=True, align='C')
+    pdf.cell(0, 8, "GetAiLab | GetAiLab Research Export", ln=True, align='C')
     pdf.ln(4)
     pdf.set_draw_color(252, 211, 77)
     pdf.line(10, pdf.get_y(), 200, pdf.get_y())
@@ -1244,7 +1244,7 @@ def generate_pptx_export(loop_data):
     p.font.color.rgb = RgbColor(252, 211, 77)
     p.alignment = PP_ALIGN.CENTER
     sub = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(12.3), Inches(0.8))
-    sub.text_frame.paragraphs[0].text = "Project Chimera • GetAiLab Research Export"
+    sub.text_frame.paragraphs[0].text = "GetAiLab • GetAiLab Research Export"
     sub.text_frame.paragraphs[0].font.size = Pt(18)
     sub.text_frame.paragraphs[0].font.color.rgb = RgbColor(192, 132, 252)
 
@@ -1409,7 +1409,7 @@ def api_llm_status():
 
 @app.route('/vision/extract', methods=['POST'])
 def vision_extract():
-    """Sauron extraction endpoint used by scientists and run_chimera."""
+    """Sauron extraction endpoint used by scientists and run_chimera.py."""
     data = request.get_json() or {}
     url = data.get('url', '')
     query = data.get('query', 'Extract key technical data')
@@ -1474,7 +1474,7 @@ def serve_dashboard():
         return send_from_directory(DASHBOARD_DIR, 'index.html')
     except Exception:
         # Graceful inline if file missing at boot (will be written by UI agent)
-        return '<!doctype html><html><head><title>GetAiLab — Dashboard Loading</title></head><body style="background:#0a0a12;color:#e0e7ff;font-family:monospace;padding:40px"><h1 style="font-family:Georgia,serif;font-style:italic;color:#e8e4dc">e<sup>iπ</sup>+1=0</h1><p>GetAiLab Chimera Dashboard materializing. Refresh shortly.</p><p><a href="/api/stats" style="color:#fcd34d">Inspect live stats API</a></p></body></html>'
+        return '<!doctype html><html><head><title>GetAiLab — Dashboard Loading</title></head><body style="background:#0a0a12;color:#e0e7ff;font-family:monospace;padding:40px"><h1 style="font-family:Georgia,serif;font-style:italic;color:#e8e4dc">e<sup>iπ</sup>+1=0</h1><p>GetAiLab Dashboard materializing. Refresh shortly.</p><p><a href="/api/stats" style="color:#fcd34d">Inspect live stats API</a></p></body></html>'
 
 @app.route('/api/config')
 def api_config():
@@ -1484,7 +1484,7 @@ def api_config():
         lid = get_lab_id()
         cfg = load_lab_config(lid)
     except Exception:
-        lid = os.getenv("LAB_ID", "chimera")
+        lid = os.getenv("LAB_ID", "example")
         cfg = {}
     try:
         from personas.loader import get_squad_names
@@ -1958,7 +1958,7 @@ def api_mobile_status():
     return jsonify({
         "getailab": "LIVE",
         "version": "V4",
-        "lab_id": os.getenv("LAB_ID", "chimera"),
+        "lab_id": os.getenv("LAB_ID", "example"),
         "oracle_url": ORACLE_URL,
         "platforms": ["web", "windows", "macos", "linux", "android", "ios"],
         "full_support": "web + Win + macOS + Linux + Android + iOS (PWA + WebView stubs). CLI parity via --chat. Docker universal.",
@@ -2159,7 +2159,7 @@ def api_learner_loop_event(loop_id):
 def _integrity_lab_id() -> str:
     if GETAILAB_LIB:
         return GETAILAB_LIB.lab_id
-    return request.args.get("lab_id") or os.getenv("LAB_ID", "chimera")
+    return request.args.get("lab_id") or os.getenv("LAB_ID", "example")
 
 
 def _integrity_book_filter() -> str | None:
@@ -2430,7 +2430,7 @@ def api_scientist_reference(scientist):
     if not valid_scientist_name(scientist):
         return jsonify({
             "ok": False,
-            "error": f"unknown scientist '{scientist}' — use a Chimera squad member (not oracle)",
+            "error": f"unknown scientist '{scientist}' — use a the example lab squad member (not oracle)",
         }), 400
 
     if request.method == 'GET':

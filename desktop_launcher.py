@@ -47,7 +47,7 @@ def start_local_dashboard(port=8088):
 def launch_full_services_background():
     """Optional: attempt to boot core services (lab + oracle + squad) in bg. Unix friendly, best effort on Win."""
     print("⚙️  Attempting background services launch (lab + oracle + squad)...")
-    boot_py = os.path.join(ROOT, "boot_chimera.sh")
+    boot_py = os.path.join(ROOT, "boot_example.sh")
     plat = platform.system().lower()
     try:
         if plat == "windows":
@@ -77,7 +77,7 @@ def try_native_desktop_embed(url):
     try:
         import webview  # pywebview
         print("🪟 Native desktop window via pywebview detected. Launching embedded GetAiLab (no browser tab).")
-        webview.create_window("GetAiLab • Chimera — Research Lab", url, width=1280, height=900, resizable=True)
+        webview.create_window("GetAiLab • the example lab — Research Lab", url, width=1280, height=900, resizable=True)
         webview.start()
         return True
     except ImportError:
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 # - Implemented: Graceful try_native_desktop_embed(url) — uses pywebview if present for true windowed app (no chrome), else browser + local static server.
 # - Production next: 
 #   * pywebview (add to reqs for builds): full menus (Council Chat, Pulse Field, Ignite Loop, Library Export), system tray, single-binary.
-#   * Tauri (recommended for signed dist): Rust sidecar calls Python FastAPI (lab/app_lab + run_chimera logic). Compile to .exe (Win), .app (mac), .deb/AppImage (Linux). Shares ALL chat/APIs/PWA assets.
+#   * Tauri (recommended for signed dist): Rust sidecar calls Python FastAPI (lab/app_lab + run_chimera.py logic). Compile to .exe (Win), .app (mac), .deb/AppImage (Linux). Shares ALL chat/APIs/PWA assets.
 #   * For full parity: mobile already 100% via PWA + /api/mobile/* + mobile_chat_stub + native bridges (Kotlin/Swift examples in README).
 # - Docker/CLI remain universal fallbacks. No platform left behind. Run `python desktop_launcher.py` then choose 5 for native preview.
 # All platforms (web + Win + mac + Linux + Android + iOS) share 100% of the chat, dashboard, CLI, field, Library logic. The manifold is universal.

@@ -8,7 +8,7 @@
 
 | Path | Time | Purpose |
 |------|------|---------|
-| `5min_status/` | 5 min | Squad health — expect **13/13** |
+| `5min_status/` | 5 min | Squad health — example lab: **4/4** services |
 | `30min_loop/` | 30 min | Short problem + expected output shape (todo) |
 | `loop_23_showcase/` | 15 min read | Orch-OR / metabolic cost flagship (Jul 7) |
 | `loop_29_showcase/` | 15 min read | **κ_c falsification** — primary peer-review story (todo) |

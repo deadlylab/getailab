@@ -17,8 +17,8 @@
    - "I know personally how soul crushing it can be when you realise that the ai has shit the bed."
    - Must remember across sessions, projects, and time. Never forget how it solved something.
 
-3. **Personalities & Naming Conventions (Chimera revival)**
-   - Go back to the naming and personalities from the Chimera loops.
+3. **Personalities & Naming Conventions (the example lab revival)**
+   - Go back to the naming and personalities from the dialectic loops.
    - "It got heated at times ay there wass real feel of debate and passion."
    - "Lets do that, i want to map out each lab one at a time and really put thought each one."
    - Revive the scientist squad (Alan, Albert, Andrew, Bohr, Brian, Carl, Emmy, Heisenberg, Neil, Oracle, Roger, etc.) with distinct, passionate, debate-heavy characters. One lab at a time, deep thought.
@@ -44,7 +44,7 @@
 ## Other Notes from the Dump
 - "oi and yes that me be a ridiculous statement - 'understand my competition' i understand that may be considered foolish to even look at it that way but who said a bloke with no experience can't get a slice of the pie yeh?"
 - Acknowledges the competitive dossier was "hectic" but useful.
-- References "chimera loops" and the passionate debate feel.
+- References "example loops" and the passionate debate feel.
 - "secret weapon is jeff maglin" (will fill in personal connection + plan tomorrow). "i got a plan yewwwwww".
 - Immediate asks in the message: Search for suitable trial testers + polish up the agreements with DocuSign and all that shit.
 - Time context: 3am, half way through notes, passing out.
@@ -57,7 +57,7 @@
 - [ ] Polish/create DocuSign-ready Beta Tester Agreement + NDA (based on existing NDA_TEMPLATE.md + terms_of_service.md + IP assignment deeds already in the tree). Make it clean, professional, scoped for self-host trials.
 
 **Phase 1 — Core Differentiation (the "isn't what every other cunt is doing" stuff) — DELIVERY MODE ENGAGED**
-- Revive & deeply design Chimera-style personalities/labs (map one at a time: Alan, Albert, etc. with real debate/passion). **Delivery started: hierarchical agents + sub-agents + subs of subs now live in base_agent + demo.**
+- Revive & deeply design the example lab-style personalities/labs (map one at a time: Alan, Albert, etc. with real debate/passion). **Delivery started: hierarchical agents + sub-agents + subs of subs now live in base_agent + demo.**
 - Build GetAiLabLibrary (loops become structured "book pages").
 - Implement/improve persistent memory (cross-session, anti-forgetting).
 - "I have nothing to research" flow + popular topics / family history / unsolved mysteries starter pack.

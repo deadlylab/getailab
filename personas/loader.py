@@ -1,6 +1,6 @@
 """
 personas/loader.py
-Project Chimera / GetAiLab - Single Source of Truth Loader for Revived Personalities
+GetAiLab - Single Source of Truth Loader for Revived Personalities
 Production-ready central loader. Do not dilute. All squad definitions flow from chimera_squad.yaml.
 
 Usage:
@@ -16,7 +16,7 @@ import re
 import yaml
 from typing import Dict, Any, Optional
 
-# Legacy R&D research used an older Albert voice ("Quantum Physicist"). Live Chimera Albert
+# Legacy R&D research used an older Albert voice ("Quantum Physicist"). Live the example lab Albert
 # is the relativity / unified-field persona — scrub mislabels before they hit his context.
 _ALBERT_ROLE_REPLACEMENTS = (
     (re.compile(r"⚛️\s*Albert\s*\(\s*Quantum Physicist\s*\)", re.I), "Albert (Theoretical Physicist)"),
@@ -32,7 +32,7 @@ _ALBERT_ROLE_REPLACEMENTS = (
 
 
 def sanitize_albert_persona_labels(text: str) -> str:
-    """Rewrite legacy 'Quantum Physicist' Albert labels to his canonical Chimera role."""
+    """Rewrite legacy 'Quantum Physicist' Albert labels to his canonical the example lab role."""
     if not text:
         return text
     out = text
@@ -53,7 +53,7 @@ _cached_path: Optional[str] = None
 
 
 def get_personas_path() -> str:
-    """Resolve personas YAML: PERSONAS_YAML env, lab config, or Chimera default."""
+    """Resolve personas YAML: PERSONAS_YAML env, lab config, or example lab default."""
     explicit = os.getenv("PERSONAS_YAML", "").strip()
     if explicit:
         if os.path.isabs(explicit):
@@ -148,9 +148,9 @@ def build_subagent_config(parent_name: str, specialization: str, task: str = "sp
     """
     try:
         parent = get_persona(parent_name)
-        base_prompt = parent.get("system_prompt", "Sub-agent operating under Chimera vision.")
+        base_prompt = parent.get("system_prompt", "Sub-agent operating under the example lab vision.")
     except Exception:
-        base_prompt = "Sub-agent operating under Chimera pure vision (Sandwich Paradox + Landscape Engine)."
+        base_prompt = "Sub-agent operating under the example lab pure vision (Sandwich Paradox + Landscape Engine)."
 
     sub_name = f"sub_{parent_name.lower()}_{specialization.lower().replace(' ', '_')[:35]}"
     data = _load_yaml()

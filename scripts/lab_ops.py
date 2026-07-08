@@ -77,7 +77,7 @@ def get_lab_runtime_config(lab_id: str) -> Dict[str, Any]:
         sys.path.insert(0, str(ROOT))
     from getailab.lab_config import _chimera_default_config, load_lab_config, lab_port_map, personas_yaml_path
 
-    if lab_id == "chimera":
+    if lab_id == "example":
         cfg = _chimera_default_config()
     else:
         cfg = load_lab_config(lab_id)
@@ -105,7 +105,7 @@ def stop_lab(lab_id: str, verbose: bool = True) -> None:
             _kill_port(port)
 
     # Port kill is primary — other labs on different ports stay up.
-    if lab_id != "chimera":
+    if lab_id != "example":
         _pkill(f"scientists/forges/{lab_id}/")
         _pkill(f"LAB_ID={lab_id}.*app_oracle")
         _pkill(f"LAB_ID={lab_id}.*app_lab")
@@ -158,7 +158,7 @@ def boot_lab(lab_id: str, *, restart: bool = True, verbose: bool = True) -> Dict
     print("⚙️  Lab sandbox...")
     _start_bg(
         [py, str(ROOT / "lab" / "app_lab.py")],
-        f"{lab_id}_lab.log" if lab_id != "chimera" else "app_lab.log",
+        f"{lab_id}_lab.log" if lab_id != "example" else "app_lab.log",
         base_env,
     )
     time.sleep(2)
@@ -166,14 +166,14 @@ def boot_lab(lab_id: str, *, restart: bool = True, verbose: bool = True) -> Dict
     print("🔮 Oracle...")
     _start_bg(
         [py, str(ROOT / "scientists" / "app_oracle.py")],
-        f"{lab_id}_oracle.log" if lab_id != "chimera" else "app_oracle.log",
+        f"{lab_id}_oracle.log" if lab_id != "example" else "app_oracle.log",
         base_env,
     )
     time.sleep(2)
 
     print("🧠 Squad...")
     scientists = cfg["scientists"]
-    if lab_id == "chimera":
+    if lab_id == "example":
         for script in sorted((ROOT / "scientists").glob("app_*.py")):
             if script.name == "app_oracle.py":
                 continue

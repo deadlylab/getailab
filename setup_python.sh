@@ -118,7 +118,7 @@ if ! pyenv versions --bare 2>/dev/null | grep -qx "$PYVER"; then
             echo "     sudo apt update"
             echo "     sudo apt install libreadline-dev"
             echo "   Ensure /etc/apt/sources.list has Kali main repo enabled."
-            echo "   Or use Docker instead: ./docker_chimera.sh squad"
+            echo "   Or use Docker instead: docker compose squad"
         fi
         exit 1
     fi
@@ -149,7 +149,7 @@ echo "✅ Done. In this directory, python3 → $PYVER via pyenv."
 echo ""
 echo "   Verify:  python3 --version"
 echo "   Ollama:   ollama serve   (keep running)"
-echo "   Boot:     ./boot_chimera.sh"
+echo "   Boot:     ./boot_example.sh"
 echo ""
 echo "   Local loops are slow (large prompts) — default 600s timeout per scientist."
 echo "   System python3 elsewhere is unchanged — Kali stays on 3.13."

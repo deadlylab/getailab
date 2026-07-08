@@ -5,7 +5,7 @@ uni_lab.py — compatibility entry point (Universal Lab Forge)
 The original uni_lab.py lived at development/dcai/labs/uni_lab.py and scaffolded
 a *separate mini-repo* (duplicate base_agent, app_lab, run_canvas.py, etc.).
 
-GetAiLab Lab Forge merged that wizard into Chimera's engine:
+GetAiLab Lab Forge merged that wizard into GetAiLab's engine:
   scripts/create_lab.py  +  data/labs/<id>/ vault  +  scientists/forges/<id>/
 
 This shim forwards to the merged forge so old habits still work:

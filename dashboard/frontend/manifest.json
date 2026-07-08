@@ -1,7 +1,7 @@
 {
-  "name": "GetAiLab • CHIMERA",
+  "name": "GetAiLab",
   "short_name": "GetAiLab",
-  "description": "GetAiLab Chimera — multi-agent research lab. Dashboard, loops, and artifacts.",
+  "description": "GetAiLab — multi-agent research lab. Dashboard, loops, and artifacts.",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0a0a12",

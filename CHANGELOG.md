@@ -14,7 +14,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning foll
 - `docs/REPOSITORY_CHECKLIST.md` — publish gate for GitHub testers
 
 ### Changed
-- Public repo scoped to **lab builder** — Chimera personas, vault, outreach, legal, competitive docs removed from git (local moat via `.gitignore`)
+- Public repo scoped to **lab builder** — operator-tuned personas, vault, outreach, legal, competitive docs removed from git (local moat via `.gitignore`)
 - Default `LAB_ID=example`; `enumerate_all_labs()` lists disk configs only
 - Docs, dashboard, and CLI copy: accurate dialectic loop description (five stages + intake; four CLI headers; per-stage tickets) — removed misleading "6-phase" marketing
 - Dashboard inspiration resonance wired to real per-lab data

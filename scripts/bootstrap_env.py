@@ -141,7 +141,7 @@ def ensure_env_file() -> None:
 
 
 def ensure_dirs() -> None:
-    for rel in ("logs", "data/labs/chimera", "lab/artifacts"):
+    for rel in ("logs", "data/labs/example", "lab/artifacts"):
         (ROOT / rel).mkdir(parents=True, exist_ok=True)
     print("✅ Workspace directories ready")
 

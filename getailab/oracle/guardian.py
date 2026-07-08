@@ -6,7 +6,7 @@ Only Gabby talks to Oracle.
 
 Oracle's job:
 - Be the gatekeeper so the user can't fuck up the lab (wrong configs, direct writes to books, bypassing phases, etc.).
-- Coordinate the scientists (Chimera model or generated).
+- Coordinate the scientists (the example lab model or generated).
 - Decide what (if anything) from the internal scientist books / codex gets exposed to Gabby/user (always tiny, safe, high-level snippets).
 - Trigger correct ingests after loops so scientists get smarter on research knowledge only.
 - Enforce that scientists' books stay pure research memory (no user data ever leaks in).
@@ -106,7 +106,7 @@ class OracleGuardian:
             scientist_books = [b for b in books if b.book_id != "codex"]
             return {
                 "lab": self.lab_id,
-                "status": "Chimera vault active",
+                "status": "operator vault active",
                 "total_pages": summary.get("total_pages", 0),
                 "loops_indexed": summary.get("loops_indexed", 0),
                 "scientist_books": len(scientist_books),

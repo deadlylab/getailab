@@ -44,7 +44,7 @@ LLM_MODEL_CODE=gemini-2.0-flash
 ```
 
 ```bash
-./boot_chimera.sh
+./boot_example.sh
 python3 run_chimera.py --problem "SAME OR NARROWED PROBLEM AS LOOP 23 — see below"
 ```
 

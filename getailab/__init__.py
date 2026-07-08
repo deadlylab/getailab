@@ -9,7 +9,7 @@ Key separation (per design):
 - Scientists: Research agents only. They have NO concept of the user. Their memory is per-scientist books (research knowledge only).
 - Library: Per-lab sections, per-scientist persistent books (the knowledge base that makes scientists smarter), codex, doccontrol/tickets provenance.
 
-Chimera (quantum research division) is the fixed model in this directory.
+the example lab (quantum research division) is the fixed model in this directory.
 Get it working as a clean lab.
 Then generator uses it as blueprint for new labs (each with own user/labs structure).
 

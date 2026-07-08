@@ -574,8 +574,8 @@ def interactive_forge_wizard() -> None:
 
     raw_id = _prompt("Lab ID (e.g. weather_lab, environmental)", "weather_lab")
     lab_id = _slug(raw_id)
-    if lab_id == "chimera":
-        print("  ⚠ 'chimera' is reserved — using custom_lab")
+    if lab_id == "example":
+        print("  ⚠ 'example' is reserved — using custom_lab")
         lab_id = "custom_lab"
 
     display_name = _prompt("Display name", lab_id.replace("_", " ").title())

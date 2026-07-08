@@ -84,7 +84,7 @@ def _load_scientist_book(agent_name: str):
     """Load this agent's research book. Fails open if library unavailable."""
     try:
         from getailab.library import get_scientist_book
-        lab_id = os.getenv("LAB_ID", "chimera")
+        lab_id = os.getenv("LAB_ID", "example")
         return get_scientist_book(agent_name, lab_id=lab_id)
     except Exception as exc:
         print(f"[BASE] ScientistBook unavailable for {agent_name}: {exc}")

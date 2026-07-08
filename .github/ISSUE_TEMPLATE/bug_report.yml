@@ -38,7 +38,7 @@ body:
     attributes:
       label: Steps to reproduce
       placeholder: |
-        1. ./boot_chimera.sh
+        1. ./boot_example.sh
         2. python3 run_chimera.py --problem "..."
         3. ...
     validations:

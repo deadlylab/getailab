@@ -88,19 +88,19 @@ def _llm_fix_suggestions(sample_error: str = "") -> list:
     in_docker = SCIENTIST_HOST_MODE == "docker" or "docker.internal" in err
     if in_docker:
         fixes.append("./scripts/ollama_for_docker.sh   — expose Ollama to containers")
-        fixes.append("./boot_chimera.sh   — native boot (localhost Ollama, no Docker hop)")
+        fixes.append("./boot_example.sh   — native boot (localhost Ollama, no Docker hop)")
     else:
         fixes.append("ollama serve   — start local Ollama")
         fixes.append("curl -s http://localhost:11434/api/tags   — should return model JSON")
     fixes.append("Set cloud LLM in .env: LLM_PROVIDER=openai + OPENAI_API_KEY")
-    fixes.append("./docker_chimera.sh status   or   python3 run_chimera.py --status")
+    fixes.append("docker compose status   or   python3 run_chimera.py --status")
     return fixes
 
 
 def _service_fix_suggestions() -> list:
     return [
-        "./boot_chimera.sh   — start native squad",
-        "./docker_chimera.sh squad   — start Docker squad",
+        "./boot_example.sh   — start native squad",
+        "docker compose squad   — start Docker squad",
         "python3 run_chimera.py --status   — see what is offline",
         "tail -f logs/app_oracle.log   — oracle errors",
     ]
@@ -110,7 +110,7 @@ def _timeout_fix_suggestions() -> list:
     ollama_t = os.getenv("OLLAMA_TIMEOUT", "600")
     return [
         f"OLLAMA_TIMEOUT={ollama_t} in .env — Ollama generate wait (restart squad after change)",
-        f"SCIENTIST_HTTP_TIMEOUT={SCIENTIST_HTTP_TIMEOUT} — HTTP limit from run_chimera to each scientist",
+        f"SCIENTIST_HTTP_TIMEOUT={SCIENTIST_HTTP_TIMEOUT} — HTTP limit from run_chimera.py to each scientist",
         "Use a faster model in .env if replies are very slow (smaller quant / fewer parameters)",
         "curl -s http://localhost:11434/api/ps   — check if Ollama is stuck on another job",
         "tail -f logs/app_albert.log   — watch one scientist while testing",
@@ -248,10 +248,10 @@ def prompt_line(message: str = "", *, color: str = "w", prompt: str = "> ") -> s
     if message:
         print(c(message, color), flush=True)
     if not sys.stdin.isatty():
-        print(c("(Tip: run with -it for Docker, or use ./boot_chimera.sh natively for full line editing)", "y"), flush=True)
+        print(c("(Tip: run with -it for Docker, or use ./boot_example.sh natively for full line editing)", "y"), flush=True)
     return input(prompt).strip()
 
-# Squad + service URLs — from data/labs/<LAB_ID>/config/lab.yaml (Chimera default)
+# Squad + service URLs — from data/labs/<LAB_ID>/config/lab.yaml (example lab default)
 try:
     from getailab.lab_config import get_lab_id, get_scientists_dict, get_service_urls, load_lab_config
     ACTIVE_LAB_ID = get_lab_id()
@@ -259,15 +259,13 @@ try:
     SCIENTISTS = get_scientists_dict(ACTIVE_LAB_ID)
     _oracle_default, _lab_default = get_service_urls(ACTIVE_LAB_ID)
 except Exception:
-    ACTIVE_LAB_ID = os.getenv("LAB_ID", "chimera")
+    ACTIVE_LAB_ID = os.getenv("LAB_ID", "example")
     LAB_CONFIG = {}
     SCIENTISTS = {
-        'albert': 5025, 'bohr': 5039, 'heisenberg': 5040,
-        'alan': 5027, 'brian': 5032, 'carl': 5028,
-        'neil': 5034, 'roger': 5038, 'emmy': 5029,
-        'tesla': 5030, 'andrew': 5026,
+        'researcher': 5125,
+        'critic': 5126,
     }
-    _oracle_default, _lab_default = "http://localhost:5024", "http://localhost:5035"
+    _oracle_default, _lab_default = "http://localhost:5124", "http://localhost:5135"
 
 def _loop_report_path(loop_id: int) -> str:
     """Per-lab loop report file — forged labs write under data/labs/<id>/reports/."""
@@ -310,10 +308,10 @@ def get_platform_info():
     }
 
 def print_platform_support_matrix():
-    """Report full cross-platform status for GetAiLab / Chimera. Used by --support / --platforms."""
+    """Report full cross-platform status for GetAiLab / the example lab. Used by --support / --platforms."""
     plat = get_platform_info()
     print(c("\n" + "="*80, "c"))
-    print(c("GETAILAB / PROJECT CHIMERA — PLATFORM SUPPORT", "g"))
+    print(c("GETAILAB / GET AI LAB — PLATFORM SUPPORT", "g"))
     print(c(f"Current Host: {plat['system']} {plat['release']} ({plat['machine']}) | Python {plat['python']}", "w"))
     print(c("="*80, "c"))
     matrix = [
@@ -344,7 +342,7 @@ def print_welcome_splash():
     print(c("", "reset"))
     print(c("  ╔══════════════════════════════════════════════════════════════════════╗", "c"))
     print(c("  ║                                                                      ║", "c"))
-    print(c("  ║   ⚗️   GET AI LAB  ·  PROJECT CHIMERA  ·  COMMANDER CONSOLE          ║", "c"))
+    print(c("  ║   ⚗️   GET AI LAB  ·  GET AI LAB  ·  COMMANDER CONSOLE          ║", "c"))
     print(c("  ║                                                                      ║", "c"))
     lab_label = LAB_CONFIG.get("display_name") or ACTIVE_LAB_ID
     print(c(f"  ║   Lab: {lab_label[:58]:<58}  ║", "c"))
@@ -599,14 +597,14 @@ def interactive_collaborative_review():
         )
     except Exception as e:
         print(c(f"  ❌ Review failed: {e}", "r"))
-        print(c("  Ensure squad is up: ./boot_chimera.sh or python3 run_chimera.py --status", "y"))
+        print(c("  Ensure squad is up: ./boot_example.sh or python3 run_chimera.py --status", "y"))
 
 
 def _print_forged_labs_summary():
-    """Show non-Chimera labs registered in data/labs/."""
+    """Show forged labs registered in data/labs/."""
     try:
         from getailab.lab_config import list_forged_labs
-        labs = [c for c in list_forged_labs() if c.get("lab_id") != "chimera"]
+        labs = [c for c in list_forged_labs() if c.get("lab_id") != "example"]
         if not labs:
             return
         print(c("\n  🔥 Forged labs (switch with LAB_ID + .env.<id>):", "y"))
@@ -626,7 +624,7 @@ def interactive_forge_lab():
     """Launch the Lab Forge wizard (scripts/create_lab.py)."""
     print_header("Lab Forge — Build Your Research Division")
     print(c("  Scaffolds personas, vault, scientist apps, and boot script.", "m"))
-    print(c("  Ports auto-allocated — won't clash with Chimera.", "w"))
+    print(c("  Ports auto-allocated — won't clash with the example lab.", "w"))
     print(c("  List labs: python3 scripts/create_lab.py --list-labs\n", "m"))
     script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts", "create_lab.py")
     try:
@@ -640,8 +638,8 @@ def run_commander_console():
     """Interactive Commander Console — welcome, menu, and action routing."""
     print_welcome_splash()
     print(_service_pulse_line())
-    if ACTIVE_LAB_ID != "chimera":
-        print(c(f"  Active lab: {ACTIVE_LAB_ID} (not Chimera — ensure ./boot_{ACTIVE_LAB_ID}.sh ran)", "y"))
+    if ACTIVE_LAB_ID != "example":
+        print(c(f"  Active lab: {ACTIVE_LAB_ID} (not the shipped example lab — ensure ./boot_{ACTIVE_LAB_ID}.sh ran)", "y"))
     _print_forged_labs_summary()
     _print_squad_books()
     _print_main_menu()
@@ -1009,7 +1007,7 @@ def run_chat_mode():
                 history.append({"user": msg, "agent": agent, "reply": reply})
             except Exception as e:
                 print(c(f"⚠️ Council temporarily unreachable ({e}). Using local resonance.", "y"))
-                print(c("Services may be offline. Start the lab with boot_chimera.sh or docker compose up.", "m"))
+                print(c("Services may be offline. Start the lab with boot_example.sh or docker compose up.", "m"))
         except KeyboardInterrupt:
             print(c("\nChat closed. Field persists.", "g"))
             break
@@ -1210,7 +1208,7 @@ def run_full_loop(problem=None):
             return
 
         report_path = _loop_report_path(loop_id)
-        markdown_log = "# Project Chimera: Loop " + str(loop_id) + "\n"
+        markdown_log = "# GetAiLab Loop " + str(loop_id) + "\n"
         markdown_log += "**Date:** " + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n"
         markdown_log += "**Problem:** " + problem + "\n\n"
         with open(report_path, "w", encoding="utf-8") as f:
@@ -1778,7 +1776,7 @@ def run_beef_up(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="GetAiLab / Project Chimera CLI — research loops, chat, dashboard.")
+    parser = argparse.ArgumentParser(description="GetAiLab CLI — research loops, chat, dashboard.")
     parser.add_argument("--chat", action="store_true", help="Interactive council chat")
     parser.add_argument("--web", "--dashboard", action="store_true", help="Open the web dashboard")
     parser.add_argument("--status", action="store_true", help="Check service health")
@@ -1796,7 +1794,7 @@ def main():
     parser.add_argument("--list-refs", action="store_true", help="List references for --beef-up scientist")
     parser.add_argument("--beef-query", type=str, default="", help="Search filter when using --list-refs")
     parser.add_argument("--forge-lab", action="store_true", help="Launch Lab Forge wizard (custom research division)")
-    parser.add_argument("--list-labs", action="store_true", help="List Chimera + forged research labs")
+    parser.add_argument("--list-labs", action="store_true", help="List registered + forged research labs")
     parser.add_argument("--collab-review", action="store_true", help="Run collaborative document review (squad + Oracle synthesis)")
     parser.add_argument("--question", "-q", type=str, default="", help="Working question (with --collab-review)")
     parser.add_argument("--no-ingest", action="store_true", help="Skip scientist book ingest (with --collab-review)")
@@ -1808,8 +1806,8 @@ def main():
         print(c("HOW TO RUN — EXACT COMMANDS PER PLATFORM (no compromises):", "c"))
         print(c("  Web (any): python run_chimera.py --web   OR open http://localhost:5035 after lab boot", "reset"))
         print(c("  Windows:   python run_chimera.py   |   python run_chimera.py --chat   |   python desktop_launcher.py", "reset"))
-        print(c("  macOS:     python3 run_chimera.py  |   ./boot_chimera.sh (or python3)   |   python3 desktop_launcher.py", "reset"))
-        print(c("  Linux:     python3 run_chimera.py  |   ./boot_chimera.sh   |   python3 desktop_launcher.py", "reset"))
+        print(c("  macOS:     python3 run_chimera.py  |   ./boot_example.sh (or python3)   |   python3 desktop_launcher.py", "reset"))
+        print(c("  Linux:     python3 run_chimera.py  |   ./boot_example.sh   |   python3 desktop_launcher.py", "reset"))
         print(c("  Android/iOS: Browser to host:5035 -> Add to Home (PWA)   OR load dashboard/frontend/mobile_chat_stub.html in WebView. Use /api/mobile/chat", "reset"))
         print(c("  Docker (all hosts): docker compose up -d   ;   docker compose run --rm cli   ; web at :5035", "reset"))
         print(c("  Full status: python run_chimera.py --status ; services health + unified chat.", "m"))

@@ -18,7 +18,7 @@
 
 ## Test notes
 
-<!-- e.g. ./boot_chimera.sh → doctor.sh → one loop dry-run -->
+<!-- e.g. ./boot_example.sh → doctor.sh → one loop dry-run -->
 
 ## Screenshots / logs
 

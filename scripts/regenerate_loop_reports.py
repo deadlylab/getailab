@@ -26,7 +26,7 @@ from typing import Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
 REPORTS_DIR = ROOT / "docs" / "loops"
-_ACTIVE_LAB = "chimera"
+_ACTIVE_LAB = "example"
 
 
 def _lab_paths(lab_id: str):
@@ -35,7 +35,7 @@ def _lab_paths(lab_id: str):
         sys.path.insert(0, str(ROOT))
     from getailab.lab_config import agora_db_path, lab_artifacts_dir, lab_results_db_path
 
-    lid = lab_id or "chimera"
+    lid = lab_id or "example"
     return (
         agora_db_path(lid),
         lab_results_db_path(lid),
@@ -137,7 +137,7 @@ def _load_existing_report(loop_id: int) -> str:
 
 
 def _hypothesis_from_book(loop_id: int, scientist: str) -> str:
-    path = ROOT / "data" / "labs" / "chimera" / "scientists" / scientist / "book" / "pages" / f"hypothesis-{loop_id}-{scientist}.json"
+    path = ROOT / "data" / "labs" / "example" / "scientists" / scientist / "book" / "pages" / f"hypothesis-{loop_id}-{scientist}.json"
     if not path.is_file():
         return ""
     try:
@@ -253,7 +253,7 @@ def build_report(loop_id: int, *, reconstructed: bool = False) -> str:
         raise ValueError(f"No data for loop {loop_id}")
 
     date_str = start_time.replace("T", " ")[:19] if start_time else "unknown"
-    lines = [f"# Project Chimera: Loop {loop_id}"]
+    lines = [f"# GetAiLab Loop {loop_id}"]
     if reconstructed:
         lines.append(f"**Reconstructed:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (from DB + artifacts)")
     lines.append(f"**Date:** {date_str}")
@@ -314,8 +314,8 @@ def rebuild_tar(loop_ids: List[int], tar_path: Path) -> int:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Regenerate Chimera loop reports and loops.tar.gz")
-    parser.add_argument("--lab-id", default="chimera", help="Lab ID (default: chimera)")
+    parser = argparse.ArgumentParser(description="Regenerate the example lab loop reports and loops.tar.gz")
+    parser.add_argument("--lab-id", default="example", help="Lab ID (default: example)")
     parser.add_argument("--loops", type=int, nargs="*", help="Only regenerate these loop IDs")
     parser.add_argument("--no-tar", action="store_true", help="Skip rebuilding loops.tar.gz")
     parser.add_argument(

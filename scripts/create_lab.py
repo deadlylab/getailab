@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GetAiLab Lab Forge — merged from uni_lab.py wizard + Chimera engine.
+GetAiLab Lab Forge — merged from uni_lab.py wizard + the example lab engine.
 
 Generates a custom research lab into getailab_live (no forked mini-codebase).
 
@@ -370,13 +370,13 @@ echo "✅ {lab_id} stopped."
 
 
 def list_labs_command() -> None:
-    """Print Chimera + all forged labs."""
+    """Print the example lab + all forged labs."""
     print("=" * 60)
     print("GETAILAB LABS")
     print("=" * 60)
-    print(f"  chimera (reference)  Oracle :5024  Lab :5035  boot: ./boot_chimera.sh")
+    print(f"  example (reference)  Oracle :5024  Lab :5035  boot: ./boot_example.sh")
     for cfg in list_forged_labs():
-        if cfg.get("lab_id") == "chimera":
+        if cfg.get("lab_id") == "example":
             continue
         lid = cfg.get("lab_id", "?")
         name = cfg.get("display_name", lid)
@@ -411,8 +411,8 @@ def interactive_wizard() -> None:
 
     raw_id = input("Lab ID (e.g. cyber_lab, biotech_research): ").strip()
     lab_id = _slug(raw_id) if raw_id else "custom_lab"
-    if lab_id == "chimera":
-        print("  ⚠️  'chimera' is the sacred reference lab — pick another ID.")
+    if lab_id == "example":
+        print("  ⚠️  'example' is the sacred reference lab — pick another ID.")
         lab_id = "custom_lab"
 
     display_name = input("Display name (e.g. Cyber Threat Research Division): ").strip()
@@ -448,7 +448,7 @@ def interactive_wizard() -> None:
     print(f"  Lab:     {lab_id}")
     print(f"  Profile: {profile}")
     print(f"  Squad:   {', '.join(squad)}")
-    print("  Ports auto-allocated (won't clash with Chimera 5024–5040)")
+    print("  Ports auto-allocated (won't clash with the example lab 5024–5040)")
     print("=" * 60)
     input("Press ENTER to forge...")
     forge_lab(lab_id, display_name, agenda, squad, profile)
@@ -462,7 +462,7 @@ def main():
     parser.add_argument("--profile", choices=("research", "canvas"), default="research")
     parser.add_argument("--scientists-json", help='JSON dict: {"tesla":{"role":"...","persona":"..."}}')
     parser.add_argument("--non-interactive", action="store_true")
-    parser.add_argument("--list-labs", action="store_true", help="Show Chimera + forged labs")
+    parser.add_argument("--list-labs", action="store_true", help="Show the example lab + forged labs")
     args = parser.parse_args()
 
     if args.list_labs:

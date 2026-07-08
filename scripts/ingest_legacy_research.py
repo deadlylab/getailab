@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Ingest Chimera research loops and synthesis docs into scientist books (beef-up at scale).
+Ingest the example lab research loops and synthesis docs into scientist books (beef-up at scale).
 
 Supports:
   - 2025 legacy archive: # Dialectic Loop #N, **Research Question:**
@@ -137,7 +137,7 @@ def _write_codex_page(
 def ingest_archive(
     archive_dir: Path,
     *,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     dry_run: bool = False,
     loop_filter: Optional[set] = None,
     tag: str = "legacy",
@@ -225,7 +225,7 @@ def ingest_archive(
 def ingest_documents(
     doc_paths: List[Path],
     *,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     dry_run: bool = False,
     tag: str = "synthesis",
     year: str = "2026",
@@ -283,9 +283,9 @@ def ingest_documents(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Ingest Chimera research into scientist books")
+    parser = argparse.ArgumentParser(description="Ingest the example lab research into scientist books")
     parser.add_argument("archive_dir", nargs="?", help="Path to folder with loop_*.md files")
-    parser.add_argument("--lab-id", default="chimera")
+    parser.add_argument("--lab-id", default="example")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--loop", type=int, nargs="*", help="Only ingest these loop numbers")
     parser.add_argument("--tag", default="legacy", help="Primary tag for ingested pages")

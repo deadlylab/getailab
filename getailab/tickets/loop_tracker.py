@@ -21,10 +21,10 @@ _TRACKER: Optional["LoopTicketTracker"] = None
 
 
 class LoopTicketTracker:
-    """Creates and updates tickets for Chimera dialectic loop phases."""
+    """Creates and updates tickets for your lab dialectic loop phases."""
 
     def __init__(self, lab_id: Optional[str] = None, db_path: Optional[str] = None):
-        self.lab_id = lab_id or os.getenv("LAB_ID", "chimera")
+        self.lab_id = lab_id or os.getenv("LAB_ID", "example")
         self.db_path = db_path or _default_db_path()
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
         self.system = JobTicketSystem(db_path=self.db_path)
@@ -49,7 +49,7 @@ class LoopTicketTracker:
             priority=TicketPriority.HIGH.value,
             status=TicketStatus.IN_PROGRESS.value,
             tags=self._tags(loop_id, "loop", role="parent"),
-            created_by="run_chimera",
+            created_by="run_chimera.py",
         ))
         return self._parent_ticket_id
 
@@ -71,7 +71,7 @@ class LoopTicketTracker:
             priority=priority,
             status=TicketStatus.ASSIGNED.value,
             tags=self._tags(loop_id, phase, scientist=assignee),
-            created_by="run_chimera",
+            created_by="run_chimera.py",
         ))
         self.system.update_ticket_status(
             ticket_id, TicketStatus.IN_PROGRESS.value, assignee, f"Started {phase}"
@@ -131,7 +131,7 @@ class LoopTicketTracker:
 
 def get_loop_ticket_tracker(lab_id: Optional[str] = None) -> LoopTicketTracker:
     global _TRACKER
-    lid = lab_id or os.getenv("LAB_ID", "chimera")
+    lid = lab_id or os.getenv("LAB_ID", "example")
     if _TRACKER is None or _TRACKER.lab_id != lid:
         _TRACKER = LoopTicketTracker(lab_id=lid)
     return _TRACKER

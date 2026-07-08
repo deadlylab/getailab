@@ -48,4 +48,4 @@ if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
 fi
 
 echo ""
-echo "✅ Ollama ready for ./docker_chimera.sh loop"
+echo "✅ Ollama ready for docker compose loop"

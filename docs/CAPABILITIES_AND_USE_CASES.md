@@ -1,6 +1,6 @@
 # GetAiLab — Capabilities and Use Cases
 
-Updated **8 July 2026** to reflect the working Chimera build.
+Updated **8 July 2026** to reflect the working the example lab build.
 
 ---
 
@@ -30,7 +30,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 
 ### Multi-agent dialectic
 
-- **11 scientists** + Oracle — distinct personas from `personas/chimera_squad.yaml` v1.4
+- **Configurable squad** + Oracle — distinct personas from `personas/<lab_id>_squad.yaml` (example ships 2)
 - Preserved dissent in Oracle synthesis (Section IV style productive tensions)
 - Tesla integrated (coupled-oscillator / resonance framing)
 - Book context + skills injected at hypothesis and implement phases
@@ -50,7 +50,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 
 ### Provenance and memory
 
-- Per-scientist books — **~9,800 vault page files** in `data/labs/chimera/`
+- Per-scientist books — **~9,800 vault page files** in `data/labs/<your_lab>/`
 - Skills patterns extracted from prior experiments
 - Job tickets per scientist per phase
 - Merkle integrity scan + optional Ed25519 vault signing
@@ -59,7 +59,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 ### Operations and reliability
 
 - `doctor.sh` — one-command health
-- `python3 run_chimera.py --status` — probes all 13 services
+- `python3 run_chimera.py --status` — probes lab, oracle, and every scientist in the active squad
 - **Graceful LLM degradation** — HTTP 503, clear errors, no corrupted reports (Loop 34 proven)
 - LLM output sanitizer (blocks tool-call artifacts — insurance against wrong model)
 - Council chat with real LLM (`--chat` or dashboard)
@@ -70,7 +70,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 - CLI / Commander Console (`run_chimera.py`)
 - Web dashboard PWA (`http://localhost:5035`)
 - Desktop launcher (`desktop_launcher.py`)
-- Docker full squad (`./docker_chimera.sh squad`)
+- Docker full squad (`docker compose squad`)
 - Mobile chat stub + `/api/mobile/chat`
 
 ### LLM backends
@@ -100,7 +100,7 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 
 - Grant / thesis preparation with collaborative review
 - Competitive analysis via multi-lens document ingest
-- WA education corpus (337 units on disk — not yet wired to Chimera)
+- WA education corpus (337 units on disk — not yet wired to the example lab)
 - External validation sprint (literature + public dataset check)
 - Robin-style closed loop (upload CSV → interpret → next loop)
 
@@ -137,4 +137,4 @@ CLI shows four phase headers; implement and execute share Phase 2. See `docs/OPE
 - [`COMPETITIVE_AUDIT_JULY_2026.md`](COMPETITIVE_AUDIT_JULY_2026.md) — field comparison
 - [`peer-review/HOW_TO_EVALUATE.md`](peer-review/HOW_TO_EVALUATE.md) — evaluator guide
 
-*GetAiLab Live · Project Chimera*
+*GetAiLab Live · GetAiLab*

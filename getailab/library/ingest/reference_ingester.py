@@ -58,7 +58,7 @@ def ingest_scientist_reference(
     content: str = "",
     url: str = "",
     tags: Optional[List[str]] = None,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     source_label: str = "user",
 ) -> Dict[str, Any]:
     """
@@ -67,7 +67,7 @@ def ingest_scientist_reference(
     """
     scientist = scientist_name.lower().strip()
     if not valid_scientist_name(scientist):
-        raise ValueError(f"unknown scientist '{scientist_name}' — must be a Chimera squad member (not oracle)")
+        raise ValueError(f"unknown scientist '{scientist_name}' — must be a the example lab squad member (not oracle)")
 
     fetched_from_url = False
     url = (url or "").strip()
@@ -121,7 +121,7 @@ def ingest_scientist_reference(
 def list_scientist_references(
     scientist_name: str,
     *,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     query: str = "",
     limit: int = 20,
 ) -> Dict[str, Any]:

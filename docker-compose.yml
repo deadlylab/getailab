@@ -1,4 +1,4 @@
-# GET AI LAB / Project Chimera — Docker Compose
+# GET AI LAB / GetAiLab — Docker Compose
 #
 # Default (dashboard + APIs):
 #   docker compose up -d
@@ -15,9 +15,9 @@
 #
 # Host Ollama: containers reach it via host.docker.internal:11434 (Linux uses host-gateway).
 
-x-chimera-env: &chimera-env
+x-example-env: &example-env
   PYTHONPATH: /app
-  LAB_ID: chimera
+  LAB_ID: example
   GETAILAB_USER_ID: default
   ORACLE_URL: http://oracle:5024
   LAB_URL: http://lab:5035
@@ -39,7 +39,7 @@ x-scientist-base: &scientist-base
   env_file:
     - .env
   environment:
-    <<: *chimera-env
+    <<: *example-env
   volumes: *data-volumes
   <<: *extra-hosts
   depends_on:
@@ -64,7 +64,7 @@ services:
     env_file:
       - .env
     environment:
-      <<: *chimera-env
+      <<: *example-env
     <<: *extra-hosts
     depends_on:
       oracle:
@@ -87,7 +87,7 @@ services:
     env_file:
       - .env
     environment:
-      <<: *chimera-env
+      <<: *example-env
     <<: *extra-hosts
     command: ["python", "scientists/app_oracle.py"]
     healthcheck:
@@ -102,7 +102,7 @@ services:
     <<: *scientist-base
     ports: ["5025:5025"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: albert
       AGENT_PORT: "5025"
     command: ["python", "scientists/app_albert.py"]
@@ -117,7 +117,7 @@ services:
     <<: *scientist-base
     ports: ["5026:5026"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: andrew
       AGENT_PORT: "5026"
     command: ["python", "scientists/app_andrew.py"]
@@ -132,7 +132,7 @@ services:
     <<: *scientist-base
     ports: ["5027:5027"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: alan
       AGENT_PORT: "5027"
     command: ["python", "scientists/app_alan.py"]
@@ -147,7 +147,7 @@ services:
     <<: *scientist-base
     ports: ["5028:5028"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: carl
       AGENT_PORT: "5028"
     command: ["python", "scientists/app_carl.py"]
@@ -162,7 +162,7 @@ services:
     <<: *scientist-base
     ports: ["5029:5029"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: emmy
       AGENT_PORT: "5029"
     command: ["python", "scientists/app_emmy.py"]
@@ -177,7 +177,7 @@ services:
     <<: *scientist-base
     ports: ["5030:5030"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: tesla
       AGENT_PORT: "5030"
     command: ["python", "scientists/app_tesla.py"]
@@ -192,7 +192,7 @@ services:
     <<: *scientist-base
     ports: ["5032:5032"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: brian
       AGENT_PORT: "5032"
     command: ["python", "scientists/app_brian.py"]
@@ -207,7 +207,7 @@ services:
     <<: *scientist-base
     ports: ["5034:5034"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: neil
       AGENT_PORT: "5034"
     command: ["python", "scientists/app_neil.py"]
@@ -222,7 +222,7 @@ services:
     <<: *scientist-base
     ports: ["5038:5038"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: roger
       AGENT_PORT: "5038"
     command: ["python", "scientists/app_roger.py"]
@@ -237,7 +237,7 @@ services:
     <<: *scientist-base
     ports: ["5039:5039"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: bohr
       AGENT_PORT: "5039"
     command: ["python", "scientists/app_bohr.py"]
@@ -252,7 +252,7 @@ services:
     <<: *scientist-base
     ports: ["5040:5040"]
     environment:
-      <<: *chimera-env
+      <<: *example-env
       AGENT_NAME: heisenberg
       AGENT_PORT: "5040"
     command: ["python", "scientists/app_heisenberg.py"]
@@ -270,7 +270,7 @@ services:
     env_file:
       - .env
     environment:
-      <<: *chimera-env
+      <<: *example-env
     volumes: *data-volumes
     <<: *extra-hosts
     command: ["python", "run_chimera.py", "--chat"]
@@ -289,7 +289,7 @@ services:
     env_file:
       - .env
     environment:
-      <<: *chimera-env
+      <<: *example-env
       SCIENTIST_HOST_MODE: docker
     volumes:
       - .:/app

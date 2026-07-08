@@ -23,7 +23,7 @@ def _default_db_path() -> str:
     if env:
         return env
     root = Path(__file__).resolve().parents[2]
-    lab_id = os.getenv("LAB_ID", "chimera")
+    lab_id = os.getenv("LAB_ID", "example")
     path = root / "data" / "labs" / lab_id / "job_tickets.db"
     path.parent.mkdir(parents=True, exist_ok=True)
     return str(path)
@@ -413,7 +413,7 @@ def main():
     p.add_argument("loop_id", type=int)
 
     p = sub.add_parser("backfill")
-    p.add_argument("--lab", default="chimera")
+    p.add_argument("--lab", default="example")
 
     args = parser.parse_args()
     sys = JobTicketSystem()

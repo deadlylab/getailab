@@ -6,7 +6,7 @@ from typing import Optional
 
 from llm.adapter import LLMAdapter, create_default_adapter
 
-SAURON_SYSTEM_PROMPT = """You are SAURON, the research extraction layer for Team Chimera.
+SAURON_SYSTEM_PROMPT = """You are SAURON, the research extraction layer for GetAiLab research teams.
 Extract structured scientific/technical data from the provided page text and/or screenshot.
 
 Return ONLY valid JSON with keys:

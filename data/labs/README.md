@@ -17,7 +17,7 @@ Per-lab vaults live here **on your machine** after you run loops. They are **not
 3. First loop populates `example/scientists/` locally
 4. Forge yours: `python3 scripts/create_lab.py`
 
-**Chimera** (`data/labs/chimera/`) is a private local reference lab — not published on GitHub. See `docs/BUILDER_REPO.md`.
+**the example lab** (`data/labs/<your_lab>/`) is a private local reference lab — not published on GitHub. See `docs/BUILDER_REPO.md`.
 
 ## Forged labs
 

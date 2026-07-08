@@ -18,7 +18,7 @@ This is **not** a chatbot. You're evaluating a **research operating system**.
 
 ### 1. Multi-perspective rigour
 
-- Do **11 scientists** genuinely disagree?
+- Do **scientists in the squad** genuinely disagree?
 - Is dissent preserved in Oracle synthesis (not flattened)?
 - See Loop 23 Section IV — quantum vs geometric primacy tension.
 

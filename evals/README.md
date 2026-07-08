@@ -6,14 +6,14 @@
 ## Planned
 
 - `golden_loops.yaml` — loops 7, 14, 23, **29** as regression references
-- `smoke_test.sh` — `doctor.sh` + status 13/13 + optional dry-run review
+- `smoke_test.sh` — `doctor.sh` + status check + optional dry-run review
 - `results/` — timestamped outputs
 
 ## Manual smoke (until scripted)
 
 ```bash
 ./doctor.sh
-python3 run_chimera.py --status   # expect 13/13
+python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists
 python3 scripts/collaborative_review.py --dry-run --text "smoke" -q "ok?"
 ```
 

@@ -4,7 +4,7 @@ Codex: the searchable collection of research "books" for a lab.
 Aggregates scientist books + shared pages.
 Used by Oracle for synthesis, by scientists for relevant knowledge, by user for overview.
 
-For Chimera model: one codex per lab, with books for each fixed scientist.
+For the example lab model: one codex per lab, with books for each fixed scientist.
 """
 from pathlib import Path
 from typing import List, Dict

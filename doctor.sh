@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# GetAiLab / Chimera — one-command health check
+# GetAiLab — one-command health check (active LAB_ID squad)
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
@@ -39,12 +39,12 @@ else
 fi
 
 # Squad + lab via CLI
-if python3 run_chimera.py --status >/tmp/chimera_status.json 2>/dev/null; then
-  ok "Service status written — see /tmp/chimera_status.json"
+if python3 run_chimera.py --status >/tmp/getailab_status.json 2>/dev/null; then
+  ok "Service status written — see /tmp/getailab_status.json"
   python3 - <<'PY'
 import json
 from pathlib import Path
-d = json.loads(Path("/tmp/chimera_status.json").read_text())
+d = json.loads(Path("/tmp/getailab_status.json").read_text())
 lab = d.get("lab", {})
 ora = d.get("oracle", {})
 print(f"  Lab: {lab.get('status', 'offline')}  libraries={lab.get('libraries', [])}")
@@ -54,12 +54,12 @@ if offline:
     print(f"  Scientists offline (sample): {', '.join(offline)}")
 PY
 else
-  bad "run_chimera.py --status failed — boot squad: ./boot_chimera.sh"
+  bad "run_chimera.py --status failed — boot squad: ./boot_example.sh"
 fi
 
 echo
 echo "Fix hints:"
-echo "  ./boot_chimera.sh              — start full squad"
+echo "  ./boot_example.sh              — start full squad"
 echo "  pip install -r lab/requirements.txt   — fix pandas/pyarrow warnings"
 echo "  docker compose build && docker compose up -d   — rebuild image with pyarrow"
 echo "  python3 run_chimera.py --status"

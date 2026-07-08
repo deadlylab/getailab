@@ -10,7 +10,7 @@ from urllib.parse import quote
 
 import requests
 
-USER_AGENT = "GetAiLab-Chimera/1.0 (research; mailto:research@getailab.dev)"
+USER_AGENT = "GetAiLab-the example lab/1.0 (research; mailto:research@getailab.dev)"
 DEFAULT_TIMEOUT = int(os.getenv("LITERATURE_SEARCH_TIMEOUT", "20"))
 PUBMED_MAX = int(os.getenv("LITERATURE_PUBMED_MAX", "5"))
 ARXIV_MAX = int(os.getenv("LITERATURE_ARXIV_MAX", "5"))

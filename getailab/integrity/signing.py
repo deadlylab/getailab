@@ -86,7 +86,7 @@ def signing_status(lab_id: str, project_root: Optional[Path] = None) -> Dict[str
 
 
 def generate_keypair(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     force: bool = False,
     project_root: Optional[Path] = None,
@@ -161,7 +161,7 @@ def _load_public_key(lab_id: str, project_root: Optional[Path] = None) -> Ed2551
 
 def sign_root_hash(
     root_hash: str,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     metadata: Optional[Dict[str, Any]] = None,
     project_root: Optional[Path] = None,
@@ -207,7 +207,7 @@ def verify_signature(
     project_root: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Verify a signature record produced by sign_root_hash."""
-    lid = lab_id or record.get("metadata", {}).get("lab_id", "chimera")
+    lid = lab_id or record.get("metadata", {}).get("lab_id", "example")
     public_key = _load_public_key(lid, project_root)
     sign_payload = {
         "root_hash": record["root_hash"],
@@ -235,7 +235,7 @@ def verify_signature(
 
 
 def get_latest_signature(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     tree_name: str = "vault",
     project_root: Optional[Path] = None,
@@ -262,7 +262,7 @@ def get_latest_signature(
 
 
 def sign_merkle_tree(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     tree_name: str = "vault",
     root_hash: Optional[str] = None,
@@ -283,7 +283,7 @@ def sign_merkle_tree(
 
 
 def verify_merkle_signature(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     tree_name: str = "vault",
     project_root: Optional[Path] = None,
@@ -331,7 +331,7 @@ def verify_merkle_signature(
 
 
 def attest_vault(
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     *,
     loop_id: Optional[int] = None,
     sign: bool = True,
@@ -415,14 +415,14 @@ def _get_encryption_key(lab_id: str, project_root: Optional[Path] = None) -> byt
     return aes_key
 
 
-def encrypt_bytes(plaintext: bytes, lab_id: str = "chimera", project_root: Optional[Path] = None) -> bytes:
+def encrypt_bytes(plaintext: bytes, lab_id: str = "example", project_root: Optional[Path] = None) -> bytes:
     key = _get_encryption_key(lab_id, project_root)
     aesgcm = AESGCM(key)
     nonce = os.urandom(12)
     return nonce + aesgcm.encrypt(nonce, plaintext, None)
 
 
-def decrypt_bytes(encrypted: bytes, lab_id: str = "chimera", project_root: Optional[Path] = None) -> bytes:
+def decrypt_bytes(encrypted: bytes, lab_id: str = "example", project_root: Optional[Path] = None) -> bytes:
     key = _get_encryption_key(lab_id, project_root)
     aesgcm = AESGCM(key)
     return aesgcm.decrypt(encrypted[:12], encrypted[12:], None)
@@ -433,15 +433,15 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("GetAiLab Signing Tool")
-        print("  python3 -m getailab.integrity.signing keygen [--lab chimera] [--force]")
-        print("  python3 -m getailab.integrity.signing sign [--lab chimera] [--tree vault]")
-        print("  python3 -m getailab.integrity.signing verify [--lab chimera] [--tree vault]")
-        print("  python3 -m getailab.integrity.signing status [--lab chimera]")
-        print("  python3 -m getailab.integrity.signing attest [--lab chimera] [--loop N]")
+        print("  python3 -m getailab.integrity.signing keygen [--lab example] [--force]")
+        print("  python3 -m getailab.integrity.signing sign [--lab example] [--tree vault]")
+        print("  python3 -m getailab.integrity.signing verify [--lab example] [--tree vault]")
+        print("  python3 -m getailab.integrity.signing status [--lab example]")
+        print("  python3 -m getailab.integrity.signing attest [--lab example] [--loop N]")
         sys.exit(0)
 
     cmd = sys.argv[1]
-    lab_id = "chimera"
+    lab_id = "example"
     tree_name = "vault"
     loop_id: Optional[int] = None
     if "--lab" in sys.argv:

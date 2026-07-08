@@ -39,7 +39,7 @@ try:
     SCIENTISTS = get_scientists_dict(_ACTIVE_LAB)
     _oracle_default, _lab_default = get_service_urls(_ACTIVE_LAB)
 except Exception:
-    _ACTIVE_LAB = os.getenv("LAB_ID", "chimera")
+    _ACTIVE_LAB = os.getenv("LAB_ID", "example")
     SCIENTISTS = {
         "albert": 5025, "bohr": 5039, "heisenberg": 5040,
         "alan": 5027, "brian": 5032, "carl": 5028,
@@ -334,7 +334,7 @@ def run_collaborative_review(
     dry_run: bool = False,
     tags: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    """Main entry — usable from CLI or run_chimera Commander."""
+    """Main entry — usable from CLI or run_chimera.py Commander."""
     lid = lab_id or _ACTIVE_LAB
     squad = _squad_members(scientists)
     materials, auto_title, sources = load_materials(files=files, text=text, urls=urls)
@@ -382,7 +382,7 @@ def run_collaborative_review(
     if not reviews:
         raise RuntimeError(
             "No scientist reviews succeeded — is the squad running? "
-            "Try: ./boot_chimera.sh or python3 run_chimera.py --status"
+            "Try: ./boot_example.sh or python3 run_chimera.py --status"
         )
 
     materials_summary = (

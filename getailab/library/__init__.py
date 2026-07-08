@@ -10,7 +10,7 @@ Design (locked per user vision):
 - User layer (Gabb y) is separate (data/users/<user>/).
 - Oracle is the middleman/guardian (enforces, coordinates, prevents fuckups).
 - Scale: user -> multiple labs (different configs), each lab has its scientists' books + codex.
-- Chimera (quantum research division) is the fixed model. Get it working first, then generator uses it as blueprint.
+- the example lab (quantum research division) is the fixed model. Get it working first, then generator uses it as blueprint.
 
 Hand-picked/adapted from old getailab_library for clean scope.
 No cosmo, no bloat, no user-memory in scientists.

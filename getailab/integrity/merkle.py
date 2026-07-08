@@ -95,13 +95,13 @@ def build_tree(root_path: str | Path, ignore_patterns: Optional[List[str]] = Non
     return tree
 
 
-def save_tree(tree: dict, name: str, lab_id: str = "chimera") -> str:
+def save_tree(tree: dict, name: str, lab_id: str = "example") -> str:
     filepath = _merkle_dir(lab_id) / f"{name}.json"
     filepath.write_text(json.dumps(tree, indent=2))
     return str(filepath)
 
 
-def load_tree(name: str, lab_id: str = "chimera") -> Optional[dict]:
+def load_tree(name: str, lab_id: str = "example") -> Optional[dict]:
     filepath = _merkle_dir(lab_id) / f"{name}.json"
     if not filepath.exists():
         return None
@@ -213,7 +213,7 @@ def scan_directory(
     directory: str | Path,
     name: str,
     *,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     ignore_patterns: Optional[List[str]] = None,
     rotate_previous: bool = True,
 ) -> dict[str, Any]:
@@ -254,7 +254,7 @@ def scan_directory(
 def compare_saved_trees(
     name: str,
     *,
-    lab_id: str = "chimera",
+    lab_id: str = "example",
     use_previous: bool = True,
 ) -> dict[str, Any]:
     """Compare current saved tree against its ``_previous`` snapshot (or an explicit baseline)."""
@@ -284,14 +284,14 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("GetAiLab Merkle Tool")
         print("Usage:")
-        print(f"  python3 -m getailab.integrity.merkle scan <dir> <name> [--lab chimera]")
-        print(f"  python3 -m getailab.integrity.merkle compare <name> [--lab chimera]")
-        print(f"  python3 -m getailab.integrity.merkle duplicates <name> [--lab chimera]")
-        print(f"  python3 -m getailab.integrity.merkle show <name> [--lab chimera]")
+        print(f"  python3 -m getailab.integrity.merkle scan <dir> <name> [--lab example]")
+        print(f"  python3 -m getailab.integrity.merkle compare <name> [--lab example]")
+        print(f"  python3 -m getailab.integrity.merkle duplicates <name> [--lab example]")
+        print(f"  python3 -m getailab.integrity.merkle show <name> [--lab example]")
         sys.exit(0)
 
     cmd = sys.argv[1]
-    lab_id = "chimera"
+    lab_id = "example"
     if "--lab" in sys.argv:
         idx = sys.argv.index("--lab")
         if idx + 1 < len(sys.argv):
@@ -299,7 +299,7 @@ if __name__ == "__main__":
 
     if cmd == "scan":
         if len(sys.argv) < 4:
-            print("Usage: scan <directory> <name> [--lab chimera]")
+            print("Usage: scan <directory> <name> [--lab example]")
             sys.exit(1)
         directory, name = sys.argv[2], sys.argv[3]
         print(f"Scanning {directory}...")
@@ -316,7 +316,7 @@ if __name__ == "__main__":
 
     elif cmd == "compare":
         if len(sys.argv) < 3:
-            print("Usage: compare <name> [--lab chimera]")
+            print("Usage: compare <name> [--lab example]")
             sys.exit(1)
         name = sys.argv[2]
         result = compare_saved_trees(name, lab_id=lab_id)
@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     elif cmd == "duplicates":
         if len(sys.argv) < 3:
-            print("Usage: duplicates <name> [--lab chimera]")
+            print("Usage: duplicates <name> [--lab example]")
             sys.exit(1)
         name = sys.argv[2]
         tree = load_tree(name, lab_id=lab_id)
@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
     elif cmd == "show":
         if len(sys.argv) < 3:
-            print("Usage: show <name> [--lab chimera]")
+            print("Usage: show <name> [--lab example]")
             sys.exit(1)
         name = sys.argv[2]
         tree = load_tree(name, lab_id=lab_id)

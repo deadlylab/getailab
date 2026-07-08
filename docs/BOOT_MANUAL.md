@@ -1,9 +1,9 @@
-# GetAiLab / Project Chimera — Boot & Operations Manual
+# GetAiLab — Boot & Operations Manual
 
 Step-by-step guide to starting, stopping, and troubleshooting GetAiLab Live.  
 Use this before your first boot and keep it handy when something feels “off.”
 
-**Last updated:** 8 July 2026 — full squad (11 scientists + Oracle + lab), `minimax-m2.5:cloud` for loops, `doctor.sh` + full `--status` probe.
+**Last updated:** 8 July 2026 — example lab (2 scientists + Oracle + lab), `minimax-m2.5:cloud` for loops, `doctor.sh` + full `--status` probe.
 
 ---
 
@@ -11,10 +11,10 @@ Use this before your first boot and keep it handy when something feels “off.�
 
 | Goal | Use |
 |------|-----|
-| Fastest dev loop, full control, logs on disk | **Native** → `./boot_chimera.sh` |
-| Isolated environment, same setup on any machine | **Docker** → `./docker_chimera.sh` |
+| Fastest dev loop, full control, logs on disk | **Native** → `./boot_example.sh` |
+| Isolated environment, same setup on any machine | **Docker** → `docker compose` |
 | Dashboard + chat only (no full research loop) | Either path — lab + oracle is enough |
-| Full dialectic loop (all 10 scientists) | Native: `boot_chimera.sh` · Docker: `docker_chimera.sh squad` |
+| Full dialectic loop (your squad) | Native: `boot_example.sh` · Docker: `docker compose squad` |
 
 **Rule:** never run **native and Docker at the same time**. They fight over the same ports.
 
@@ -26,7 +26,7 @@ Work through this once before your first boot.
 
 ### Hardware (minimum)
 
-- [ ] **CPU:** 4+ cores recommended (10 scientist agents + lab sandbox)
+- [ ] **CPU:** 4+ cores recommended (scientist agents + lab sandbox scale with squad size)
 - [ ] **RAM:** 8 GB minimum · 16 GB+ recommended if using local Ollama
 - [ ] **Disk:** ~5 GB free (Python deps, optional Docker image, `data/` vault, artifacts)
 - [ ] **Network:** internet access for web reader / Sauron (optional for pure local work)
@@ -34,7 +34,7 @@ Work through this once before your first boot.
 ### Operating system
 
 - [ ] **Linux** (incl. Kali, Ubuntu, etc.) — fully supported  
-- [ ] **macOS** — supported via `boot_chimera.sh` or Docker Desktop  
+- [ ] **macOS** — supported via `boot_example.sh` or Docker Desktop  
 - [ ] **Windows** — use `python run_chimera.py` or Docker Desktop (WSL2 recommended)
 
 ### Required software (native path)
@@ -78,7 +78,7 @@ Work through this once before your first boot.
 cd getailab_live
 ./setup_python.sh --install-deps   # apt compile deps + pyenv 3.11.15 + pip
 python3 --version                  # → Python 3.11.15 inside this folder
-./boot_chimera.sh
+./boot_example.sh
 ```
 
 If `libreadline-dev` not found: `sudo apt update` first. Package exists on Kali rolling as `libreadline-dev` (not `libreadline8-dev`).
@@ -87,8 +87,8 @@ If `libreadline-dev` not found: `sudo apt update` first. Package exists on Kali 
 
 ```bash
 ./scripts/ollama_for_docker.sh
-./docker_chimera.sh squad
-./docker_chimera.sh loop
+docker compose squad
+docker compose loop
 ```
 
 ### Project setup (one-time)
@@ -110,7 +110,7 @@ playwright install chromium
 
 ### Pre-flight port check
 
-Chimera reserves these ports on **localhost**:
+the example lab reserves these ports on **localhost**:
 
 | Port | Service |
 |------|---------|
@@ -127,7 +127,7 @@ Chimera reserves these ports on **localhost**:
 | 5038 | Roger |
 | 5039 | Bohr |
 | 5040 | Heisenberg |
-| 11434 | Ollama (host, not Chimera) |
+| 11434 | Ollama (host, not the shipped example lab) |
 
 Check nothing else is listening:
 
@@ -158,7 +158,7 @@ No output = good. If something is listed, stop it before booting (see §5).
 
 4. **Boot the stack:**
    ```bash
-   ./boot_chimera.sh
+   ./boot_example.sh
    ```
 
    What it does:
@@ -181,7 +181,7 @@ No output = good. If something is listed, stop it before booting (see §5).
 
 ### Important: closing the terminal does NOT stop services
 
-`boot_chimera.sh` backgrounds the agents. Closing the terminal only stops the Commander Console — **lab and scientists keep running**.
+`boot_example.sh` backgrounds the agents. Closing the terminal only stops the Commander Console — **lab and scientists keep running**.
 
 ---
 
@@ -201,7 +201,7 @@ No output = good. If something is listed, stop it before booting (see §5).
 
 3. **Build the image** (first time, or after code/requirements changes):
    ```bash
-   ./docker_chimera.sh build
+   docker compose build
    ```
    First build can take several minutes (Playwright/Chromium download).
 
@@ -209,12 +209,12 @@ No output = good. If something is listed, stop it before booting (see §5).
 
    **Dashboard + APIs only:**
    ```bash
-   ./docker_chimera.sh up
+   docker compose up
    ```
 
    **Full squad (needed for dialectic loops in Docker):**
    ```bash
-   ./docker_chimera.sh squad
+   docker compose squad
    ```
 
 5. **Open dashboard:**
@@ -225,22 +225,22 @@ No output = good. If something is listed, stop it before booting (see §5).
 
 6. **Check health:**
    ```bash
-   ./docker_chimera.sh status
+   docker compose status
    ```
 
 ### Docker command reference
 
 | Command | What it does |
 |---------|----------------|
-| `./docker_chimera.sh build` | Build `getailab:latest` image |
-| `./docker_chimera.sh up` | Lab + Oracle |
-| `./docker_chimera.sh squad` | Lab + Oracle + all 10 scientists |
-| `./docker_chimera.sh down` | Stop stack |
-| `./docker_chimera.sh clean` | Stop + remove orphans (keeps `./data` on host) |
-| `./docker_chimera.sh status` | Health-check endpoints |
-| `./docker_chimera.sh logs` | Tail lab logs (`logs oracle`, etc.) |
-| `./docker_chimera.sh cli` | Interactive chat in container |
-| `./docker_chimera.sh loop` | Full dialectic loop (starts squad if needed) |
+| `docker compose build` | Build `getailab:latest` image |
+| `docker compose up` | Lab + Oracle |
+| `docker compose squad` | Lab + Oracle + all 10 scientists |
+| `docker compose down` | Stop stack |
+| `docker compose clean` | Stop + remove orphans (keeps `./data` on host) |
+| `docker compose status` | Health-check endpoints |
+| `docker compose logs` | Tail lab logs (`logs oracle`, etc.) |
+| `docker compose cli` | Interactive chat in container |
+| `docker compose loop` | Full dialectic loop (starts squad if needed) |
 
 ### Ollama + Docker
 
@@ -255,8 +255,8 @@ Containers reach host Ollama via `host.docker.internal:11434` (set automatically
 
 ```bash
 # Health endpoints
-curl -s http://localhost:5035/health | python3 -m json.tool
-curl -s http://localhost:5024/health | python3 -m json.tool
+curl -s http://localhost:5135/health | python3 -m json.tool
+curl -s http://localhost:5124/health | python3 -m json.tool
 
 # Process list
 pgrep -af 'app_lab|app_oracle|scientists/app_'
@@ -265,19 +265,19 @@ pgrep -af 'app_lab|app_oracle|scientists/app_'
 ss -tlnp | grep -E ':50(2[4-9]|3[0-9]|4[0-0])\b'
 ```
 
-You should see **13 Python processes** (1 lab + 1 oracle + 11 scientists) and listeners on 5024–5040 (5030 = Tesla; gaps at 5031/5033/5036–5037 are normal).
+Example lab: **4 Python processes** (1 lab + 1 oracle + 2 scientists) on ports 5124–5135.
 
 ```bash
 ./doctor.sh                        # one-command: stack + Ollama + status
-python3 run_chimera.py --status    # full JSON — all 11 scientists probed
+python3 run_chimera.py --status    # full JSON — all squad members probed
 ```
 
-**Target:** 13/13 (`lab` active, `oracle` + 11 scientists `healthy`).
+**Target (example lab):** `lab` active, `oracle` + 2 scientists `healthy`.
 
 ### Docker
 
 ```bash
-./docker_chimera.sh status
+docker compose status
 docker compose ps
 ```
 
@@ -296,7 +296,7 @@ tail -f logs/app_albert.log
 ### Stop native stack
 
 ```bash
-./stop_chimera.sh
+./stop_example.sh
 ```
 
 Or manually:
@@ -315,13 +315,13 @@ ss -tlnp | grep -E ':50(2[4-9]|3[0-9]|4[0-0])\b' || echo "Ports clear"
 ### Stop Docker stack
 
 ```bash
-./docker_chimera.sh down
+docker compose down
 ```
 
 Nuclear option (all Docker containers on the machine — use carefully):
 
 ```bash
-./docker_chimera.sh clean
+docker compose clean
 ```
 
 ### Stop everything before switching paths
@@ -330,7 +330,7 @@ Always stop **both** native and Docker before switching boot method:
 
 ```bash
 pkill -f 'python3.*app_' 2>/dev/null || true
-./docker_chimera.sh down 2>/dev/null || true
+docker compose down 2>/dev/null || true
 ```
 
 ---
@@ -339,7 +339,7 @@ pkill -f 'python3.*app_' 2>/dev/null || true
 
 ### “Address already in use” / port clash
 
-**Cause:** Another Chimera instance, old `astel_*` containers, or another app on 5024–5040.
+**Cause:** Another the example lab instance, old `astel_*` containers, or another app on 5024–5040.
 
 **Fix:**
 
@@ -348,7 +348,7 @@ pkill -f 'python3.*app_' 2>/dev/null || true
    ss -tlnp | grep -E ':50(2[4-9]|3[0-9]|4[0-0])\b'
    ```
 2. Stop native agents: `pkill -f 'python3.*app_'`
-3. Stop Docker: `./docker_chimera.sh down`
+3. Stop Docker: `docker compose down`
 4. If another Docker project holds the port:
    ```bash
    docker ps --format '{{.Names}} {{.Ports}}' | grep 5035
@@ -366,7 +366,7 @@ pkill -f 'python3.*app_' 2>/dev/null || true
 **Checks:**
 
 1. Are processes running? (`pgrep` or `docker compose ps`)
-2. Read logs: `logs/app_oracle.log` or `./docker_chimera.sh logs oracle`
+2. Read logs: `logs/app_oracle.log` or `docker compose logs oracle`
 3. Curl health endpoints directly (§4)
 4. Wrong `ORACLE_URL` / `LAB_URL` in `.env`? Native should use `localhost`; Docker overrides these inside compose.
 
@@ -403,7 +403,7 @@ Cause: Ollama listens on `127.0.0.1` only — containers cannot reach loopback s
 ```bash
 ./scripts/ollama_for_docker.sh
 # then retry:
-./docker_chimera.sh loop
+docker compose loop
 ```
 
 **Cloud:** confirm `LLM_PROVIDER` and the matching API key are set in `.env`.
@@ -417,8 +417,8 @@ Cause: Ollama listens on `127.0.0.1` only — containers cannot reach loopback s
 **Fix:**
 
 ```bash
-./docker_chimera.sh squad
-./docker_chimera.sh status
+docker compose squad
+docker compose status
 ```
 
 Full loops in Docker also need `SCIENTIST_HOST_MODE=docker` (set automatically on the `loop` service).
@@ -432,9 +432,9 @@ Full loops in Docker also need `SCIENTIST_HOST_MODE=docker` (set automatically o
 **Fix:**
 
 ```bash
-./docker_chimera.sh build
-./docker_chimera.sh down
-./docker_chimera.sh squad
+docker compose build
+docker compose down
+docker compose squad
 ```
 
 ---
@@ -444,7 +444,7 @@ Full loops in Docker also need `SCIENTIST_HOST_MODE=docker` (set automatically o
 **Checks:**
 
 1. Lab healthy: `curl http://localhost:5035/health`
-2. Writable dirs: `lab/artifacts/`, `data/labs/chimera/`
+2. Writable dirs: `lab/artifacts/`, `data/labs/<your_lab>/`
 3. LLM reachable (hypothesis/implement calls will fail silently or log errors)
 4. Inspect `logs/app_lab.log` for execute errors
 
@@ -464,11 +464,11 @@ Full loops in Docker also need `SCIENTIST_HOST_MODE=docker` (set automatically o
 
 **Fix:** Use the updated script (includes `-it`):
 ```bash
-./docker_chimera.sh loop
-./docker_chimera.sh cli
+docker compose loop
+docker compose cli
 ```
 
-Native path (`./boot_chimera.sh`) should edit normally. If not, confirm you are in a real terminal (not piping input).
+Native path (`./boot_example.sh`) should edit normally. If not, confirm you are in a real terminal (not piping input).
 
 ---
 
@@ -483,7 +483,7 @@ playwright install chromium
 **Docker:** Chromium is baked into the image at build time. Rebuild if vision fails after an old image:
 
 ```bash
-./docker_chimera.sh build
+docker compose build
 ```
 
 ---
@@ -511,7 +511,7 @@ cp .env.example .env
 pip install -r lab/requirements.txt -r scientists/requirements.txt
 ollama serve          # separate terminal
 ollama pull dolphin3:latest
-./boot_chimera.sh
+./boot_example.sh
 # Browser → http://localhost:5035
 ```
 
@@ -521,8 +521,8 @@ ollama pull dolphin3:latest
 cd getailab_live
 cp .env.example .env
 ollama serve          # host — required for local LLM
-./docker_chimera.sh build
-./docker_chimera.sh squad
+docker compose build
+docker compose squad
 # Browser → http://localhost:5035
 ```
 
@@ -530,21 +530,21 @@ ollama serve          # host — required for local LLM
 
 ```bash
 pkill -f 'python3.*app_'
-./docker_chimera.sh squad
+docker compose squad
 ```
 
 ### Switch from Docker to native
 
 ```bash
-./docker_chimera.sh down
-./boot_chimera.sh
+docker compose down
+./boot_example.sh
 ```
 
 ### End of day shutdown
 
 ```bash
 pkill -f 'python3.*app_' 2>/dev/null || true
-./docker_chimera.sh down 2>/dev/null || true
+docker compose down 2>/dev/null || true
 ```
 
 ---
@@ -555,16 +555,16 @@ pkill -f 'python3.*app_' 2>/dev/null || true
 |------|---------|
 | `.env` | Your config (models, API keys, ports) — **do not commit** |
 | `.env.example` | Template |
-| `boot_chimera.sh` | Native boot script |
+| `boot_example.sh` | Native boot script |
 | `doctor.sh` | One-command health (stack + Ollama + squad status) |
-| `stop_chimera.sh` | Native shutdown script |
-| `docker_chimera.sh` | Docker build & run script |
+| `stop_example.sh` | Native shutdown script |
+| `docker compose` | Docker build & run script |
 | `run_chimera.py` | Commander Console / CLI |
 | `logs/` | Native service logs |
-| `data/labs/chimera/` | Library vault, tickets, signing keys |
+| `data/labs/<your_lab>/` | Library vault, tickets, signing keys |
 | `lab/artifacts/` | Experiment outputs (.csv, .json, .png) |
-| `chimera_lab.db` | Oracle loop database |
-| `loop_*_report.md` | Per-loop markdown reports (native) |
+| `data/labs/<lab_id>/agora.db` | Oracle loop database |
+| `data/labs/<lab_id>/reports/` | Per-loop markdown reports |
 
 ---
 
@@ -574,18 +574,18 @@ pkill -f 'python3.*app_' 2>/dev/null || true
 ┌─────────────────────────────────────────────────────────────┐
 │  BEFORE BOOT                                                │
 │  □ .env exists    □ deps installed    □ Ollama running      │
-│  □ ports 5024-5040 free    □ not mixing native + docker     │
+│  □ ports free (example: 5124-5135)  □ not mixing native+docker │
 ├─────────────────────────────────────────────────────────────┤
-│  NATIVE          ./boot_chimera.sh                          │
-│  DOCKER BUILD    ./docker_chimera.sh build                  │
-│  DOCKER UP       ./docker_chimera.sh up                     │
-│  DOCKER SQUAD    ./docker_chimera.sh squad                  │
-│  DASHBOARD       http://localhost:5035                      │
+│  NATIVE          ./boot_example.sh                          │
+│  DOCKER BUILD    docker compose build                  │
+│  DOCKER UP       docker compose up                     │
+│  DOCKER SQUAD    docker compose squad                  │
+│  DASHBOARD       http://localhost:5135                      │
 ├─────────────────────────────────────────────────────────────┤
-│  STOP NATIVE     ./stop_chimera.sh                          │
-│  STOP DOCKER     ./docker_chimera.sh down                   │
-│  HEALTH          curl localhost:5035/health                 │
-│                  curl localhost:5024/health                 │
+│  STOP NATIVE     ./stop_example.sh                          │
+│  STOP DOCKER     docker compose down                   │
+│  HEALTH          curl localhost:5135/health                 │
+│                  curl localhost:5124/health                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -595,8 +595,8 @@ pkill -f 'python3.*app_' 2>/dev/null || true
 
 - Full platform handbook: [OPERATION_MANUAL.md](./OPERATION_MANUAL.md)
 - Docker compose reference: [docker-compose.yml](../docker-compose.yml)
-- Persona definitions: [personas/chimera_squad.yaml](../personas/chimera_squad.yaml)
+- Persona definitions: [personas/<lab_id>_squad.yaml](../personas/<lab_id>_squad.yaml)
 
 ---
 
-*GetAiLab Live · Project Chimera · CryptO'Brien Pty Ltd*
+*GetAiLab Live · GetAiLab · CryptO'Brien Pty Ltd*

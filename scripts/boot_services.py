@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GetAiLab — cross-platform Chimera service boot.
+GetAiLab — cross-platform the example lab service boot.
 
 Starts lab, oracle, and scientist squad in background with logs/.
 """
@@ -48,7 +48,7 @@ def _load_env() -> None:
 def _banner():
     print()
     print("  ╔══════════════════════════════════════════════════════════════════╗")
-    print("  ║   GetAiLab · Chimera Ignition                                     ║")
+    print("  ║   GetAiLab · the example lab Ignition                                     ║")
     print(f"  ║   {platform.system()} · Python {_python()}".ljust(69) + "║")
     print("  ╚══════════════════════════════════════════════════════════════════╝")
     print()
@@ -84,7 +84,7 @@ def start_process(script: Path, log_name: str, extra_env: dict | None = None) ->
     LOGS.mkdir(parents=True, exist_ok=True)
     log_path = LOGS / log_name
     env = os.environ.copy()
-    env.setdefault("LAB_ID", "chimera")
+    env.setdefault("LAB_ID", "example")
     if extra_env:
         env.update(extra_env)
     py = _python()
@@ -140,7 +140,7 @@ print(f"  Health: {'READY' if a.is_ready() else 'NOT REACHABLE'}")
     lab_port = os.getenv("LAB_PORT", "5035")
     oracle_port = os.getenv("ORACLE_URL", "http://localhost:5024").split(":")[-1].rstrip("/")
     print()
-    print("✅ Chimera online.")
+    print("✅ the example lab online.")
     print(f"   Dashboard : http://localhost:{lab_port}")
     print(f"   Oracle    : http://localhost:{oracle_port}")
     print("   Logs      : logs/")

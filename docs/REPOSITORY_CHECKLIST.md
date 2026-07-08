@@ -24,7 +24,7 @@ Use this before every external send or GitHub publish. Run `./scripts/repo_prefl
 |------|----------------|--------|----------|
 | Prerequisites listed | No mystery deps | ✅ | `README.md` + `docs/BOOT_MANUAL.md` |
 | `.env.example` with comments | Safe copy-paste setup | ✅ | `.env.example` |
-| One-command boot | Lowest friction path | ✅ | `./boot_chimera.sh` |
+| One-command boot | Lowest friction path | ✅ | `./boot_example.sh` |
 | One-command health check | “Is it working?” | ✅ | `./doctor.sh` |
 | Cross-platform installers | Windows/Mac/Linux testers | ✅ | `Install-GetAiLab-*` |
 | Smoke test script | Pre-send validation | ✅ | `evals/smoke_test.sh` |
@@ -123,11 +123,11 @@ git clone git@github.com:deadlylab/getailab.git
 cd getailab
 cp .env.example .env
 pip install -r requirements.txt
-./boot_chimera.sh
+./boot_example.sh
 ./doctor.sh
-python3 run_chimera.py --status   # expect 13/13 when Ollama + models ready
+python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists when Ollama + models ready
 ```
 
 ---
 
-*Maintained for GetAiLab / Project Chimera — CryptO'Brien Pty Ltd.*
+*Maintained for GetAiLab — CryptO'Brien Pty Ltd.*

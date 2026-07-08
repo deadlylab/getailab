@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SAURON VISION — Research scraper for Project Chimera.
+SAURON VISION — Research scraper for GetAiLab.
 Uses the configured LLM provider (Ollama, OpenAI, Google, etc.) via llm.adapter.
 
 Usage:

@@ -1,9 +1,9 @@
 """
-Lab configuration — multi-lab support for GetAiLab / Project Chimera.
+Lab configuration — multi-lab support for GetAiLab.
 
 Shipped labs live under data/labs/<lab_id>/config/lab.yaml with scientist apps in
-scientists/forges/<lab_id>/. The public repo defaults to the example lab; Chimera
-is a private local reference lab when present (not published).
+scientists/forges/<lab_id>/. The public repo defaults to the example lab.
+Legacy local operational labs (lab_id=chimera) are supported when present on disk.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_LABS = PROJECT_ROOT / "data" / "labs"
 PERSONAS_DIR = PROJECT_ROOT / "personas"
 
-# Chimera reference ports (do not collide when allocating new labs)
+# Legacy local reference-lab ports (only when LAB_ID=chimera exists on disk)
 CHIMERA_ORACLE_PORT = 5024
 CHIMERA_LAB_PORT = 5035
 CHIMERA_SCIENTIST_PORTS = {
@@ -50,19 +50,20 @@ def get_lab_id() -> str:
 
 
 def is_chimera_lab(lab_id: Optional[str] = None) -> bool:
+    """True for legacy local operational lab id 'chimera' only."""
     return (lab_id or get_lab_id()) == "chimera"
 
 
 def lab_vault_path(lab_id: Optional[str] = None) -> Path:
-    """Library vault root — always data/labs/<lab_id>/ (Chimera included)."""
+    """Library vault root — always data/labs/<lab_id>/."""
     return DATA_LABS / (lab_id or get_lab_id())
 
 
 def lab_reports_dir(lab_id: Optional[str] = None) -> Path:
     """
     Loop report markdown search path.
-    Chimera: project root + docs/loops (legacy).
-    Forged labs: data/labs/<id>/reports/ only — never Chimera's loop_*.md files.
+    Legacy chimera: project root + docs/loops.
+    All other labs (including example): data/labs/<id>/reports/.
     """
     lid = lab_id or get_lab_id()
     if is_chimera_lab(lid):
@@ -129,8 +130,8 @@ def _chimera_default_config() -> Dict[str, Any]:
     }
     return {
         "lab_id": "chimera",
-        "display_name": "Project Chimera — Quantum Research Division",
-        "research_agenda": "Quantum cognition, landscape engine, dialectic research",
+        "display_name": "Reference operational lab (local)",
+        "research_agenda": "Local reference deployment — not shipped on GitHub",
         "build_profile": "reference",
         "personas_yaml": "personas/chimera_squad.yaml",
         "oracle_port": CHIMERA_ORACLE_PORT,
@@ -141,7 +142,7 @@ def _chimera_default_config() -> Dict[str, Any]:
 
 
 def load_lab_config(lab_id: Optional[str] = None) -> Dict[str, Any]:
-    """Load lab.yaml for lab_id, or Chimera defaults."""
+    """Load lab.yaml for lab_id, or chimera legacy defaults when local only."""
     lid = lab_id or get_lab_id()
     path = lab_config_path(lid)
     if path.is_file():
@@ -198,7 +199,7 @@ def list_forged_labs() -> List[Dict[str, Any]]:
 
 
 def scan_used_ports() -> set:
-    """Ports reserved in any lab config plus Chimera defaults."""
+    """Ports reserved in any lab config plus legacy chimera defaults."""
     used = {CHIMERA_ORACLE_PORT, CHIMERA_LAB_PORT, *CHIMERA_SCIENTIST_PORTS.values()}
     for lab in list_forged_labs():
         used.add(int(lab.get("oracle_port", 0)))
@@ -217,7 +218,6 @@ def port_listening(port: int) -> bool:
 def lab_port_map(lab_id: Optional[str] = None) -> Dict[str, int]:
     """Named ports for a lab (oracle, lab, scientist names)."""
     cfg = load_lab_config(lab_id)
-    lid = lab_id or cfg.get("lab_id", "chimera")
     out: Dict[str, int] = {
         "oracle": int(cfg.get("oracle_port", CHIMERA_ORACLE_PORT)),
         "lab": int(cfg.get("lab_port", CHIMERA_LAB_PORT)),
@@ -233,7 +233,7 @@ def lab_port_map(lab_id: Optional[str] = None) -> Dict[str, int]:
 
 
 def enumerate_all_labs() -> List[Dict[str, Any]]:
-    """Every lab with config/lab.yaml on disk (+ legacy Chimera defaults if no yaml)."""
+    """Every lab with config/lab.yaml on disk (+ legacy chimera if local only)."""
     labs: List[Dict[str, Any]] = []
     seen: set = set()
 
@@ -255,7 +255,6 @@ def enumerate_all_labs() -> List[Dict[str, Any]]:
         )
         labs.append(entry)
 
-    # Local-only Chimera: list if config/yaml missing from disk but legacy defaults apply
     if "chimera" not in seen and (
         personas_yaml_path("chimera").is_file() or (PROJECT_ROOT / "boot_chimera.sh").is_file()
     ):
@@ -309,25 +308,25 @@ def forge_apps_dir(lab_id: str) -> Path:
 
 
 def agora_db_path(lab_id: Optional[str] = None) -> Path:
-    """Per-lab loop DB — Chimera uses project-root chimera_lab.db; forged labs use vault agora.db."""
+    """Per-lab loop DB — legacy chimera uses project-root chimera_lab.db."""
     lid = lab_id or get_lab_id()
-    if lid == "chimera":
+    if is_chimera_lab(lid):
         return PROJECT_ROOT / "chimera_lab.db"
     return DATA_LABS / lid / "agora.db"
 
 
 def lab_results_db_path(lab_id: Optional[str] = None) -> Path:
-    """Per-lab sandbox execution DB (lab_experiments). Chimera keeps lab/lab_results.db."""
+    """Per-lab sandbox execution DB (lab_experiments)."""
     lid = lab_id or get_lab_id()
-    if lid == "chimera":
+    if is_chimera_lab(lid):
         return PROJECT_ROOT / "lab" / "lab_results.db"
     return DATA_LABS / lid / "lab_results.db"
 
 
 def lab_artifacts_dir(lab_id: Optional[str] = None) -> Path:
-    """Per-lab experiment workspace. Chimera keeps lab/artifacts/."""
+    """Per-lab experiment workspace."""
     lid = lab_id or get_lab_id()
-    if lid == "chimera":
+    if is_chimera_lab(lid):
         return PROJECT_ROOT / "lab" / "artifacts"
     return DATA_LABS / lid / "artifacts"
 
@@ -338,21 +337,19 @@ def ensure_lab_results_db(lab_id: Optional[str] = None) -> Path:
 
     path = lab_results_db_path(lab_id)
     path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path, timeout=10)
+    conn = sqlite3.connect(str(path))
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS lab_experiments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            loop_id TEXT,
+            loop_id INTEGER,
             agent_name TEXT,
-            experiment_name TEXT,
             code TEXT,
             stdout TEXT,
             stderr TEXT,
-            success BOOLEAN,
-            execution_time_ms INTEGER,
-            artifacts_json TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            artifacts TEXT,
+            success INTEGER,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
         """
     )
@@ -361,32 +358,18 @@ def ensure_lab_results_db(lab_id: Optional[str] = None) -> Path:
     return path
 
 
-def ensure_scientist_vault(lab_id: str, scientist_names: List[str]) -> None:
-    """Empty book/skills dirs for each squad member (isolated from other labs)."""
+def ensure_vault_structure(lab_id: str, scientist_names: List[str]) -> Path:
+    """Create data/labs/<id>/ tree with empty scientist books."""
+    root = lab_vault_path(lab_id)
+    for sub in ("config", "artifacts", "codex", "merkle", "signatures", "keys"):
+        (root / sub).mkdir(parents=True, exist_ok=True)
     for name in scientist_names:
-        n = name.lower().strip()
-        if not n or n == "oracle":
-            continue
-        book = DATA_LABS / lab_id / "scientists" / n / "book"
-        for sub in ("pages", "skills"):
-            (book / sub).mkdir(parents=True, exist_ok=True)
-        manifest = book / "manifest.json"
-        if not manifest.exists():
-            manifest.write_text(
-                json.dumps({"scientist": n, "lab_id": lab_id, "pages": [], "skills": []}, indent=2) + "\n",
-                encoding="utf-8",
-            )
+        book = root / "scientists" / name / "book" / "pages"
+        book.mkdir(parents=True, exist_ok=True)
+    return root
 
 
-def ensure_vault_structure(lab_id: str, scientist_names: Optional[List[str]] = None) -> Path:
-    base = DATA_LABS / lab_id
-    for sub in ("config", "scientists", "codex/book/pages", "artifacts", "reports", "merkle", "keys", "signatures"):
-        (base / sub).mkdir(parents=True, exist_ok=True)
-    manifest = base / "manifest.json"
-    if not manifest.exists():
-        manifest.write_text('{"loops": []}\n', encoding="utf-8")
-    if lab_id != "chimera":
-        ensure_lab_results_db(lab_id)
-    if scientist_names:
-        ensure_scientist_vault(lab_id, scientist_names)
-    return base
+def ensure_scientist_vault(lab_id: str, scientist_name: str) -> Path:
+    path = lab_vault_path(lab_id) / "scientists" / scientist_name / "book" / "pages"
+    path.mkdir(parents=True, exist_ok=True)
+    return path

@@ -39,7 +39,7 @@ class Gabby:
         profile = {
             "user_id": self.user_id,
             "preferences": {},
-            "labs": ["chimera"],
+            "labs": ["example"],
             "personal_note": "",
         }
         if self.profile_path.exists():
@@ -67,7 +67,7 @@ class Gabby:
     def get_adaptive_coaching(self) -> str:
         return self._learner.get_coaching_message()
 
-    def chat(self, message: str, lab_id: str = "chimera") -> str:
+    def chat(self, message: str, lab_id: str = "example") -> str:
         """Normal user conversation. Gabby can be helpful, remember context, etc."""
         ctx = self.record_interaction(message)
         intervention = ctx.get("intervention", "standard")
@@ -78,7 +78,7 @@ class Gabby:
             return self._learner.get_coaching_message()
         return "Got it. I've noted that. Want me to kick off something in the lab?"
 
-    def get_safe_research_inspiration(self, lab_id: str = "chimera", topic: str = "") -> List[str]:
+    def get_safe_research_inspiration(self, lab_id: str = "example", topic: str = "") -> List[str]:
         """
         User-friendly inspiration (for 'no idea' flow or to make the lab feel alive).
         This is the ONLY way a user gets to see *any* of the scientists' accumulated knowledge.
@@ -88,7 +88,7 @@ class Gabby:
         guardian = OracleGuardian(lab_id, self.base_path)
         return guardian.get_safe_inspiration_for_user(topic, self.get_user_profile())
 
-    def request_research_loop(self, problem: str, lab_id: str = "chimera") -> Dict:
+    def request_research_loop(self, problem: str, lab_id: str = "example") -> Dict:
         """
         User asks Gabby to run research.
         Gabby adds any personal flavor (sanitized), then asks Oracle to handle it.
@@ -101,7 +101,7 @@ class Gabby:
         guardian = OracleGuardian(lab_id, self.base_path)
         return guardian.validate_and_run_loop(problem, safe_context)
 
-    def get_my_lab_overview(self, lab_id: str = "chimera") -> Dict:
+    def get_my_lab_overview(self, lab_id: str = "example") -> Dict:
         """High-level, user-safe view of a lab. 'Your research progress', not the raw books."""
         from ..oracle.guardian import OracleGuardian
         guardian = OracleGuardian(lab_id, self.base_path)

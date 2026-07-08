@@ -52,7 +52,6 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   fi
   MOAT_PATHS=(
     personas/chimera_squad.yaml
-    data/labs/chimera/config/lab.yaml
     outreach/Outreach_Contacts_List.md
     legal/Beta_Trial_Terms_and_Conditions.md
     docs/COMPETITIVE_DOSSIER_GETAILAB_2026.md

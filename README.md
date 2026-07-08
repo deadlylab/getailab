@@ -3,11 +3,11 @@
 [![CI](https://github.com/deadlylab/getailab/actions/workflows/ci.yml/badge.svg)](https://github.com/deadlylab/getailab/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-**Self-hosted research operating system + lab forge.** Clone this repo to run the engine and build **your own** multi-agent research division — not Project Chimera's vault.
+**Self-hosted research operating system + lab forge.** Clone this repo to run the engine and build **your own** multi-agent research division.
 
 GetAiLab is a **method**, not a chatbot: hypothesis → implement → execute → synthesize → pick next direction. Each stage is ticketed; artifacts land in your isolated vault.
 
-> **Builder vs workspace:** This GitHub repo ships the **engine + example lab + forge**. CryptO'Brien's Chimera personas, loop history, and vault live in a **private local workspace** only. See [`docs/BUILDER_REPO.md`](docs/BUILDER_REPO.md).
+> **What ships here:** the **engine**, a minimal **example lab**, and the **Lab Forge** so you can spin up custom squads. A mature operational deployment might accumulate thousands of loop reports and vault pages locally — that output is yours, not part of this builder repo. See [`docs/BUILDER_REPO.md`](docs/BUILDER_REPO.md).
 
 **Status (8 July 2026):** Engine proven. Example lab + Lab Forge ready for testers.
 
@@ -101,7 +101,7 @@ CLI shows **four headers** (implement + execute share Phase 2). Details: [`docs/
 
 **In (public repo):** Engine, Lab Forge, example lab, boot tooling, self-host, SQLite/file vaults.
 
-**Out (private workspace):** Chimera squad YAML, loop reports, outreach, investor/competitive docs, 90MB+ vault bulk.
+**Out (your local workspace):** Operator-tuned squad YAML, loop reports, outreach, investor/competitive docs, large vault bulk.
 
 **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
 

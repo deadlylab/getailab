@@ -6,7 +6,7 @@ Thanks for helping shape a self-hosted research operating system. This repo is o
 
 1. Read [`README.md`](README.md) and [`docs/peer-review/QUICKSTART_15MIN.md`](docs/peer-review/QUICKSTART_15MIN.md).
 2. Copy `.env.example` → `.env` — never commit `.env`.
-3. Run `./doctor.sh` after `./boot_chimera.sh`.
+3. Run `./doctor.sh` after `./boot_example.sh`.
 
 ## How to give feedback (preferred for beta)
 

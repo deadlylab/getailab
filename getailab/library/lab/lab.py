@@ -2,7 +2,7 @@
 Per-lab section management.
 
 Each lab gets its own isolated section with books for its scientists.
-Chimera is the model lab (id='chimera' or similar).
+the example lab is the model lab (id='example' or similar).
 Generated labs get their own.
 
 This ensures no cross-lab pollution.

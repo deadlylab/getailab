@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CryptO'Brien Pty Ltd — Oracle Agent
-Port: 5024 | Project Chimera
+Port: 5024 | GetAiLab
 Role: Loop orchestration, synthesis, and no-idea problem generation
 """
 import os
@@ -16,8 +16,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from base_agent import create_agent_app, run_agent  # type: ignore
 from personas.loader import build_agent_config, get_persona
 
-_LAB_ID = os.getenv('LAB_ID', 'chimera').strip() or 'chimera'
-if _LAB_ID == 'chimera':
+_LAB_ID = os.getenv('LAB_ID', 'example').strip() or 'example'
+if _LAB_ID == 'example':
     DB_PATH = os.getenv('AGORA_DB', os.path.join(os.getcwd(), 'chimera_lab.db'))
 else:
     DB_PATH = os.getenv(

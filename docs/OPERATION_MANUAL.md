@@ -6,7 +6,7 @@ Working handbook for the current build (updated **8 July 2026**). Covers archite
 
 ## 1. What the platform is
 
-GetAiLab Live is a **local-first research operating system** built around the Chimera squad: eleven specialist scientist personas, one Oracle, a sandbox lab, and a persistent vault.
+GetAiLab Live is a **local-first research operating system**: a squad of scientist personas (the shipped example has two), one Oracle, a sandbox lab, and a persistent vault per `LAB_ID`.
 
 A full research loop — **five work stages**, plus intake and optional vault archive:
 
@@ -21,36 +21,29 @@ A full research loop — **five work stages**, plus intake and optional vault ar
 | 5. Direction | Three ranked next problems; you or Oracle pick the next loop or quit | **Phase 4** | *(not ticketed)* |
 
 ```
-Intake → Hypothesis (×11) → Implement → Execute → Synthesize → [Archive] → Direction picker
+Intake → Hypothesis (×N) → Implement → Execute → Synthesize → [Archive] → Direction picker
 ```
 
 The terminal shows **four phase headers** because implement and execute run under one banner: *Phase 2: Experiment & Artifact Audit*.
 
-**Evidence it works:** 18 loop reports, loops 29–33 complete end-to-end on `minimax-m2.5:cloud`, ~9,800 vault page files, ~400 sandbox artifacts.
+**Evidence it works:** dialectic loops complete end-to-end on `minimax-m2.5:cloud`; a mature local deployment accumulates vault pages and sandbox artifacts under `data/labs/<lab_id>/`.
 
 ---
 
 ## 2. Runtime architecture
 
-### Core services (13 when fully booted)
+### Core services (example lab: 4 when booted)
+
+Ports come from `data/labs/<lab_id>/config/lab.yaml`. Shipped example:
 
 | Service | Port | File |
 |---------|------|------|
-| Lab (sandbox + dashboard) | 5035 | `lab/app_lab.py` |
-| Oracle | 5024 | `scientists/app_oracle.py` |
-| Albert | 5025 | `scientists/app_albert.py` |
-| Andrew | 5026 | `scientists/app_andrew.py` |
-| Alan | 5027 | `scientists/app_alan.py` |
-| Carl | 5028 | `scientists/app_carl.py` |
-| Emmy | 5029 | `scientists/app_emmy.py` |
-| Tesla | 5030 | `scientists/app_tesla.py` |
-| Brian | 5032 | `scientists/app_brian.py` |
-| Neil | 5034 | `scientists/app_neil.py` |
-| Roger | 5038 | `scientists/app_roger.py` |
-| Bohr | 5039 | `scientists/app_bohr.py` |
-| Heisenberg | 5040 | `scientists/app_heisenberg.py` |
+| Lab (sandbox + dashboard) | 5135 | `lab/app_lab.py` |
+| Oracle | 5124 | `scientists/app_oracle.py` |
+| Researcher | 5125 | `scientists/forges/example/app_researcher.py` |
+| Critic | 5126 | `scientists/forges/example/app_critic.py` |
 
-Lab config: `data/labs/chimera/config/lab.yaml`
+Forged labs use the same pattern under `scientists/forges/<lab_id>/`. Lab config: `data/labs/<lab_id>/config/lab.yaml`
 
 ### Supporting modules
 
@@ -58,7 +51,7 @@ Lab config: `data/labs/chimera/config/lab.yaml`
 |--------|---------|
 | `run_chimera.py` | CLI, Commander Console, loop orchestration, `--status` |
 | `scientists/base_agent.py` | Shared Flask agent (hypothesis, implement, 503 on LLM failure) |
-| `personas/chimera_squad.yaml` | Squad definitions (v1.4) |
+| `personas/<lab_id>_squad.yaml` | Squad definitions (v1.4) |
 | `personas/loader.py` | YAML → agent config |
 | `getailab/literature_search.py` | PubMed / arXiv / Semantic Scholar |
 | `llm/sanitize.py` | Strip tool-call artifacts from model output |
@@ -72,12 +65,12 @@ Lab config: `data/labs/chimera/config/lab.yaml`
 
 | Path | Contents |
 |------|----------|
-| `data/labs/chimera/scientists/*/book/` | Per-scientist vault (pages, skills, knowledge.db) |
+| `data/labs/<your_lab>/scientists/*/book/` | Per-scientist vault (pages, skills, knowledge.db) |
 | `lab/artifacts/{loop_id}/` | Sandbox outputs (.py, .csv, .json, .png) |
-| `loop_*_report.md` | Live loop markdown reports |
-| `chimera_lab.db` | Oracle loop records |
-| `lab/lab_results.db` | Sandbox execution records |
-| `logs/` | Per-service logs (`app_albert.log`, etc.) |
+| `data/labs/<lab_id>/reports/` | Loop markdown reports (forged + example labs) |
+| `data/labs/<lab_id>/agora.db` | Oracle loop records |
+| `data/labs/<lab_id>/lab_results.db` | Sandbox execution records |
+| `logs/` | Per-service logs |
 
 ---
 
@@ -108,17 +101,17 @@ Vision (Sauron): `LLM_MODEL_VISION=llava:latest` (local Ollama).
 ### Native (recommended)
 
 ```bash
-./boot_chimera.sh          # backgrounds lab + oracle + all scientists
+./boot_example.sh          # backgrounds lab + oracle + all scientists
 ./doctor.sh                # verify stack
-python3 run_chimera.py --status   # expect 13/13 healthy
+python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists healthy
 ```
 
 ### Docker
 
 ```bash
-./docker_chimera.sh build
-./docker_chimera.sh squad
-./docker_chimera.sh status
+docker compose build
+docker compose squad
+docker compose status
 ```
 
 ### Health check
@@ -128,14 +121,14 @@ python3 run_chimera.py --status   # expect 13/13 healthy
 ```json
 "lab": { "status": "active" }
 "oracle": { "status": "healthy" }
-"albert": { "status": "healthy" }
-... (all 11 scientists)
+"researcher": { "status": "healthy" }
+... (all scientists in your squad)
 ```
 
 ### Shutdown
 
 ```bash
-./stop_chimera.sh
+./stop_example.sh
 # or: pkill -f 'python3.*app_'
 ```
 
@@ -214,7 +207,7 @@ After a loop:
 
 1. `loop_N_report.md` — full dialectic
 2. `lab/artifacts/N/` — code, plots, data
-3. `data/labs/chimera/scientists/*/book/pages/` — archived pages grow
+3. `data/labs/<your_lab>/scientists/*/book/pages/` — archived pages grow
 4. `logs/app_*.log` — per-scientist traces
 5. Dashboard → http://localhost:5035 — live progress, loop history, learner panel
 
@@ -230,7 +223,7 @@ python3 -c "from getailab.integrity.verify import full_integrity_report; import 
 
 | Symptom | Check |
 |---------|-------|
-| `--status` shows fewer than 13 | `./boot_chimera.sh` — partial boot after Ctrl+C |
+| `--status` shows fewer than 13 | `./boot_example.sh` — partial boot after Ctrl+C |
 | 503 on all scientists | Ollama down, credits exhausted, or wrong model |
 | Timeouts | Raise `OLLAMA_TIMEOUT=600`; local hardware needs minutes per scientist |
 | Oracle offline | `tail -f logs/app_oracle.log` |
@@ -241,7 +234,7 @@ python3 -c "from getailab.integrity.verify import full_integrity_report; import 
 
 ## 10. Extension points
 
-- New persona fields: `personas/chimera_squad.yaml` (Chimera division fixed — fork for new labs)
+- New persona fields: `personas/<lab_id>_squad.yaml` (reference operational lab fixed — fork for new labs)
 - Agent behaviour: `scientists/base_agent.py`
 - Sandbox tools: `lab/app_lab.py` (execute, vision, web, literature)
 - Oracle synthesis: `scientists/app_oracle.py`
@@ -258,4 +251,4 @@ Preserve: artifact flow, ticket trail, vault checksums, dissent in synthesis.
 - Peer review: [`peer-review/QUICKSTART_15MIN.md`](peer-review/QUICKSTART_15MIN.md)
 - Competitive position: [`COMPETITIVE_AUDIT_JULY_2026.md`](COMPETITIVE_AUDIT_JULY_2026.md)
 
-*GetAiLab Live · Project Chimera · CryptO'Brien Pty Ltd*
+*GetAiLab Live · GetAiLab · CryptO'Brien Pty Ltd*

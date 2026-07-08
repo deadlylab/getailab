@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# GetAiLab — Linux boot (setup if needed, then ignite Chimera squad)
+# GetAiLab — Linux boot (setup if needed, then ignite the example lab squad)
 # ==============================================================================
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

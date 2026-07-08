@@ -15,7 +15,7 @@
 
 - **Engine:** dialectic loop runner, sandbox, Oracle synthesis, tickets, vault
 - **Lab Forge:** `scripts/create_lab.py` — can you stand up *your* division?
-- **Example lab:** 2 scientists — proof of flow, not CryptO'Brien's Chimera vault
+- **Example lab:** 2 scientists — proof of flow, not a mature operational vault
 
 ## Current build facts
 
@@ -24,4 +24,4 @@
 - **Health:** `./doctor.sh` or `python3 run_chimera.py --status`
 - **Forge:** `python3 scripts/create_lab.py` for a custom squad
 
-Project Chimera loop reports and vault bulk are **not** in the public repo — they are private R&D evidence.
+GetAiLab loop reports and vault bulk are **not** in the public repo — they are private R&D evidence.

@@ -33,4 +33,4 @@ python3 run_chimera.py --status   # example lab: lab + oracle + 2 scientists
 - **Failure mode:** Loop 34 partial — graceful degradation receipt
 
 **NDA?**  
-`legal/NDA_Beta_Tester_Chimera_DocuSign_Ready.txt` if your institution requires it.
+`legal/` NDA templates if your institution requires them (not shipped in the public builder repo).
