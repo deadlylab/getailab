@@ -1,0 +1,304 @@
+# GET AI LAB / Project Chimera — Docker Compose
+#
+# Default (dashboard + APIs):
+#   docker compose up -d
+#   → http://localhost:5035
+#
+# Full scientist squad (required for dialectic loops in containers):
+#   docker compose --profile squad up -d
+#
+# CLI chat (lab + oracle only):
+#   docker compose --profile cli run --rm cli
+#
+# Full loop inside containers (needs squad profile running):
+#   docker compose --profile squad --profile cli run --rm loop
+#
+# Host Ollama: containers reach it via host.docker.internal:11434 (Linux uses host-gateway).
+
+x-chimera-env: &chimera-env
+  PYTHONPATH: /app
+  LAB_ID: chimera
+  GETAILAB_USER_ID: default
+  ORACLE_URL: http://oracle:5024
+  LAB_URL: http://lab:5035
+  LLM_ENDPOINT: ${LLM_ENDPOINT:-http://host.docker.internal:11434}
+
+x-extra-hosts: &extra-hosts
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+x-data-volumes: &data-volumes
+  - ./data:/app/data
+  - ./logs:/app/logs
+  - ./chimera_lab.db:/app/chimera_lab.db
+
+x-scientist-base: &scientist-base
+  build: .
+  image: getailab:latest
+  profiles: ["squad"]
+  env_file:
+    - .env
+  environment:
+    <<: *chimera-env
+  volumes: *data-volumes
+  <<: *extra-hosts
+  depends_on:
+    lab:
+      condition: service_healthy
+    oracle:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  lab:
+    build: .
+    image: getailab:latest
+    ports:
+      - "${LAB_HOST_PORT:-5035}:5035"
+    volumes:
+      - ./data:/app/data
+      - ./lab/artifacts:/app/lab/artifacts
+      - ./logs:/app/logs
+      - ./chimera_lab.db:/app/chimera_lab.db
+      - ./lab/lab_results.db:/app/lab/lab_results.db
+    env_file:
+      - .env
+    environment:
+      <<: *chimera-env
+    <<: *extra-hosts
+    depends_on:
+      oracle:
+        condition: service_healthy
+    command: ["python", "lab/app_lab.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5035/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  oracle:
+    build: .
+    image: getailab:latest
+    ports:
+      - "${ORACLE_HOST_PORT:-5024}:5024"
+    volumes: *data-volumes
+    env_file:
+      - .env
+    environment:
+      <<: *chimera-env
+    <<: *extra-hosts
+    command: ["python", "scientists/app_oracle.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5024/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  albert:
+    <<: *scientist-base
+    ports: ["5025:5025"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: albert
+      AGENT_PORT: "5025"
+    command: ["python", "scientists/app_albert.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5025/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  andrew:
+    <<: *scientist-base
+    ports: ["5026:5026"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: andrew
+      AGENT_PORT: "5026"
+    command: ["python", "scientists/app_andrew.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5026/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  alan:
+    <<: *scientist-base
+    ports: ["5027:5027"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: alan
+      AGENT_PORT: "5027"
+    command: ["python", "scientists/app_alan.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5027/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  carl:
+    <<: *scientist-base
+    ports: ["5028:5028"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: carl
+      AGENT_PORT: "5028"
+    command: ["python", "scientists/app_carl.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5028/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  emmy:
+    <<: *scientist-base
+    ports: ["5029:5029"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: emmy
+      AGENT_PORT: "5029"
+    command: ["python", "scientists/app_emmy.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5029/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  tesla:
+    <<: *scientist-base
+    ports: ["5030:5030"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: tesla
+      AGENT_PORT: "5030"
+    command: ["python", "scientists/app_tesla.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5030/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  brian:
+    <<: *scientist-base
+    ports: ["5032:5032"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: brian
+      AGENT_PORT: "5032"
+    command: ["python", "scientists/app_brian.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5032/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  neil:
+    <<: *scientist-base
+    ports: ["5034:5034"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: neil
+      AGENT_PORT: "5034"
+    command: ["python", "scientists/app_neil.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5034/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  roger:
+    <<: *scientist-base
+    ports: ["5038:5038"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: roger
+      AGENT_PORT: "5038"
+    command: ["python", "scientists/app_roger.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5038/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  bohr:
+    <<: *scientist-base
+    ports: ["5039:5039"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: bohr
+      AGENT_PORT: "5039"
+    command: ["python", "scientists/app_bohr.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5039/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  heisenberg:
+    <<: *scientist-base
+    ports: ["5040:5040"]
+    environment:
+      <<: *chimera-env
+      AGENT_NAME: heisenberg
+      AGENT_PORT: "5040"
+    command: ["python", "scientists/app_heisenberg.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5040/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  cli:
+    build: .
+    image: getailab:latest
+    profiles: ["cli"]
+    env_file:
+      - .env
+    environment:
+      <<: *chimera-env
+    volumes: *data-volumes
+    <<: *extra-hosts
+    command: ["python", "run_chimera.py", "--chat"]
+    depends_on:
+      lab:
+        condition: service_healthy
+      oracle:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+  loop:
+    build: .
+    image: getailab:latest
+    profiles: ["cli"]
+    env_file:
+      - .env
+    environment:
+      <<: *chimera-env
+      SCIENTIST_HOST_MODE: docker
+    volumes:
+      - .:/app
+    <<: *extra-hosts
+    command: ["python", "run_chimera.py"]
+    depends_on:
+      lab:
+        condition: service_healthy
+      oracle:
+        condition: service_healthy
+    stdin_open: true
+    tty: true

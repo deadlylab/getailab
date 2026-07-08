@@ -1,0 +1,152 @@
+{
+  "lab": {
+    "agent": "lab_sandbox_v2",
+    "libraries": [
+      "numpy",
+      "scipy",
+      "matplotlib",
+      "pandas",
+      "sympy"
+    ],
+    "status": "active",
+    "workspace": "/home/deadly/x/getailab_live/lab/artifacts"
+  },
+  "oracle": {
+    "agent": "oracle",
+    "book": {
+      "available": true,
+      "loops": [],
+      "pages": 0,
+      "skills": 0
+    },
+    "llm": {
+      "code_model": "minimax-m2.5:cloud",
+      "configured_provider": "ollama",
+      "endpoint": "http://localhost:11434",
+      "model": "minimax-m2.5:cloud",
+      "provider": "ollama",
+      "supports_vision": true,
+      "vision_model": "llava:latest"
+    },
+    "port": 5024,
+    "role": "orchestrator",
+    "status": "healthy",
+    "tools": [
+      "sauron_vision",
+      "artifact_vault",
+      "scientist_book",
+      "skills"
+    ]
+  },
+  "albert": {
+    "agent": "albert",
+    "book": {
+      "available": true,
+      "loops": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        21,
+        22,
+        23
+      ],
+      "pages": 289,
+      "skills": 164
+    },
+    "llm": {
+      "code_model": "minimax-m2.5:cloud",
+      "configured_provider": "ollama",
+      "endpoint": "http://localhost:11434",
+      "model": "minimax-m2.5:cloud",
+      "provider": "ollama",
+      "supports_vision": true,
+      "vision_model": "llava:latest"
+    },
+    "port": 5025,
+    "role": "theoretical_physicist",
+    "status": "healthy",
+    "tools": [
+      "sauron_vision",
+      "artifact_vault",
+      "scientist_book",
+      "skills"
+    ]
+  },
+  "andrew": {
+    "agent": "andrew",
+    "book": {
+      "available": true,
+      "loops": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        21,
+        22,
+        23
+      ],
+      "pages": 287,
+      "skills": 164
+    },
+    "llm": {
+      "code_model": "minimax-m2.5:cloud",
+      "configured_provider": "ollama",
+      "endpoint": "http://localhost:11434",
+      "model": "minimax-m2.5:cloud",
+      "provider": "ollama",
+      "supports_vision": true,
+      "vision_model": "llava:latest"
+    },
+    "port": 5026,
+    "role": "neuroscientist",
+    "status": "healthy",
+    "tools": [
+      "sauron_vision",
+      "artifact_vault",
+      "scientist_book",
+      "skills"
+    ]
+  },
+  "alan": {
+    "agent": "alan",
+    "book": {
+      "available": true,
+      "loops": [
+        9,
+        10,
+        11,
+        12,
+        14,
+        15,
+        21,
+        22,
+        23
+      ],
+      "pages": 287,
+      "skills": 164
+    },
+    "llm": {
+      "code_model": "minimax-m2.5:cloud",
+      "configured_provider": "ollama",
+      "endpoint": "http://localhost:11434",
+      "model": "minimax-m2.5:cloud",
+      "provider": "ollama",
+      "supports_vision": true,
+      "vision_model": "llava:latest"
+    },
+    "port": 5027,
+    "role": "philosopher",
+    "status": "healthy",
+    "tools": [
+      "sauron_vision",
+      "artifact_vault",
+      "scientist_book",
+      "skills"
+    ]
+  }
+}

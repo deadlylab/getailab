@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an improvement for testers or researchers
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What research or UX friction does this solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: dropdown
+    id: persona
+    attributes:
+      label: Primary user
+      options:
+        - Peer reviewer / beta tester
+        - Research architect (loop runner)
+        - Lab forge / new department builder
+        - Dashboard user
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Willing to test a PR?
+      options:
+        - label: I can test on my machine after a fix branch is pushed

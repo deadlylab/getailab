@@ -1,0 +1,46 @@
+# Git and editor noise
+.git
+.gitignore
+.cursor
+*.swp
+*.swo
+*~
+
+# Python artifacts
+__pycache__
+*.py[cod]
+*.egg-info
+.eggs
+dist
+build
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.venv
+venv
+env
+
+# Runtime data — mount as volumes, do not bake into image
+data/
+logs/
+*.db
+lab/artifacts/
+loop_*_report.md
+
+# Env secrets (compose loads from host via env_file)
+.env
+.env.*
+
+# Docs and session noise (not needed in container)
+docs/
+*.md
+!lab/requirements.txt
+!scientists/requirements.txt
+
+# Large or irrelevant assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4

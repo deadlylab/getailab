@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  import-check:
+    name: import-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile entrypoints
+        run: |
+          python -m py_compile run_chimera.py uni_lab.py
+          python -m compileall -q getailab lab -x '/artifacts/'
+
+      - name: Import core modules
+        run: |
+          python - <<'PY'
+          import importlib
+          mods = [
+              "getailab",
+              "getailab.lab_config",
+              "getailab.resonance",
+              "getailab.integrity.verify",
+              "getailab.integrity.merkle",
+              "getailab.integrity.signing",
+          ]
+          for m in mods:
+              importlib.import_module(m)
+              print("ok", m)
+          PY
+
+      - name: Verify repo hygiene files
+        run: |
+          test -f README.md
+          test -f LICENSE
+          test -f .env.example
+          test -f CONTRIBUTING.md
+          test -f SECURITY.md
+          test -f docs/REPOSITORY_CHECKLIST.md
+          ! git ls-files --error-unmatch .env 2>/dev/null
+          echo "hygiene OK"
+
+  secrets-scan:
+    name: secrets-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Block tracked env secrets
+        run: |
+          if git ls-files '.env' 2>/dev/null | grep -q .; then
+            echo "FAIL: .env is tracked"
+            exit 1
+          fi
+          LEAKS=$(git ls-files | grep -E '^\.env\.' | grep -v '.env.example' || true)
+          if [ -n "$LEAKS" ]; then
+            echo "FAIL: tracked env files: $LEAKS"
+            exit 1
+          fi
+          echo "no tracked secrets"

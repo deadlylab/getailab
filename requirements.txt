@@ -1,0 +1,5 @@
+# GetAiLab — install everything needed for native boot + loops
+# Usage: pip install -r requirements.txt
+
+-r lab/requirements.txt
+-r scientists/requirements.txt

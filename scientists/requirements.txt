@@ -1,0 +1,10 @@
+flask==3.0.0
+flask-cors==4.0.0
+redis==5.0.1
+requests==2.31.0
+# LLM calls go through llm/adapter.py (Ollama, OpenAI-compat, Anthropic, Google HTTP, etc.)
+# GetAiLab FULL cross-platform + chat parity (Win/Mac/Linux/Web + mobile Android/iOS stubs)
+# Agents + base_agent + oracle run on all platforms via same Flask + dynamic paths (os.path root)
+python-dotenv>=1.0
+PyYAML>=6.0
+# Desktop native optional (see desktop_launcher + lab reqs for pywebview). No platform-specific deps required.

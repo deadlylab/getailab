@@ -1,0 +1,80 @@
+name: Bug report
+description: Something broke — lab, loop, dashboard, or boot
+title: "[bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing. Include enough detail that we can reproduce without a call.
+        See [QUICKSTART_15MIN](docs/peer-review/QUICKSTART_15MIN.md) if you haven't booted yet.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Boot / install
+        - Loop runner (run_chimera.py)
+        - Dashboard
+        - Oracle / scientists
+        - Docker
+        - Lab Forge / new lab
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Commit or tag
+      description: Output of `git rev-parse --short HEAD` if cloned from GitHub
+      placeholder: abc1234 or v0.1.0-alpha
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ./boot_chimera.sh
+        2. python3 run_chimera.py --problem "..."
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python version, Ollama/cloud model, native vs Docker
+      placeholder: |
+        - OS: Kali / macOS / Windows 11
+        - Python: 3.11
+        - LLM_MODEL: minimax-m2.5:cloud
+        - python3 run_chimera.py --status: (paste JSON or summary)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Redact API keys. Paste relevant lines from logs/ or terminal.
+    validations:
+      required: false

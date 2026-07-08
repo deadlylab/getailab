@@ -1,0 +1,33 @@
+flask==3.0.0
+flask-cors==4.0.0
+redis==5.0.1
+requests==2.31.0
+# --- Scientific Tools ---
+numpy==1.26.4
+scipy==1.12.0
+matplotlib==3.8.3
+pandas==2.2.0
+pyarrow>=15.0.0
+sympy==1.12
+scikit-learn==1.4.0
+# --- Research Tools ---
+youtube-transcript-api>=0.6
+beautifulsoup4>=4.12
+playwright>=1.40
+markdownify>=0.11
+Pillow>=10.2
+lxml>=5.1
+# GetAiLab V4 FULL MULTI-PLATFORM SUPPORT + chat + mobile stubs + desktop launcher + docker
+# Works: Web/PWA, Windows (PowerShell/CMD + Docker), macOS (zsh + Docker), Linux, Android/iOS (PWA + WebView)
+python-dotenv>=1.0
+cryptography>=42.0
+# For export features already referenced in app_lab (keep optional)
+fpdf2>=2.7
+python-pptx>=0.6.21
+# For optional native desktop apps (plan activated in desktop_launcher.py choice 5 + README):
+#   pip install pywebview   -> true embedded window on Win/Mac/Linux (cross-plat)
+# pywebview>=5.0
+# Tiered export features (freemium): PDF entry-level, PPTX Pro (unified across all client platforms)
+fpdf2>=2.7.0
+python-pptx>=0.6.21
+# Note: All core (Flask server, chat APIs, PWA, CLI) are pure stdlib + listed; Docker base is slim python cross-plat.

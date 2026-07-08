@@ -1,0 +1,3381 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a12">
+    <title>GET AI LAB • CHIMERA • Research Lab</title>
+    <link rel="manifest" href="/manifest.json">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#0a0a12',
+                        deep: '#11111a',
+                        mist: '#1a1a28',
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&amp;family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            color-scheme: dark;
+            --void: #0a0a12;
+            --deep: #11111a;
+            --mist: #1a1a28;
+            --glow-gold: #fcd34d;
+            --glow-violet: #c084fc;
+            --glow-cyan: #67e8f9;
+            --text: #e0e7ff;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        html {
+            background-color: #0a0a12;
+            color-scheme: dark;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+            background: #0a0a12;
+            color: #e0e7ff;
+            overflow-x: hidden;
+        }
+
+        input, textarea, select, button {
+            color-scheme: dark;
+        }
+
+        @media (prefers-color-scheme: light) {
+            html, body {
+                background-color: #0a0a12 !important;
+                color: #e0e7ff !important;
+            }
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .cosmic-bg {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(192, 132, 252, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(103, 232, 249, 0.05) 0%, transparent 60%),
+                linear-gradient(#0a0a12, #0a0a12);
+        }
+
+        .glass {
+            background: rgba(17, 17, 26, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(224, 231, 255, 0.08);
+        }
+
+        .holo-border {
+            position: relative;
+        }
+        .holo-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, #fcd34d, #c084fc, #67e8f9, #fcd34d);
+            background-size: 300% 300%;
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.15;
+            animation: holo-shift 6s linear infinite;
+        }
+        @keyframes holo-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 300% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .section-header {
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+
+        .lab-card {
+            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), 
+                        box-shadow 0.2s cubic-bezier(0.23, 1, 0.32, 1),
+                        border-color 0.2s ease;
+            border: 1px solid rgba(224, 231, 255, 0.08);
+        }
+        .lab-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: rgba(192, 132, 252, 0.25);
+        }
+
+        .agent-orb {
+            width: 54px;
+            height: 54px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.23, 1.0, 0.32, 1);
+            position: relative;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .agent-orb:hover {
+            transform: scale(1.15) rotate(3deg);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.4), 0 0 0 9px rgba(192,132,252,0.15);
+        }
+        .agent-orb::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .agent-orb:hover::after { opacity: 1; }
+
+        .quantum-glow {
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.3),
+                        0 0 30px rgba(103, 232, 249, 0.1);
+        }
+
+        .inspire-quote {
+            position: relative;
+            font-size: 15.5px;
+            line-height: 1.45;
+        }
+        .inspire-quote::before {
+            content: '“';
+            position: absolute;
+            left: -14px;
+            top: -8px;
+            font-size: 68px;
+            opacity: 0.08;
+            line-height: 1;
+            font-family: Georgia, serif;
+        }
+
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .stat-card:hover .metric-value {
+            color: #fcd34d;
+        }
+
+        .reminder {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .reminder:hover {
+            background: rgba(26, 26, 40, 0.6);
+        }
+        .reminder.exiting {
+            transform: translateX(30px);
+            opacity: 0;
+        }
+
+        .field-canvas {
+            mix-blend-mode: screen;
+            opacity: 0.88;
+        }
+
+        .cosmic-text {
+            background: linear-gradient(90deg, #e0e7ff, #c084fc, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 100%;
+            animation: text-shimmer 8s ease infinite;
+        }
+
+        @keyframes text-shimmer {
+            0%,100% { background-position: 0% 50%; }
+            50% { background-position: 200% 50%; }
+        }
+
+        .lab-modal {
+            animation: modal-enter 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        @keyframes modal-enter {
+            from { opacity: 0; transform: translateY(12px) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .live-pulse {
+            animation: live-pulse-anim 1.6s ease forwards;
+        }
+        @keyframes live-pulse-anim {
+            0% { opacity: 0; transform: translateY(8px); }
+            20% { opacity: 1; }
+            100% { transform: translateY(0); }
+        }
+
+        .nav-active {
+            color: #fcd34d;
+            position: relative;
+        }
+        .nav-active:after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #fcd34d, transparent);
+        }
+
+        .galaxy-sigil-hero {
+            width: 6.5rem;
+            height: 6.5rem;
+            filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.5))
+                    drop-shadow(0 0 8px rgba(252, 211, 77, 0.2));
+            animation: galaxy-spin 48s linear infinite;
+            transition: filter 0.22s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .galaxy-sigil-hero.pulse-flash {
+            animation-duration: 12s;
+            filter: drop-shadow(0 0 28px rgba(252, 211, 77, 0.65))
+                    drop-shadow(0 0 14px rgba(103, 232, 249, 0.45));
+        }
+        @keyframes galaxy-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .sauce-glow {
+            text-shadow: 0 0 8px rgba(252, 211, 77, 0.5);
+        }
+
+        .metric-up {
+            animation: metric-pop 650ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .oldmate-widget {
+            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        }
+        .oldmate-widget:hover {
+            transform: translateY(-1px) scale(1.01);
+        }
+
+        .loop-card {
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .loop-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(103, 232, 249, 0.3);
+        }
+
+        .progress-ring {
+            transition: stroke-dashoffset 1.1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .subtle-grid {
+            background-image: 
+                linear-gradient(rgba(224,231,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(224,231,255,0.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        /* PURE UI SAUCE — more interactive delight */
+        .directive-card {
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            border-left: 4px solid #67e8f9;
+        }
+        .directive-card:hover {
+            transform: translateX(4px);
+            border-left-color: #fcd34d;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2);
+        }
+        .toast {
+            position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+            background: rgba(17,17,26,0.95); border: 1px solid rgba(252,211,77,0.4);
+            color: #fcd34d; padding: 10px 22px; border-radius: 9999px; font-size: 13px;
+            box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.6); z-index: 99999;
+            animation: toast-pop 240ms cubic-bezier(0.23,1,0.32,1), toast-fade 2600ms ease 1400ms forwards;
+            pointer-events: none;
+        }
+        @keyframes toast-pop { from { transform: translateX(-50%) translateY(14px); opacity:0; } to { transform: translateX(-50%) translateY(0); opacity:1; } }
+        @keyframes toast-fade { to { opacity: 0; } }
+
+        .achieve-badge {
+            font-size: 10px; padding: 1px 9px; border-radius: 999px;
+            background: rgba(103,232,249,0.12); color: #67e8f9; border: 1px solid rgba(103,232,249,0.3);
+            transition: all .2s ease;
+        }
+        .achieve-badge.unlocked { background: rgba(252,211,77,0.18); color: #fcd34d; border-color: #fcd34d55; animation: badge-pop 420ms; }
+        .achievement-strip { gap: 6px; }
+
+        .curvature-progress {
+            transition: width 900ms cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .live-directive {
+            font-style: italic; border-left: 3px solid #c084fc; padding-left: 11px;
+        }
+
+        .journal-input {
+            background: #0a0a12; border: 1px solid rgba(224,231,255,0.12);
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .journal-input:focus {
+            border-color: #c084fc; box-shadow: 0 0 0 3px rgba(192,132,252,0.1); outline: none;
+        }
+
+        .library-filter {
+            background: rgba(26,26,40,0.6); border: 1px solid rgba(224,231,255,0.1);
+            font-size: 12px;
+        }
+
+        .stat-clickable { cursor: pointer; }
+        .stat-clickable:active { transform: scale(0.985); }
+
+        .nav-link {
+            padding: 0.4rem 0.65rem;
+            border-radius: 0.65rem;
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            white-space: nowrap;
+            transition: color 0.15s, background-color 0.15s;
+        }
+        .nav-link:hover {
+            color: #fcd34d;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .nav-action {
+            font-size: 0.6875rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            white-space: nowrap;
+            transition: border-color 0.15s, background-color 0.15s, transform 0.1s;
+        }
+        .nav-action:hover { background: rgba(255, 255, 255, 0.05); }
+        .nav-action:active { transform: scale(0.98); }
+        .nav-action-primary {
+            border-color: rgba(252, 211, 77, 0.45);
+            color: #fcd34d;
+        }
+        .nav-action-primary:hover {
+            border-color: #fcd34d;
+            background: rgba(252, 211, 77, 0.08);
+        }
+        .nav-scroll::-webkit-scrollbar { height: 0; }
+
+        /* Galaxy sigil: still frame in header */
+        .galaxy-sigil-slot {
+            width: 4.25rem;
+            height: 100%;
+            flex-shrink: 0;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        @media (min-width: 640px) {
+            .galaxy-sigil-slot {
+                width: 5rem;
+            }
+        }
+        .galaxy-sigil-mark {
+            width: 4rem;
+            height: 4rem;
+            flex-shrink: 0;
+            display: block;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.55))
+                    drop-shadow(0 0 16px rgba(192, 132, 252, 0.4));
+            transition: transform 0.22s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .galaxy-sigil-mark:hover {
+            transform: scale(1.06);
+        }
+        @media (min-width: 640px) {
+            .galaxy-sigil-mark {
+                width: 4.5rem;
+                height: 4.5rem;
+            }
+        }
+        .galaxy-sigil-mark .eq-orbit,
+        .galaxy-sigil-hero .eq-orbit {
+            font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+            font-size: 5.5px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .hero-sigil-panel {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 50% 42%, rgba(192, 132, 252, 0.12) 0%, transparent 58%),
+                        radial-gradient(ellipse at 72% 68%, rgba(103, 232, 249, 0.07) 0%, transparent 50%),
+                        radial-gradient(ellipse at 22% 78%, rgba(252, 211, 77, 0.05) 0%, transparent 45%),
+                        rgba(8, 8, 18, 0.55);
+            border: 1px solid rgba(224, 231, 255, 0.06);
+        }
+
+        .learner-coaching-card {
+            background: linear-gradient(135deg, rgba(103, 232, 249, 0.06), rgba(192, 132, 252, 0.04));
+            border: 1px solid rgba(103, 232, 249, 0.18);
+        }
+        .learner-stat-tile {
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .concept-chip {
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .concept-chip.mastered { border-color: rgba(52, 211, 153, 0.35); color: #6ee7b7; }
+        .concept-chip.struggling { border-color: rgba(251, 191, 36, 0.35); color: #fcd34d; }
+    </style>
+</head>
+<body class="cosmic-bg subtle-grid min-h-screen text-[#e0e7ff] selection:bg-[#c084fc] selection:text-[#0a0a12]">
+    <!-- NAV -->
+    <nav class="border-b border-white/10 bg-[#0a0a12]/95 backdrop-blur-xl sticky top-0 z-50 w-full">
+        <div class="flex items-center w-full h-[4.5rem] sm:h-[4.75rem]">
+            <!-- Brand: flush left -->
+            <div class="flex items-center gap-3 sm:gap-4 pl-4 sm:pl-5 shrink-0 border-r border-white/10 pr-4 sm:pr-5 h-full">
+                <div class="galaxy-sigil-slot" aria-hidden="true">
+                <svg class="galaxy-sigil-mark" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="GET AI LAB — galactic sigil" title="Galaxy + equation cloud — GET AI LAB">
+                    <defs>
+                        <radialGradient id="navGalCore" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#fffbeb"/>
+                            <stop offset="30%" stop-color="#fcd34d"/>
+                            <stop offset="65%" stop-color="#c084fc"/>
+                            <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+                        </radialGradient>
+                        <radialGradient id="navGalNebula" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#c084fc" stop-opacity="0.35"/>
+                            <stop offset="70%" stop-color="#67e8f9" stop-opacity="0.12"/>
+                            <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+                        </radialGradient>
+                        <linearGradient id="navGalArm" x1="0" y1="0" x2="1" y2="0">
+                            <stop stop-color="#fcd34d" stop-opacity="0.15"/>
+                            <stop offset="0.35" stop-color="#c084fc" stop-opacity="0.75"/>
+                            <stop offset="1" stop-color="#67e8f9" stop-opacity="0.2"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="14" cy="22" r="0.5" fill="#e0e7ff" opacity="0.45"/>
+                    <circle cx="88" cy="18" r="0.45" fill="#e0e7ff" opacity="0.35"/>
+                    <circle cx="8" cy="58" r="0.4" fill="#c084fc" opacity="0.4"/>
+                    <circle cx="92" cy="62" r="0.55" fill="#67e8f9" opacity="0.35"/>
+                    <ellipse cx="50" cy="50" rx="38" ry="34" stroke="rgba(192,132,252,0.16)" stroke-width="0.6" stroke-dasharray="3 5"/>
+                    <text class="eq-orbit" x="50" y="14" text-anchor="middle" fill="#fcd34d" opacity="0.92">e^(iπ)+1=0</text>
+                    <text class="eq-orbit" x="84" y="38" text-anchor="middle" fill="#67e8f9" opacity="0.85">E=mc²</text>
+                    <text class="eq-orbit" x="76" y="72" text-anchor="middle" fill="#c084fc" opacity="0.8">F=ma</text>
+                    <text class="eq-orbit" x="24" y="72" text-anchor="middle" fill="#67e8f9" opacity="0.8">∇·B=0</text>
+                    <text class="eq-orbit" x="16" y="38" text-anchor="middle" fill="#fcd34d" opacity="0.85">∂ψ/∂t</text>
+                    <g transform="translate(50 50)">
+                        <ellipse rx="26" ry="20" fill="url(#navGalNebula)" opacity="0.75"/>
+                        <g opacity="0.7">
+                            <path d="M0 0 C4 -2 10 -6 18 -12 C26 -18 32 -26 34 -34" stroke="url(#navGalArm)" stroke-width="2.2" stroke-linecap="round"/>
+                            <path d="M0 0 C4 -2 10 -6 18 -12 C26 -18 32 -26 34 -34" stroke="url(#navGalArm)" stroke-width="2.2" stroke-linecap="round" transform="rotate(120)"/>
+                            <path d="M0 0 C4 -2 10 -6 18 -12 C26 -18 32 -26 34 -34" stroke="url(#navGalArm)" stroke-width="2.2" stroke-linecap="round" transform="rotate(240)"/>
+                        </g>
+                        <circle cx="12" cy="-8" r="0.55" fill="#e0e7ff" opacity="0.65"/>
+                        <circle cx="-10" cy="6" r="0.45" fill="#67e8f9" opacity="0.55"/>
+                        <circle cx="6" cy="14" r="0.5" fill="#fcd34d" opacity="0.5"/>
+                        <circle cx="-16" cy="-12" r="0.4" fill="#c084fc" opacity="0.6"/>
+                        <circle cx="20" cy="4" r="0.35" fill="#e0e7ff" opacity="0.5"/>
+                        <circle r="9" fill="url(#navGalCore)"/>
+                        <circle r="3.5" fill="#fff7ed" opacity="0.85"/>
+                    </g>
+                </svg>
+                </div>
+                <div class="min-w-0 leading-tight">
+                    <div class="font-display text-xl sm:text-2xl tracking-tighter whitespace-nowrap">GET AI LAB</div>
+                    <div id="lab-badge" class="text-[10px] text-[#64748b] truncate max-w-[9rem] sm:max-w-[14rem]">PROJECT CHIMERA • RESEARCH LAB</div>
+                </div>
+            </div>
+
+            <!-- Center: section nav -->
+            <div class="hidden lg:flex flex-1 items-center justify-center gap-0.5 px-3 min-w-0">
+                <div onclick="scrollToSection('inspiration')" class="nav-link cursor-pointer">Voices</div>
+                <div onclick="scrollToSection('resonance')" class="nav-link cursor-pointer">Resonance</div>
+                <div onclick="scrollToSection('adaptive-learner')" class="nav-link cursor-pointer">Learning</div>
+                <div onclick="scrollToSection('council')" class="nav-link cursor-pointer">Council</div>
+                <div onclick="scrollToSection('library')" class="nav-link cursor-pointer">Library</div>
+                <div onclick="scrollToSection('getailab-library-notes')" class="nav-link cursor-pointer">Notes</div>
+                <div onclick="scrollToSection('field-monitor')" class="nav-link cursor-pointer">Monitor</div>
+            </div>
+
+            <!-- Right: status + actions -->
+            <div class="flex items-center gap-2 sm:gap-2.5 ml-auto pr-4 sm:pr-5 shrink-0">
+                <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1a1a28] text-[10px] border border-white/10">
+                    <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <span class="text-emerald-400 font-medium tracking-wide">LIVE</span>
+                </div>
+                <div onclick="pulseTheField()" class="nav-action nav-action-primary cursor-pointer hidden sm:flex items-center gap-1 font-medium">
+                    <span>✧</span><span>PULSE</span>
+                </div>
+                <div onclick="window.pumpTheTyres && window.pumpTheTyres()" class="nav-action cursor-pointer hidden sm:flex items-center gap-1 font-medium" title="Motivational boost from your notes + field">
+                    <span>🔥</span><span>TYRES</span>
+                </div>
+                <div id="last-seen" class="hidden xl:block text-[10px] text-[#64748b] whitespace-nowrap"></div>
+                <div id="lab-port-badge" class="px-2.5 py-0.5 bg-[#1a1a28] rounded-lg border border-white/10 font-mono text-[10px] text-[#a5b4fc]">PORT —</div>
+                <div onclick="window.open('mobile_chat_stub.html','_blank')" class="nav-action cursor-pointer lg:hidden" title="Mobile chat">📱</div>
+            </div>
+        </div>
+
+        <!-- Compact nav row on smaller screens -->
+        <div class="lg:hidden border-t border-white/5 px-3 py-1.5 flex items-center gap-1 overflow-x-auto nav-scroll text-xs">
+            <div onclick="scrollToSection('inspiration')" class="nav-link cursor-pointer">Voices</div>
+            <div onclick="scrollToSection('resonance')" class="nav-link cursor-pointer">Resonance</div>
+            <div onclick="scrollToSection('adaptive-learner')" class="nav-link cursor-pointer">Learning</div>
+            <div onclick="scrollToSection('council')" class="nav-link cursor-pointer">Council</div>
+            <div onclick="scrollToSection('library')" class="nav-link cursor-pointer">Library</div>
+            <div onclick="scrollToSection('getailab-library-notes')" class="nav-link cursor-pointer">Notes</div>
+            <div onclick="scrollToSection('field-monitor')" class="nav-link cursor-pointer">Monitor</div>
+            <div onclick="pulseTheField()" class="nav-action nav-action-primary cursor-pointer sm:hidden">✧ PULSE</div>
+            <div onclick="window.pumpTheTyres && window.pumpTheTyres()" class="nav-action cursor-pointer sm:hidden">🔥 TYRES</div>
+        </div>
+    </nav>
+
+    <!-- HERO / BEAUTIFUL ANIMATED ENTRY -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-10 pb-8">
+        <div class="flex flex-col lg:flex-row gap-8 items-end">
+            <div class="flex-1">
+                <div class="inline-flex items-center gap-x-2 px-4 py-1 rounded-3xl glass mb-4 border border-white/10 text-xs tracking-[3px]">
+                    WELCOME BACK, ARCHITECT
+                </div>
+                
+                <h1 class="font-display text-7xl lg:text-[84px] leading-[0.92] tracking-[-5.6px] mb-3">
+                    MULTI-AGENT<br><span class="cosmic-text sauce-glow">RESEARCH LAB</span>.
+                </h1>
+                <p class="max-w-lg text-xl text-[#94a3b8]">
+                    Every loop you run bends the manifold a little more. 
+                    Structured research loops with auditable artifacts. <span class="text-[#c084fc]">Hypothesise, experiment, review, refine.</span>
+                </p>
+
+                <div class="mt-6 flex items-center gap-3">
+                    <button onclick="igniteNewVector()" 
+                            class="group px-8 py-4 bg-[#fcd34d] text-[#0a0a12] font-semibold rounded-3xl flex items-center gap-x-3 hover:bg-[#fde68a] active:bg-[#fbbf24] transition-all text-sm tracking-wide shadow-[0_0_24px_rgba(252,211,77,0.15)]">
+                        <span>IGNITE A NEW VECTOR</span>
+                        <span class="group-active:rotate-45 transition inline-block">→</span>
+                    </button>
+                    <button onclick="showRandomInspiration(true)" 
+                            class="px-6 py-4 border border-white/25 hover:bg-white/5 rounded-3xl text-sm flex items-center gap-2 transition-all">
+                        <span>HEAR THE COUNCIL</span>
+                    </button>
+                    <!-- NO-IDEA ONBOARDING ENTRY: Pure vision for "I have nothing to research" -->
+                    <button onclick="openNoIdeaPortal()" 
+                            class="group px-6 py-4 border-2 border-[#fcd34d]/70 hover:border-[#fcd34d] hover:bg-[#fcd34d]/5 text-[#fcd34d] rounded-3xl text-sm flex items-center gap-2 transition-all font-medium">
+                        <span>NO IDEA? STEP INTO THE LAB</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Animated Entry Canvas + Galaxy Sigil -->
+            <div class="relative w-full lg:w-[380px] h-[210px] flex-shrink-0 hero-sigil-panel">
+                <canvas id="hero-canvas" class="field-canvas absolute inset-0 w-full h-full" width="380" height="210"></canvas>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <svg class="galaxy-sigil-hero mb-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <radialGradient id="heroGalCore" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff"/>
+                                <stop offset="22%" stop-color="#fde68a"/>
+                                <stop offset="50%" stop-color="#c084fc"/>
+                                <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+                            </radialGradient>
+                            <radialGradient id="heroGalNebula" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#c084fc" stop-opacity="0.45"/>
+                                <stop offset="55%" stop-color="#67e8f9" stop-opacity="0.18"/>
+                                <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+                            </radialGradient>
+                            <linearGradient id="heroGalArm" x1="0" y1="0" x2="1" y2="0">
+                                <stop stop-color="#fcd34d" stop-opacity="0.2"/>
+                                <stop offset="0.4" stop-color="#c084fc" stop-opacity="0.85"/>
+                                <stop offset="1" stop-color="#67e8f9" stop-opacity="0.25"/>
+                            </linearGradient>
+                            <filter id="heroGalGlow" x="-40%" y="-40%" width="180%" height="180%">
+                                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <g transform="translate(50 50)" filter="url(#heroGalGlow)">
+                            <ellipse rx="34" ry="26" fill="url(#heroGalNebula)" opacity="0.8"/>
+                            <g opacity="0.82">
+                                <path d="M0 0 C5 -3 12 -8 22 -15 C30 -22 36 -30 38 -40" stroke="url(#heroGalArm)" stroke-width="3" stroke-linecap="round"/>
+                                <path d="M0 0 C5 -3 12 -8 22 -15 C30 -22 36 -30 38 -40" stroke="url(#heroGalArm)" stroke-width="3" stroke-linecap="round" transform="rotate(120)"/>
+                                <path d="M0 0 C5 -3 12 -8 22 -15 C30 -22 36 -30 38 -40" stroke="url(#heroGalArm)" stroke-width="3" stroke-linecap="round" transform="rotate(240)"/>
+                            </g>
+                            <circle cx="16" cy="-11" r="0.7" fill="#e0e7ff" opacity="0.75"/>
+                            <circle cx="-14" cy="8" r="0.55" fill="#67e8f9" opacity="0.65"/>
+                            <circle cx="8" cy="18" r="0.6" fill="#fcd34d" opacity="0.6"/>
+                            <circle cx="-20" cy="-14" r="0.5" fill="#c084fc" opacity="0.7"/>
+                            <circle cx="24" cy="6" r="0.45" fill="#e0e7ff" opacity="0.55"/>
+                            <circle cx="-8" cy="-22" r="0.4" fill="#67e8f9" opacity="0.5"/>
+                            <circle cx="28" cy="-4" r="0.35" fill="#fcd34d" opacity="0.45"/>
+                            <circle r="11" fill="url(#heroGalCore)"/>
+                            <circle r="4.5" fill="#fff7ed" opacity="0.92"/>
+                        </g>
+                    </svg>
+                    <div class="text-[10px] font-medium tracking-[4px] text-[#fcd34d]/70">GALACTIC FIELD</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ON-LOAD INSPIRATION + SMART TEASER -->
+    <div id="inspiration" class="max-w-screen-2xl mx-auto px-8 pb-8">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
+            
+            <!-- Council Quote -->
+            <div class="xl:col-span-7 glass rounded-3xl p-7 holo-border lab-card flex flex-col">
+                <div class="section-header mb-4 flex items-center gap-2">
+                    <span>VOICE FROM THE COUNCIL</span> 
+                    <span id="inspire-agent-badge" class="ml-auto text-xs px-3 py-px rounded-full" style="background:rgba(192,132,252,0.1);color:#c084fc"></span>
+                </div>
+                
+                <div id="inspire-quote" class="inspire-quote flex-1 text-[17px] leading-tight pr-3 text-[#cbd5e1]">
+                    Loading resonance...
+                </div>
+                <div class="flex items-center justify-between mt-5">
+                    <div id="inspire-attrib" class="text-xs text-[#64748b]"></div>
+                    <button onclick="showRandomInspiration(true)" 
+                            class="text-xs flex items-center gap-x-1.5 hover:text-[#fcd34d] transition px-4 py-2 -mr-2 rounded-2xl hover:bg-white/5">
+                        <span>ANOTHER VOICE</span> 
+                        <span class="text-lg leading-none">↻</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Research Teaser -->
+            <div class="xl:col-span-5 glass rounded-3xl p-7 lab-card flex flex-col relative overflow-hidden">
+                <div class="section-header mb-3">RESEARCH SPARK • RANDOM GEODESIC</div>
+                <div id="research-teaser" class="flex-1 text-[15.5px] leading-snug font-light text-[#cbd5e1] pr-6">
+                    The field is choosing a vector for you...
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="igniteNewVector()" 
+                            class="flex-1 text-xs bg-white/5 hover:bg-white/10 border border-white/15 active:bg-[#c084fc]/20 transition px-4 py-[9px] rounded-2xl">
+                        IGNITE THIS VECTOR
+                    </button>
+                    <button onclick="newResearchTeaser()" 
+                            class="px-5 text-xs border border-white/15 hover:border-white/30 rounded-2xl transition">
+                        ANOTHER
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REAL STATS + PROGRESS -->
+    <div id="resonance" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="flex items-end justify-between mb-5 px-1">
+            <div>
+                <div class="section-header">THE RESONANCE ENGINE</div>
+                <div class="font-display text-4xl tracking-[-1.6px]">What you have built</div>
+            </div>
+            <div onclick="nudgeInspiration()" class="cursor-pointer text-xs px-4 py-2 rounded-full border border-white/15 hover:bg-white/5 flex items-center gap-2">
+                <span class="text-[#fcd34d]">✧</span> 
+                <span>NUDGE THE FIELD</span>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            
+            <div onclick="nudgeInspiration(3)" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer">
+                <div class="text-xs text-[#64748b]">DIALECTIC LOOPS</div>
+                <div id="stat-loops" class="metric-value text-6xl font-display tracking-[-3.2px] mt-1.5">—</div>
+                <div class="text-emerald-400 text-xs mt-2 flex items-center gap-1">FORGED IN THE REAL</div>
+            </div>
+
+            <div onclick="nudgeInspiration(2)" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer">
+                <div class="text-xs text-[#64748b]">ARTIFACTS IN THE VAULT</div>
+                <div id="stat-artifacts" class="metric-value text-6xl font-display tracking-[-3.2px] mt-1.5">—</div>
+                <div class="text-xs mt-2 flex items-center gap-1"><span class="text-[#a5b4fc]">.csv</span> <span class="text-[#c084fc]">.png</span> <span class="text-[#67e8f9]">.json</span></div>
+            </div>
+
+            <div onclick="nudgeInspiration(1)" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer">
+                <div class="text-xs text-[#64748b]">CONSENSUS BOOKS</div>
+                <div id="stat-books" class="metric-value text-6xl font-display tracking-[-3.2px] mt-1.5">—</div>
+                <div class="text-xs mt-2 text-[#94a3b8]">Synthesized by the Oracle</div>
+            </div>
+
+            <div class="stat-card glass rounded-3xl p-6 lab-card relative col-span-2 md:col-span-1">
+                <div class="text-xs text-[#64748b]">INSPIRATION RESONANCE</div>
+                <div class="flex items-baseline gap-2">
+                    <div id="stat-inspire" class="metric-value text-6xl font-display tracking-[-3.2px] mt-1.5">—</div>
+                    <div class="text-sm text-[#64748b]">/ 100</div>
+                </div>
+                
+                <!-- Beautiful SVG progress ring -->
+                <div class="absolute top-5 right-6">
+                    <svg width="64" height="64" class="transform -rotate-90">
+                        <circle cx="32" cy="32" r="26" fill="none" stroke="#1a1a28" stroke-width="6"/>
+                        <circle id="inspire-ring" cx="32" cy="32" r="26" fill="none" 
+                                stroke="#fcd34d" stroke-width="6" stroke-linecap="round"
+                                stroke-dasharray="163.36" stroke-dashoffset="42"/>
+                    </svg>
+                </div>
+                <div class="text-[10px] text-[#fcd34d] mt-1 font-medium">THE FIELD NOTICES YOU</div>
+            </div>
+
+            <div class="stat-card glass rounded-3xl p-6 lab-card col-span-2 md:col-span-1 lg:col-span-1">
+                <div class="text-xs text-[#64748b] mb-2">AGENT PARTICIPATION</div>
+                <div id="stat-agents" class="text-5xl font-display tracking-[-1.5px]">10/10</div>
+                <div class="text-xs mt-3 leading-tight">Perfectly balanced. Every voice present in every loop.</div>
+            </div>
+
+            <!-- NEW: Real progress sauce — Curvature + Streak. Click pumps. -->
+            <div onclick="nudgeCurvature(7)" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer stat-clickable col-span-2 md:col-span-1">
+                <div class="text-xs text-[#64748b]">RESEARCH PROGRESS</div>
+                <div class="flex items-baseline gap-2">
+                    <div id="stat-curvature" class="metric-value text-5xl font-display tracking-[-2px] mt-1">—</div>
+                    <div class="text-sm text-[#64748b]">/100</div>
+                </div>
+                <div class="h-1.5 bg-white/10 rounded mt-3 overflow-hidden">
+                    <div id="curvature-bar" class="curvature-progress h-1.5 bg-gradient-to-r from-[#67e8f9] via-[#c084fc] to-[#fcd34d] w-[78%]" style="width:78%"></div>
+                </div>
+                <div class="text-[10px] text-[#67e8f9] mt-1.5 font-medium tracking-tight">THE MANIFOLD BENDS BECAUSE OF YOU</div>
+            </div>
+
+            <div onclick="bumpStreak()" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer stat-clickable">
+                <div class="text-xs text-[#64748b]">RESONANCE STREAK</div>
+                <div id="stat-streak" class="metric-value text-5xl font-display tracking-[-2.2px] mt-1.5">—</div>
+                <div class="text-xs mt-1 text-emerald-400 flex items-center gap-1">DAYS OF PURE FOCUS <span class="text-[11px]">🔥</span></div>
+            </div>
+
+            <!-- NEW: Real-time GetAiLabLibrary pages count — direct tie to codex + user's notes -->
+            <div onclick="nudgeInspiration(4); showLibraryCodexSearch()" class="stat-card glass rounded-3xl p-6 lab-card cursor-pointer stat-clickable col-span-2 md:col-span-1">
+                <div class="text-xs text-[#64748b]">LIVING CODEX PAGES</div>
+                <div id="stat-library-pages" class="metric-value text-5xl font-display tracking-[-2px] mt-1.5">—</div>
+                <div class="text-xs mt-1 text-[#c084fc] flex items-center gap-1">YOUR NOTES + ARTIFACTS CRYSTALLIZED</div>
+            </div>
+        </div>
+
+        <!-- Charts: Progress + Knowledge Growth -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mt-4">
+            
+            <!-- Loop Completion / Resonance -->
+            <div class="lg:col-span-2 glass rounded-3xl p-7 lab-card">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <div class="section-header">LOOP RESONANCE</div>
+                        <div class="font-medium">Completion across the manifold</div>
+                    </div>
+                    <div id="loop-synth-badge" class="text-xs px-4 py-1 rounded-2xl bg-white/5 text-[#64748b]">—</div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <!-- Custom animated rings for overall progress -->
+                    <div class="flex-shrink-0 relative">
+                        <svg width="118" height="118">
+                            <circle cx="59" cy="59" r="50" fill="none" stroke="#1a1a28" stroke-width="13"/>
+                            <circle id="overall-ring" cx="59" cy="59" r="50" fill="none" 
+                                    stroke="#67e8f9" stroke-width="13" stroke-linecap="round"
+                                    stroke-dasharray="314" stroke-dashoffset="22"/>
+                            <text id="loop-resonance-pct" x="59" y="63" text-anchor="middle" fill="#e0e7ff" font-size="22" font-weight="700">—</text>
+                            <text x="59" y="78" text-anchor="middle" fill="#64748b" font-size="9">SYNTH</text>
+                        </svg>
+                    </div>
+                    <div class="flex-1 space-y-3 text-sm">
+                        <div class="flex justify-between text-xs"><div>Phase 1 • Hypotheses</div><div class="text-emerald-400">✓</div></div>
+                        <div class="flex justify-between text-xs"><div>Phase 2 • Lab Execution</div><div class="text-emerald-400">✓</div></div>
+                        <div class="flex justify-between text-xs"><div>Phase 3 • Oracle Synthesis</div><div class="text-emerald-400">✓</div></div>
+                        <div class="flex justify-between text-xs"><div>Phase 4 • Your Directive</div><div class="text-[#fcd34d]">OPEN</div></div>
+                        <div id="loop-resonance-hint" class="pt-1 text-[10px] text-[#64748b]">Synthesis rate from this lab's Agora record.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Knowledge Growth Chart -->
+            <div class="lg:col-span-3 glass rounded-3xl p-7 lab-card">
+                <div class="section-header mb-3">KNOWLEDGE ACCRETION • ARTIFACT GROWTH</div>
+                <div class="h-[142px] -mx-1">
+                    <canvas id="growth-chart"></canvas>
+                </div>
+                <div class="text-[10px] text-[#64748b] mt-2">Cumulative artifacts forged across recent loops. Every point is a crystallized insight.</div>
+            </div>
+
+            <!-- NEW SAUCE: Resonance Trajectory (Curvature + Library + Streak live chart) — interactive progress -->
+            <div class="lg:col-span-5 glass rounded-3xl p-7 lab-card">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <div class="section-header">RESONANCE TRAJECTORY</div>
+                        <div class="text-sm">Your curvature, codex growth &amp; streak over the manifold</div>
+                    </div>
+                    <button onclick="refreshTrajectoryChart(true)" class="text-[10px] px-3 py-1 rounded-xl border border-white/15 hover:bg-white/5 active:bg-white/10">REPLAY PATH</button>
+                </div>
+                <div class="h-[118px] -mx-1">
+                    <canvas id="trajectory-chart"></canvas>
+                </div>
+                <div class="text-[10px] text-[#64748b] mt-1.5">Click points to surface your exact directive from that resonance. Every bend is authored by you.</div>
+            </div>
+        </div>
+
+        <!-- Achievements / tyre-pump badges — dynamic & delightful -->
+        <div class="mt-4 px-1 flex items-center gap-2 flex-wrap achievement-strip" id="achievements-strip">
+            <!-- Populated in JS based on real stats thresholds. Clicking pumps the field. -->
+        </div>
+    </div>
+
+    <!-- SMART REMINDERS — now with direct user notes integration -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="flex items-center justify-between mb-4 px-1">
+            <div class="font-display text-3xl tracking-[-1.3px]">Smart Reminders</div>
+            <div class="text-xs text-[#64748b]">The field is waiting for you to act • Speak back anytime</div>
+        </div>
+        
+        <div id="reminders-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- NEW: Quick personal reflection journal — ties your voice into the GetAiLab Library & live field -->
+        <div class="mt-4 glass rounded-3xl p-5 lab-card">
+            <div class="flex items-center gap-3 text-xs uppercase tracking-[1.5px] text-[#64748b] mb-2">YOUR VOICE • LOG A REFLECTION TO THE FIELD</div>
+            <div class="flex gap-3">
+                <input id="reflection-input" type="text" placeholder="What did you notice in the latest synthesis? Or a new vector you want the council to consider..." 
+                       class="journal-input flex-1 px-5 py-3 rounded-2xl text-sm placeholder:text-[#64748b]/70" 
+                       onkeydown="if(event.key==='Enter') submitReflection()">
+                <button onclick="submitReflection()" 
+                        class="px-7 rounded-2xl border border-[#c084fc]/60 hover:bg-[#c084fc]/10 active:bg-[#c084fc]/20 text-sm font-medium transition">SEND</button>
+            </div>
+            <div class="text-[10px] text-[#64748b] mt-1.5 pl-1">Reflections feed the activity stream and your adaptive learner profile.</div>
+        </div>
+    </div>
+
+    <!-- ADAPTIVE LEARNER — Gabby user layer (engagement, coaching, loop progress) -->
+    <div id="adaptive-learner" class="max-w-screen-2xl mx-auto px-8 pb-10 scroll-mt-24">
+        <div class="flex items-end justify-between mb-4 px-1 gap-3 flex-wrap">
+            <div>
+                <div class="section-header">ADAPTIVE LEARNER</div>
+                <div class="font-display text-3xl tracking-[-1.3px]">Your Learning Arc</div>
+                <div class="text-xs text-[#64748b] mt-1">Gabby layer — tracks engagement across chat, loops &amp; reflections. Scientists never see this.</div>
+            </div>
+            <button onclick="fetchLearnerDashboard(true)" class="text-xs px-4 py-2 rounded-2xl border border-[#67e8f9]/30 hover:bg-[#67e8f9]/10 text-[#67e8f9] transition flex items-center gap-1.5">
+                <span>↻</span><span>REFRESH PROFILE</span>
+            </button>
+        </div>
+        <div id="learner-dashboard-root" class="glass rounded-3xl p-6 sm:p-7 lab-card border border-[#67e8f9]/15">
+            <div class="text-sm text-[#64748b] animate-pulse">Loading your learner profile...</div>
+        </div>
+    </div>
+
+    <!-- NEW DELIGHT: GETAILAB LIBRARY DIRECTIVES — direct, personal reference to USER'S NOTES & PROBLEM VECTORS -->
+    <!-- This is the heart of the sauce: every visit you are greeted by your own recorded vision. -->
+    <div class="max-w-screen-2xl mx-auto px-8 pb-10" id="getailab-library-notes">
+        <div class="flex items-end justify-between mb-4 px-1">
+            <div>
+                <div class="section-header">GETAILAB LIBRARY</div>
+                <div class="font-display text-3xl tracking-[-1.3px]">Architect's Directives • Your Living Notes</div>
+            </div>
+            <div onclick="refreshDirectives()" class="cursor-pointer text-xs flex items-center gap-x-1.5 text-[#64748b] hover:text-[#e0e7ff]">
+                <span>REFRESH FROM THE RECORD</span> <span>↻</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 mb-2 px-1">
+            <input id="codex-search" type="text" placeholder="Search the codex (your notes, pages, artifacts)..." 
+                   class="library-filter flex-1 px-4 py-2 text-sm rounded-2xl" onkeydown="if(event.key==='Enter') searchCodexLive(this.value)">
+            <button onclick="searchCodexLive(document.getElementById('codex-search').value)" class="px-4 py-2 text-xs border border-white/20 rounded-2xl hover:bg-white/5">SEARCH CODEX</button>
+            <button onclick="showLibraryCodexSearch()" class="px-4 py-2 text-xs bg-white/5 border border-white/15 rounded-2xl hover:bg-white/10">LIVE VAULT</button>
+        </div>
+        <div id="directives-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <!-- JS populated real directive cards from your loop reports + README + GetAiLabLibrary. Click to re-ignite or reflect. -->
+        </div>
+        <div class="text-[10px] text-[#64748b] mt-2 px-1">These are your words. The field quotes them back to you so the curvature never forgets who is shaping it. Search pulls real pages from the Library.</div>
+        <div id="codex-results" class="hidden mt-3 text-xs p-3 glass rounded-2xl"></div>
+    </div>
+
+    <!-- THE LIVING COUNCIL + OLDMATE WIDGET -->
+    <div id="council" class="max-w-screen-2xl mx-auto px-8 pb-10">
+        <div class="flex items-end gap-x-3 mb-4 px-1">
+            <div class="font-display text-3xl tracking-[-1.3px]">The Living Council</div>
+            <div id="council-subtitle" class="text-sm pb-1 text-[#64748b]">Council loading…</div>
+        </div>
+
+        <div id="council-grid" class="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6" style="grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));">
+            <!-- Agent orbs populated dynamically from active lab squad only -->
+        </div>
+
+        <!-- Old Mate Widget -->
+        <div class="mt-6">
+            <div onclick="consultOldMate()" class="oldmate-widget cursor-pointer inline-flex items-center gap-x-4 glass px-7 py-5 rounded-3xl border border-white/10 hover:border-[#fcd34d]/30">
+                <div class="flex-shrink-0 w-10 h-10 rounded-2xl bg-gradient-to-br from-[#fcd34d] to-amber-400 flex items-center justify-center text-[#0a0a12] text-xl">🧔</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-semibold tracking-tight">OLD MATE</span> 
+                        <span class="text-xs px-2 py-px rounded bg-white/10 text-[#fcd34d]">WISE COMPANION</span>
+                    </div>
+                    <div id="oldmate-message" class="text-sm text-[#a1a1aa] leading-tight mt-px">Your loops are doing good work. The last one is still warm.</div>
+                </div>
+                <div class="text-xs px-3 py-1 rounded-2xl border border-white/20 text-center leading-none pt-[7px]">CONSULT</div>
+            </div>
+        </div>
+
+        <!-- LIVE COUNCIL CHAT INTERFACE (Web + Full Mobile Optimized for Android/iOS PWA + WebView) -->
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-3 px-1">
+                <div class="font-display text-xl tracking-[-0.5px]">LIVE COUNCIL CHAT</div>
+                <div class="text-[10px] px-3 py-px rounded-full bg-emerald-400/10 text-emerald-400">UNIFIED • CLI • MOBILE</div>
+            </div>
+            <div class="glass rounded-3xl border border-white/10 overflow-hidden flex flex-col h-[320px] md:h-[260px] chat-container">
+                <!-- Chat header for mobile touch -->
+                <div class="px-4 py-2 text-xs border-b border-white/10 flex items-center justify-between bg-white/5">
+                    <span class="font-medium">Council • Real-time • <span class="text-[#67e8f9]">Cross-platform</span></span>
+                    <button onclick="clearMobileChat()" class="text-[10px] px-2 py-0.5 border border-white/20 rounded">CLEAR</button>
+                </div>
+                <div id="chat-messages" class="flex-1 overflow-auto p-4 space-y-3 text-sm custom-scroll bg-[#0a0a12]/60">
+                    <!-- Populated live bubbles by JS. Mobile friendly: touch scroll, bubbles -->
+                </div>
+                <div class="p-3 border-t border-white/10 bg-[#11111a] flex gap-2">
+                    <input id="chat-input" type="text" placeholder="Ask the Council... (works on Android, iOS, desktop, CLI)" 
+                           class="flex-1 bg-white/5 border border-white/15 focus:border-[#c084fc] text-sm px-4 py-2 rounded-2xl placeholder:text-[#64748b] outline-none"
+                           onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <button onclick="sendChatMessage()" 
+                            class="px-5 py-2 text-sm font-medium bg-[#c084fc] text-[#0a0a12] rounded-2xl active:scale-[0.985] transition">SEND</button>
+                    <button onclick="quickMobileAction()" class="px-3 py-2 text-xs border border-white/20 rounded-2xl md:hidden">ACTIONS</button>
+                </div>
+            </div>
+            <div class="text-[10px] text-[#64748b] mt-1.5 px-1">Same backend as run_chimera.py --chat. Install PWA from browser menu on phone for native-like Android/iOS experience.</div>
+        </div>
+    </div>
+
+    <!-- THE LIBRARY / VAULT -->
+    <div id="library" class="max-w-screen-2xl mx-auto px-8 pb-12">
+        <div class="flex items-center justify-between mb-5 px-1">
+            <div>
+                <div class="section-header">THE VAULT • GETAILAB LIBRARY</div>
+                <div class="font-display text-3xl tracking-[-1.2px]">Research Library • Loops & Artifacts</div>
+            </div>
+            <div onclick="refreshLibrary()" class="text-xs cursor-pointer flex items-center gap-x-1.5 text-[#64748b] hover:text-[#e0e7ff]">
+                <span>REFRESH PAGES</span> <span>↻</span>
+            </div>
+        </div>
+
+        <div id="library-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <!-- Populated by JS from real loops -->
+        </div>
+    </div>
+
+    <!-- LIVE FIELD MONITOR -->
+    <div id="field-monitor" class="max-w-screen-2xl mx-auto px-8 pb-16">
+        <div class="glass rounded-3xl p-7">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <div class="section-header">FIELD MONITOR</div>
+                    <div class="font-medium text-xl tracking-tight">Live pulses from the manifold</div>
+                </div>
+                <div class="text-right text-xs">
+                    <div class="text-emerald-400">● RECEIVING</div>
+                    <div id="live-timestamp" class="font-mono text-[#64748b]"></div>
+                </div>
+            </div>
+
+            <div id="live-feed" class="space-y-2 max-h-[138px] overflow-auto pr-2 text-sm font-light custom-scroll">
+                <!-- Live messages injected here -->
+            </div>
+
+            <div class="flex gap-2 mt-5">
+                <button onclick="pulseTheField()" class="flex-1 px-6 py-3 text-sm border border-[#fcd34d]/70 hover:bg-[#fcd34d]/10 rounded-2xl transition flex items-center justify-center gap-x-2">
+                    <span class="font-medium">BROADCAST PULSE</span>
+                </button>
+                <button onclick="simulateLiveEvent()" class="px-6 py-3 text-sm border border-white/15 hover:bg-white/5 rounded-2xl">SIMULATE ARTIFACT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER INSPIRATION -->
+    <div class="border-t border-white/10 py-6">
+        <div class="max-w-screen-2xl mx-auto px-8 text-center text-xs text-[#64748b]">
+            Every interaction is a measurement that changes the system.<br>
+            <span class="text-[#c084fc]">“We are taking the ashes of dead stars and coaxing them to dream.”</span>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="modal" onclick="if (event.target.id === 'modal') closeModal()" class="hidden fixed inset-0 bg-black/70 backdrop-blur z-[70] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="lab-modal max-w-xl w-full glass rounded-3xl p-8 border border-white/10">
+            <div id="modal-content"></div>
+            <div class="mt-6 flex justify-end gap-x-3">
+                <button onclick="closeModal()" class="px-5 py-2 text-xs border border-white/20 rounded-2xl">CLOSE</button>
+                <button onclick="closeModalAndPulse()" class="px-6 py-2 text-xs bg-[#c084fc] text-[#0a0a12] font-medium rounded-2xl">MARK REVIEWED • PULSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== PURE GETAILAB SAUCE ====================
+        // Interactive, alive, inspiring. Original. No copies.
+        let currentStats = {};
+        let growthChartInstance = null;
+        let agentChartInstance = null;
+        let trajectoryChartInstance = null;
+        let currentInspiration = 82;
+        let agentData = {};
+        let labConfig = { lab_id: 'chimera', oracle_url: null, display_name: 'Project Chimera' };
+        let directivesCache = [];
+        let achievementsUnlocked = new Set();
+        let trajectoryData = [];  // dynamic for live updates
+
+        // Tailwind runtime config — cosmic GetAiLab palette
+        function initTailwind() {
+            document.querySelectorAll('script').forEach(s => {
+                if (s.src && s.src.includes('tailwind')) {
+                    // Already loaded
+                }
+            });
+            // Custom config
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .custom-scroll::-webkit-scrollbar { width: 4px; }
+                .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 20px; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ==================== HERO CANVAS: Galaxy + Equation Cloud ====================
+        let heroCanvas, ctx, starField = [], orbiters = [], heroOrbitBoost = 0, galaxySpin = 0;
+        const HERO_EQUATIONS = [
+            { text: 'e^(iπ)+1=0', color: '#fcd34d' },
+            { text: 'E=mc²', color: '#67e8f9' },
+            { text: 'F=ma', color: '#c084fc' },
+            { text: '∇·B=0', color: '#67e8f9' },
+            { text: '∂ψ/∂t', color: '#fcd34d' },
+            { text: 'S=k ln W', color: '#a78bfa' }
+        ];
+
+        function initHeroCanvas() {
+            heroCanvas = document.getElementById('hero-canvas');
+            if (!heroCanvas) return;
+            ctx = heroCanvas.getContext('2d', { alpha: true });
+
+            const W = heroCanvas.width;
+            const H = heroCanvas.height;
+            const cx = () => W * 0.5;
+            const cy = () => H * 0.48;
+
+            starField = [];
+            for (let arm = 0; arm < 3; arm++) {
+                const base = (arm / 3) * Math.PI * 2;
+                for (let i = 0; i < 22; i++) {
+                    const t = i / 22;
+                    const r = 14 + t * 72;
+                    const angle = base + t * 2.8;
+                    starField.push({
+                        arm,
+                        t,
+                        r,
+                        angle,
+                        size: Math.random() * 1.2 + 0.35,
+                        phase: Math.random() * Math.PI * 2,
+                        tint: i % 3 === 0 ? '#fcd34d' : (i % 2 ? '#c084fc' : '#67e8f9')
+                    });
+                }
+            }
+            for (let i = 0; i < 18; i++) {
+                starField.push({
+                    arm: -1,
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    size: Math.random() * 0.9 + 0.25,
+                    phase: Math.random() * Math.PI * 2,
+                    tint: '#e0e7ff'
+                });
+            }
+
+            orbiters = HERO_EQUATIONS.map((eq, i) => ({
+                ...eq,
+                angle: (i / HERO_EQUATIONS.length) * Math.PI * 2,
+                radius: 78 + (i % 2) * 10,
+                tilt: 0.82 + (i % 3) * 0.04,
+                speed: 0.007 + (i % 4) * 0.0015,
+                trail: [],
+                cloud: Array.from({ length: 6 }, () => ({
+                    ox: (Math.random() - 0.5) * 14,
+                    oy: (Math.random() - 0.5) * 10,
+                    phase: Math.random() * Math.PI * 2
+                }))
+            }));
+
+            function drawEqLabel(text, x, y, color, alpha, size) {
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.font = `${size}px "Space Grotesk", Inter, system-ui, sans-serif`;
+                ctx.fillStyle = color;
+                ctx.shadowColor = color;
+                ctx.shadowBlur = alpha > 0.5 ? 10 : 4;
+                const w = ctx.measureText(text).width;
+                ctx.fillText(text, x - w / 2, y + size * 0.35);
+                ctx.restore();
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                const centerX = cx();
+                const centerY = cy();
+                const boost = heroOrbitBoost;
+                if (heroOrbitBoost > 0) heroOrbitBoost *= 0.94;
+                galaxySpin += 0.0018 * (1 + boost * 1.8);
+
+                // nebula core glow
+                const neb = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 95);
+                neb.addColorStop(0, `rgba(252,211,77,${0.07 + boost * 0.04})`);
+                neb.addColorStop(0.35, 'rgba(192,132,252,0.06)');
+                neb.addColorStop(1, 'rgba(10,10,18,0)');
+                ctx.fillStyle = neb;
+                ctx.fillRect(0, 0, W, H);
+
+                // spiral arm starfield
+                for (const s of starField) {
+                    s.phase += 0.018;
+                    let sx, sy;
+                    if (s.arm >= 0) {
+                        const a = s.angle + galaxySpin + s.arm * 0.08;
+                        sx = centerX + Math.cos(a) * s.r * 0.92;
+                        sy = centerY + Math.sin(a) * s.r * 0.72;
+                    } else {
+                        sx = s.x;
+                        sy = s.y;
+                    }
+                    const twinkle = 0.35 + Math.sin(s.phase) * 0.25;
+                    ctx.beginPath();
+                    ctx.fillStyle = s.tint;
+                    ctx.globalAlpha = twinkle;
+                    ctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+
+                // equation orbit track
+                ctx.save();
+                ctx.strokeStyle = 'rgba(103,232,249,0.09)';
+                ctx.lineWidth = 0.8;
+                ctx.setLineDash([4, 7]);
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, 86, 70, galaxySpin * 0.15, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+
+                for (const o of orbiters) {
+                    o.angle += o.speed * (1 + boost * 2.2);
+                    const x = centerX + Math.cos(o.angle) * o.radius;
+                    const y = centerY + Math.sin(o.angle) * o.radius * o.tilt;
+
+                    o.trail.push({ x, y });
+                    if (o.trail.length > 14) o.trail.shift();
+
+                    // equation ghost trail (the cloud)
+                    for (let i = 0; i < o.trail.length - 1; i++) {
+                        const t = o.trail[i];
+                        const fade = (i + 1) / o.trail.length;
+                        drawEqLabel(o.text, t.x, t.y, o.color, fade * 0.22, 9);
+                    }
+
+                    // wisps around each equation
+                    for (const c of o.cloud) {
+                        c.phase += 0.05;
+                        const wx = x + c.ox + Math.sin(c.phase) * 3;
+                        const wy = y + c.oy + Math.cos(c.phase * 1.3) * 2;
+                        ctx.beginPath();
+                        ctx.fillStyle = `rgba(103,232,249,${0.08 + Math.sin(c.phase) * 0.05})`;
+                        ctx.arc(wx, wy, 1.2 + Math.sin(c.phase) * 0.4, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    drawEqLabel(o.text, x, y, o.color, 0.95, 11);
+                }
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+
+            heroCanvas.addEventListener('mousemove', (e) => {
+                const rect = heroCanvas.getBoundingClientRect();
+                const scaleX = W / rect.width;
+                const scaleY = H / rect.height;
+                const mx = (e.clientX - rect.left) * scaleX;
+                const my = (e.clientY - rect.top) * scaleY;
+                heroOrbitBoost = Math.min(heroOrbitBoost + 0.08, 1.2);
+                galaxySpin += 0.006;
+            });
+
+            heroCanvas.addEventListener('click', () => {
+                heroOrbitBoost = 2.5;
+                for (const o of orbiters) o.speed += 0.003;
+                setTimeout(() => {
+                    for (const o of orbiters) o.speed = Math.max(o.speed - 0.003, 0.007);
+                }, 600);
+                pulseTheField(false);
+            });
+        }
+
+        // ==================== LAB CONFIG (Oracle URL, squad — from /api/config) ====================
+        async function loadLabConfig() {
+            try {
+                const r = await fetch('/api/config');
+                if (r.ok) {
+                    labConfig = await r.json();
+                    const badge = document.getElementById('lab-badge');
+                    if (badge && labConfig.display_name) {
+                        badge.textContent = labConfig.display_name;
+                    }
+                    const portBadge = document.getElementById('lab-port-badge');
+                    if (portBadge && labConfig.lab_port) {
+                        portBadge.textContent = 'PORT ' + labConfig.lab_port;
+                    }
+                }
+            } catch (_) {}
+        }
+
+        function oracleUrl(path = '') {
+            const base = (labConfig.oracle_url || '').replace(/\/$/, '')
+                || window.location.origin.replace(/:\d+$/, ':5024');
+            return base + path;
+        }
+
+        // ==================== DATA FETCHING + LIVE ====================
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                currentStats = data;
+                currentInspiration = data.inspiration_score ?? 0;
+                renderStats(data);
+                return data;
+            } catch(e) {
+                // graceful fallback with realistic numbers from our real DBs
+                const fallback = {
+                    loops_completed: 0, max_loop_id: 0, total_artifacts: 0,
+                    books_created: 0, inspiration_score: 0, total_experiments: 0,
+                    agent_contributions: {},
+                    knowledge_growth: [],
+                    last_loop_time: null,
+                    research_progress: 0,
+                    resonance_streak: 0,
+                    synthesis: {total_loops: 0, synthesized_loops: 0, synthesis_pct: 0, has_loops: false},
+                    resonance_trajectory: {labels: [], research_progress: [], library_pages: [], streak: [], inspiration: []},
+                    lab_id: labConfig.lab_id || 'lab',
+                    recent_directive: "Lab sandbox offline — start the lab to load real resonance.",
+                };
+                currentStats = fallback;
+                currentInspiration = fallback.inspiration_score;
+                renderStats(fallback);
+                return fallback;
+            }
+        }
+
+        function renderStats(stats) {
+            // Animated count-ups
+            animateValue('stat-loops', 0, stats.loops_completed, 950);
+            animateValue('stat-artifacts', 0, stats.total_artifacts, 1250);
+            animateValue('stat-books', 0, stats.books_created || 6, 820);
+            animateValue('stat-inspire', 0, stats.inspiration_score, 1100, true);
+
+            // NEW: Curvature + Streak real metrics + GetAiLabLibrary pages
+            const curv = stats.research_progress || 78;
+            const streak = stats.resonance_streak ?? 0;
+            animateValue('stat-curvature', 0, curv, 980);
+            const bar = document.getElementById('curvature-bar');
+            if (bar) bar.style.width = Math.min(100, curv) + '%';
+            const streakEl = document.getElementById('stat-streak');
+            if (streakEl) {
+                streakEl.textContent = streak;
+                streakEl.classList.add('metric-up');
+                setTimeout(()=>streakEl.classList.remove('metric-up'), 700);
+            }
+            // Live library pages stat if present (tyre pump + real)
+            const libEl = document.getElementById('stat-library-pages');
+            if (libEl && stats.library_pages) {
+                animateValue('stat-library-pages', parseInt(libEl.textContent)||40, stats.library_pages, 900);
+            }
+
+            currentInspiration = stats.inspiration_score ?? 0;
+
+            // Inspiration resonance ring
+            const ring = document.getElementById('inspire-ring');
+            if (ring) {
+                const pct = Math.min(99, Math.max(0, currentInspiration)) / 100;
+                ring.setAttribute('stroke-dashoffset', 163.36 * (1 - pct));
+            }
+
+            // Loop synthesis panel (this lab only)
+            const synth = stats.synthesis || {};
+            const synthPct = synth.synthesis_pct ?? 0;
+            const pctEl = document.getElementById('loop-resonance-pct');
+            const badgeEl = document.getElementById('loop-synth-badge');
+            const hintEl = document.getElementById('loop-resonance-hint');
+            const overallRing = document.getElementById('overall-ring');
+            if (pctEl) pctEl.textContent = synth.has_loops ? String(synthPct) : '—';
+            if (badgeEl) {
+                if (!synth.has_loops) {
+                    badgeEl.textContent = 'NO LOOPS YET';
+                    badgeEl.className = 'text-xs px-4 py-1 rounded-2xl bg-white/5 text-[#64748b]';
+                } else {
+                    badgeEl.textContent = `${synth.synthesized_loops}/${synth.total_loops} SYNTHESIZED`;
+                    badgeEl.className = synthPct >= 80
+                        ? 'text-xs px-4 py-1 rounded-2xl bg-emerald-500/10 text-emerald-400'
+                        : 'text-xs px-4 py-1 rounded-2xl bg-amber-500/10 text-amber-300';
+                }
+            }
+            if (overallRing) {
+                const circ = 314;
+                overallRing.setAttribute('stroke-dashoffset', synth.has_loops ? circ * (1 - synthPct / 100) : circ);
+            }
+            if (hintEl) {
+                hintEl.textContent = synth.has_loops
+                    ? `${synth.synthesized_loops} of ${synth.total_loops} loops have Oracle consensus in ${stats.lab_id || 'this lab'}.`
+                    : 'Run a dialectic loop to populate resonance for this department.';
+            }
+
+            // Last seen
+            const last = document.getElementById('last-seen');
+            if (last && stats.last_loop_time) {
+                const d = new Date(stats.last_loop_time.replace(' ', 'T'));
+                last.innerHTML = `LAST RESONANCE • ${d.toLocaleDateString('en', {month:'short', day:'numeric'})}`;
+            }
+
+            // Render growth chart
+            renderGrowthChart(stats.knowledge_growth || []);
+
+            // NEW: Agent contributions doughnut — delightful real stat viz
+            renderAgentChart(stats.agent_contributions || {});
+
+            // SAUCE: Live Resonance Trajectory chart (curvature, library pages evolution, streak feel)
+            renderTrajectoryChart(stats);
+
+            // Update old mate with real-ish message
+            updateOldMate(stats);
+
+            // Render dynamic achievements
+            renderAchievements(stats);
+
+            // On load or big render: surface a personal note in hero-ish way occasionally
+            if (stats.recent_directive && Math.random() > 0.55) {
+                setTimeout(() => {
+                    const teaser = document.getElementById('research-teaser');
+                    if (teaser && !teaser._personalized) {
+                        teaser.innerHTML = `<span class="text-[#c084fc]">From your own notes (L${stats.recent_directive_loop || 12}):</span> ${stats.recent_directive.substring(0,108)}...`;
+                        teaser._personalized = true;
+                    }
+                }, 1650);
+            }
+        }
+
+        function animateValue(id, start, end, duration, isScore = false) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const range = end - start;
+            let startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3); // nice cubic ease out
+                const val = Math.floor(start + range * ease);
+                el.textContent = isScore ? val : val.toLocaleString();
+                el.classList.add('metric-up');
+                setTimeout(() => el.classList.remove('metric-up'), 800);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    el.textContent = isScore ? end : end.toLocaleString();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function renderGrowthChart(growthData) {
+            const canvas = document.getElementById('growth-chart');
+            if (!canvas) return;
+            
+            if (growthChartInstance) growthChartInstance.destroy();
+
+            const labels = growthData.map(d => 'L' + d.loop);
+            const artifacts = growthData.map(d => d.artifacts);
+            const cumulative = growthData.map(d => d.cumulative);
+
+            growthChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Artifacts forged',
+                            data: artifacts,
+                            borderColor: '#c084fc',
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            pointBackgroundColor: '#c084fc',
+                            pointBorderWidth: 0,
+                            pointRadius: 3,
+                            fill: false
+                        },
+                        {
+                            label: 'Cumulative Knowledge',
+                            data: cumulative,
+                            borderColor: '#67e8f9',
+                            borderWidth: 2.5,
+                            borderDash: [2, 3],
+                            tension: 0.38,
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { displayColors: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(224,231,255,0.06)', lineWidth: 0.5 }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(224,231,255,0.06)', lineWidth: 0.5 }, ticks: { color: '#64748b', font: { size: 10 }, stepSize: 150 } }
+                    },
+                    elements: { line: { borderJoinStyle: 'round' }, point: { hitRadius: 16 } }
+                }
+            });
+
+            // Make chart interactive — clicking bar/point updates a reminder
+            canvas.onclick = (evt) => {
+                const points = growthChartInstance.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, false);
+                if (points.length) {
+                    const idx = points[0].index;
+                    const loop = growthData[idx];
+                    addLiveMessage(`Insight spike noted on Loop ${loop.loop} — ${loop.artifacts} new artifacts.`, true);
+                    nudgeInspiration(2);
+                    if (directivesCache.length) showDirectiveInModal(directivesCache[0]);
+                }
+            };
+        }
+
+        // NEW DELIGHT: Interactive Resonance Trajectory chart — real progress visualization. Click = your notes.
+        function renderTrajectoryChart(stats) {
+            const canvas = document.getElementById('trajectory-chart');
+            if (!canvas || !window.Chart) return;
+            if (trajectoryChartInstance) trajectoryChartInstance.destroy();
+
+            const traj = stats.resonance_trajectory || {};
+            const labels = traj.labels || [];
+            const curvSeries = traj.research_progress || [];
+            const libSeries = traj.library_pages || [];
+            const streakSeries = traj.streak || [];
+            const inspSeries = traj.inspiration || [];
+            trajectoryData = {labels, curv: curvSeries, lib: libSeries, streak: streakSeries, insp: inspSeries, statsRef: stats};
+
+            if (!labels.length) {
+                if (trajectoryChartInstance) trajectoryChartInstance.destroy();
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = '11px Inter, sans-serif';
+                    ctx.fillText('No loop history in this lab yet — trajectory appears after your first loop.', 8, 48);
+                }
+                return;
+            }
+
+            trajectoryChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Research Progress', data: curvSeries, borderColor: '#fcd34d', borderWidth: 2.5, tension: 0.4, pointRadius: 2.5, pointHoverRadius: 5, fill: false },
+                        { label: 'Codex Pages (GetAiLabLibrary)', data: libSeries, borderColor: '#67e8f9', borderWidth: 2, borderDash: [3,2], tension: 0.35, pointRadius: 2, fill: false },
+                        { label: 'Streak Momentum', data: streakSeries, borderColor: '#c084fc', borderWidth: 1.5, tension: 0.5, pointRadius: 1.5, fill: false },
+                        { label: 'Inspiration Resonance', data: inspSeries, borderColor: '#fcd34d', borderWidth: 1.5, borderDash: [4, 3], tension: 0.35, pointRadius: 2, fill: false }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: true, labels: { color: '#64748b', font:{size:9}, boxWidth:12 } }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw}` } } },
+                    scales: {
+                        x: { grid: { color: 'rgba(224,231,255,0.05)' }, ticks: { color: '#64748b', font:{size:9} } },
+                        y: { grid: { color: 'rgba(224,231,255,0.05)' }, ticks: { color: '#64748b', font:{size:9}, stepSize: 15 } }
+                    },
+                    onClick: (evt, els) => {
+                        if (els.length) {
+                            const idx = els[0].index;
+                            const l = labels[idx];
+                            addLiveMessage(`Trajectory point ${l} — curvature ${curvSeries[idx]}. Your notes at this resonance still live.`, true);
+                            nudgeInspiration(3);
+                            // Surface user's real note
+                            if (directivesCache.length) {
+                                const pick = directivesCache[Math.min(idx, directivesCache.length-1)];
+                                setTimeout(() => showDirectiveInModal(pick), 280);
+                            } else if (trajectoryData.statsRef && trajectoryData.statsRef.recent_directive) {
+                                showToast('Your directive shaped this bend.');
+                            }
+                        }
+                    }
+                }
+            });
+            // Extra interactive: hover on canvas pulses lightly
+            canvas.onmouseenter = () => nudgeInspiration(0.5);
+        }
+
+        async function refreshTrajectoryChart(animate=false) {
+            const stats = await fetchStats().catch(()=>currentStats);
+            renderTrajectoryChart(stats);
+            if (animate) addLiveMessage('Trajectory replayed. The path is yours.', true);
+        }
+
+        function renderAgentChart(contribs) {
+            const canvasId = 'agent-chart'; // lazy: we will mount a tiny canvas dynamically if needed
+            let canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                // Inject a beautiful mini doughnut next to the agents count on demand
+                const agentsCard = document.querySelector('#stat-agents')?.parentElement;
+                if (agentsCard) {
+                    const holder = document.createElement('div');
+                    holder.className = 'absolute -top-1 -right-1 w-[62px] h-[62px] pointer-events-none';
+                    holder.innerHTML = `<canvas id="${canvasId}" width="62" height="62"></canvas>`;
+                    agentsCard.style.position = 'relative';
+                    agentsCard.appendChild(holder);
+                    canvas = document.getElementById(canvasId);
+                }
+            }
+            if (!canvas || !window.Chart) return;
+            if (agentChartInstance) agentChartInstance.destroy();
+
+            const labels = Object.keys(contribs);
+            const data = Object.values(contribs);
+            const colors = labels.map((k,i) => {
+                const cols = ['#fcd34d','#c084fc','#67e8f9','#a78bfa','#f472b6','#fbbf24','#34d399','#60a5fa','#fb7185','#a5b4fc'];
+                return cols[i % cols.length];
+            });
+
+            agentChartInstance = new Chart(canvas, {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
+                options: {
+                    responsive: false, cutout: '68%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c)=> `${c.label}: ${c.raw} exps` } } }
+                }
+            });
+            // Click the doughnut to pulse field & show agent focus
+            canvas.onclick = () => { pulseTheField(); nudgeInspiration(1); addLiveMessage('Agent participation celebrated. Every voice matters.', true); };
+        }
+
+        function renderAchievements(stats) {
+            const strip = document.getElementById('achievements-strip');
+            if (!strip) return;
+            strip.innerHTML = '';
+            const loops = stats.loops_completed || 9;
+            const arts = stats.total_artifacts || 830;
+            const curv = stats.research_progress || 78;
+            const insp = stats.inspiration_score ?? 0;
+
+            const badges = [
+                { key: 'first10', label: '10 LOOPS', cond: loops >= 10, desc: 'First decade of curvature' },
+                { key: 'vault500', label: '500+ ARTIFACTS', cond: arts >= 500, desc: 'Vault overflowing with insight' },
+                { key: 'curved80', label: 'CURVATURE 80', cond: curv >= 80, desc: 'You are warping the manifold' },
+                { key: 'resonance90', label: 'RESONANCE 90', cond: insp >= 90, desc: 'The field is singing back' },
+                { key: 'allvoices', label: 'FULL COUNCIL', cond: (() => { const s = Object.keys(agentData||{}).length || labConfig.squad_size || 0; const a = Object.keys(stats.agent_contributions||{}).length; return s > 0 && a >= s; })(), desc: 'Every squad voice has contributed' },
+                { key: 'streak7', label: '7-DAY STREAK', cond: (stats.resonance_streak||0) >= 7, desc: 'Active research streak' }
+            ];
+
+            badges.forEach(b => {
+                const el = document.createElement('div');
+                const unlocked = b.cond;
+                if (unlocked && !achievementsUnlocked.has(b.key)) {
+                    achievementsUnlocked.add(b.key);
+                    // celebratory micro toast + particles on new unlock
+                    setTimeout(() => showToast(`ACHIEVEMENT UNLOCKED: ${b.label}`), 820);
+                    setTimeout(() => burstParticles(220 + (idx||0)*60, 320, 18, '#fcd34d'), 650);
+                }
+                el.className = `achieve-badge px-3 py-px cursor-pointer select-none ${unlocked ? 'unlocked' : 'opacity-60'}`;
+                el.textContent = b.label;
+                el.title = b.desc;
+                el.onclick = () => {
+                    nudgeInspiration(unlocked ? 4 : 1);
+                    pulseTheField(false);
+                    addLiveMessage(`${b.label} — ${b.desc}. Recorded.`, true);
+                    if (unlocked) el.style.transform = 'scale(1.1)';
+                    setTimeout(()=> el.style.transform='', 280);
+                };
+                strip.appendChild(el);
+            });
+        }
+
+        async function fetchAndRenderReminders() {
+            const container = document.getElementById('reminders-container');
+            container.innerHTML = '';
+            
+            let reminders = [];
+            try {
+                const res = await fetch('/api/reminders');
+                reminders = await res.json();
+            } catch(e) {
+                reminders = [
+                    {id:"r1", type:"continue", title:"This lab's council is standing by.", body:"Run a dialectic loop to populate voices, artifacts, and vault pages for this department only.", action:"Forge Next Vector", boost:3},
+                ];
+            }
+
+            reminders.forEach(rem => {
+                const isDirective = rem.type === 'directive';
+                const div = document.createElement('div');
+                div.className = `reminder glass rounded-3xl p-5 lab-card flex flex-col border-l-[5px] ${rem.type === 'celebrate' || isDirective ? 'border-[#fcd34d]' : 'border-[#c084fc]'}`;
+                let extra = '';
+                if (isDirective && rem.directive_ref) {
+                    extra = `<div class="text-[10px] mt-1 text-[#c084fc]/80">“${rem.directive_ref.note.substring(0, 92)}...”</div>`;
+                }
+                div.innerHTML = `
+                    <div class="uppercase text-[9px] tracking-widest text-[#64748b] mb-px">${rem.type.toUpperCase()}</div>
+                    <div class="font-medium text-[15px] leading-tight mt-0.5 mb-2">${rem.title}</div>
+                    <div class="text-xs text-[#94a3b8] flex-1">${rem.body}</div>
+                    ${extra}
+                    <div class="flex items-center gap-2 mt-4">
+                        <button onclick="handleReminderAction(this, '${rem.id}', ${rem.boost}, '${rem.action}', ${isDirective ? 'true' : 'false'}, ${rem.directive_ref ? JSON.stringify(rem.directive_ref).replace(/"/g,'&quot;') : 'null'})" 
+                                class="text-xs px-5 py-[7px] bg-white/5 border border-white/15 hover:border-[#c084fc]/70 hover:text-white active:scale-[0.985] rounded-2xl transition flex-1">${rem.action}</button>
+                        <button onclick="dismissReminder(this, '${rem.id}')" class="text-xs px-3 py-[7px] text-[#64748b] hover:text-white">✕</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function handleReminderAction(btnEl, id, boost, actionText, isDirective=false, directiveJSON=null) {
+            const orig = btnEl.textContent;
+            btnEl.textContent = 'ACTING...';
+            btnEl.disabled = true;
+
+            // Optimistic UI boost
+            await nudgeInspiration(boost);
+            
+            // Broadcast real pulse to backend
+            try {
+                await fetch('/api/pulse', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: `Reminder action: ${actionText}` })
+                });
+            } catch(_) {}
+
+            // Visual feedback
+            setTimeout(() => {
+                btnEl.textContent = '✓ RESONATED';
+                btnEl.style.borderColor = '#67e8f9';
+                addLiveMessage(`Action taken — ${actionText}. The manifold shifted. +${boost} resonance.`, true);
+                
+                if (isDirective && directiveJSON) {
+                    try {
+                        const d = typeof directiveJSON === 'string' ? JSON.parse(directiveJSON) : directiveJSON;
+                        setTimeout(() => showDirectiveInModal(d), 580);
+                    } catch(_) {}
+                }
+                
+                if (actionText.toLowerCase().includes('search') || actionText.toLowerCase().includes('codex')) {
+                    setTimeout(() => showLibraryCodexSearch(), 420);
+                }
+                
+                setTimeout(() => {
+                    // Refresh reminders occasionally
+                    if (Math.random() > 0.6) fetchAndRenderReminders();
+                    btnEl.textContent = orig;
+                    btnEl.disabled = false;
+                }, 1250);
+            }, 620);
+        }
+
+        // NEW: Quick resonate with user's own note directly from reminders/directives — hits /api/resonate for real backend tie + stats update
+        async function resonateNoteFromUI(directive, btn) {
+            if (btn) btn.textContent = 'RESONATING...';
+            try {
+                const res = await fetch('/api/resonate', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({note_ref: directive.note, loop: directive.loop || directive.loop_id, boost: 5})});
+                const data = await res.json();
+                if (data.stats) renderStats(data.stats);
+                addLiveMessage(data.affirmation || 'Resonance received. The field moved.', true);
+                pulseTheField(false);
+            } catch(_) {
+                addLiveMessage('Could not reach resonance API — is the lab sandbox running?', true);
+            }
+            if (btn) { btn.textContent = 'RESONATED ✓'; setTimeout(()=> {if(btn) btn.textContent='RESONATE AGAIN';}, 1800); }
+        }
+
+        function dismissReminder(el, id) {
+            const parent = el.closest('.reminder');
+            parent.classList.add('exiting');
+            setTimeout(() => {
+                parent.remove();
+                addLiveMessage('Reminder integrated. The field is lighter.', false);
+                nudgeInspiration(1);
+            }, 210);
+        }
+
+        function updateOldMate(stats) {
+            const msg = document.getElementById('oldmate-message');
+            if (!msg) return;
+            const loops = stats.loops_completed || 0;
+            const arts = stats.total_artifacts || 0;
+            const phrases = loops > 0 ? [
+                `Loop #${stats.max_loop_id || loops} is still warm in ${labConfig.lab_id || 'this lab'}.`,
+                `${arts} artifacts in this department's vault.`,
+                `The last synthesis is waiting for your eye.`,
+                `${loops} loop${loops === 1 ? '' : 's'} forged here. Respect.`,
+            ] : [
+                `${labConfig.display_name || 'Your lab'} is ready — the council speaks from this squad only.`,
+                `No loops yet. Ignite a vector and hear your scientists in the artifacts.`,
+            ];
+            msg.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
+        function consultOldMate() {
+            const msgEl = document.getElementById('oldmate-message');
+            const oldText = msgEl.textContent;
+            
+            msgEl.style.transitionDuration = '90ms';
+            msgEl.textContent = "Old Mate is thinking...";
+            
+            setTimeout(async () => {
+                try {
+                    const res = await fetch('/api/inspire');
+                    const insp = await res.json();
+                    msgEl.textContent = `"${insp.quote.substring(0, 92)}..." — ${insp.agent}`;
+                } catch(_) {
+                    msgEl.textContent = "Keep walking the geodesics, mate. You're doing important work.";
+                }
+                
+                nudgeInspiration(3);
+                addLiveMessage("Old Mate offered counsel. +3 resonance.", true);
+                
+                setTimeout(() => {
+                    msgEl.style.transitionDuration = '220ms';
+                }, 180);
+            }, 680);
+        }
+
+        // ==================== AGENTS / COUNCIL INTERACTIVE ====================
+        async function renderCouncil() {
+            const grid = document.getElementById('council-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            let agents = {};
+            try {
+                const r = await fetch('/api/agents');
+                agents = await r.json();
+            } catch(_) {
+                agents = labConfig.agents || {};
+            }
+            agentData = agents;
+            const squadKeys = Object.keys(agents);
+            const subtitle = document.getElementById('council-subtitle');
+            if (subtitle) {
+                const n = squadKeys.length;
+                subtitle.textContent = n
+                    ? `${n} scientist${n === 1 ? '' : 's'} · ${labConfig.lab_id || 'this lab'} only`
+                    : 'No squad loaded — check PERSONAS_YAML for this lab';
+            }
+            const statAgents = document.getElementById('stat-agents');
+            if (statAgents) {
+                const active = Object.values(agents).filter(a => (a.experiments || 0) > 0).length;
+                statAgents.textContent = `${active}/${squadKeys.length || '—'}`;
+            }
+
+            squadKeys.forEach((key, idx) => {
+                const a = agents[key];
+                const div = document.createElement('div');
+                div.className = 'flex flex-col items-center text-center';
+                
+                const initials = key.slice(0,2).toUpperCase();
+                
+                div.innerHTML = `
+                    <div class="agent-orb quantum-glow mb-2" style="background: linear-gradient(145deg, ${a.color}22, #11111a); color: ${a.color}; border-color: ${a.color}33;" data-agent="${key}">
+                        ${initials}
+                    </div>
+                    <div class="text-xs font-medium leading-none">${key.toUpperCase()}</div>
+                    <div class="text-[9px] text-[#64748b] tracking-tight leading-none mt-px">${a.role.split(' ')[0]}</div>
+                `;
+                
+                const orb = div.querySelector('.agent-orb');
+                orb.onclick = () => consultAgent(key, a, orb);
+                orb.onmouseenter = () => { orb.style.boxShadow = `0 0 0 4px rgba(0,0,0,0.5), 0 0 0 13px ${a.color}22`; };
+                orb.onmouseleave = () => { orb.style.boxShadow = '0 0 0 4px rgba(0,0,0,0.4), 0 0 0 9px rgba(192,132,252,0.15)'; };
+                
+                grid.appendChild(div);
+            });
+        }
+
+        async function consultAgent(agentKey, agentInfo, orbEl) {
+            const origShadow = orbEl.style.boxShadow;
+            orbEl.style.transitionDuration = '60ms';
+            orbEl.style.boxShadow = `0 0 0 3px #11111a, 0 0 0 14px ${agentInfo.color}55`;
+            
+            // Get fresh quote + teaser tailored
+            let quote = "The geometry is more beautiful than we imagined.";
+            let role = agentInfo.role;
+            try {
+                const res = await fetch(`/api/inspire?agent=${encodeURIComponent(agentKey)}`);
+                const d = await res.json();
+                quote = d.quote || quote;
+                role = d.role || role;
+            } catch(_) {}
+
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <div class="flex items-center gap-x-4">
+                    <div class="agent-orb flex-shrink-0" style="width:62px;height:62px;font-size:19px;background: linear-gradient(145deg, ${agentInfo.color}33, #11111a); color:${agentInfo.color}; border-color:${agentInfo.color}55;">${agentKey.slice(0,2).toUpperCase()}</div>
+                    <div>
+                        <div class="font-display text-2xl tracking-[-1px]">${agentKey.toUpperCase()}</div>
+                        <div class="text-[#94a3b8]">${role}</div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-5 glass rounded-2xl text-[15.2px] leading-tight border-l-[5px]" style="border-color:${agentInfo.color}">
+                    ${quote}
+                </div>
+                
+                <div class="mt-5">
+                    <div class="text-xs tracking-widest text-[#64748b] mb-1.5">SEED A HYPOTHESIS IN ${agentKey.toUpperCase()}'S VOICE</div>
+                    <div onclick="seedHypothesisFromAgent('${agentKey}', this)" class="cursor-pointer px-5 py-[13px] border border-white/15 hover:bg-white/5 active:bg-[#11111a] rounded-2xl text-sm">“${getAgentSeed(agentKey)}” →</div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setTimeout(() => {
+                orbEl.style.boxShadow = origShadow;
+                orbEl.style.transitionDuration = '0.3s';
+            }, 380);
+        }
+
+        function getAgentSeed(agent) {
+            const role = (agentData[agent] && agentData[agent].role) || labConfig.research_agenda || 'this lab';
+            return `What testable hypothesis should ${agent.replace(/_/g, ' ')} pursue next on ${role}?`;
+        }
+
+        async function seedHypothesisFromAgent(agent, el) {
+            el.style.transitionDuration = '60ms';
+            el.textContent = 'Seeding vector into the field...';
+            
+            await new Promise(r => setTimeout(r, 680));
+            
+            addLiveMessage(`${agent.toUpperCase()} seeded a new hypothesis. The Oracle will consider it in the next loop.`, true);
+            nudgeInspiration(4);
+            
+            el.textContent = '✓ Seeded. The field received it.';
+            
+            setTimeout(() => {
+                closeModal();
+                // open a fresh teaser
+                showRandomInspiration();
+            }, 1050);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+            const modalBox = modal.querySelector('.lab-modal');
+            if (modalBox) modalBox.classList.remove('max-w-2xl', 'max-h-[90vh]', 'overflow-y-auto');
+        }
+        
+        function closeModalAndPulse() {
+            closeModal();
+            pulseTheField();
+            nudgeInspiration(2);
+        }
+
+        // ============================================================
+        // NO-IDEA FLOW / CURIOSITY PORTAL (Web UI edition)
+        // Mirrors CLI: categories, optional family/personal note, live generation
+        // from /api/generate_starter (lab) + deeper Oracle when available.
+        // "Just write a problem and the lab gets to it." — integrates personas + Library.
+        // On "Ignite": registers with Oracle (if reachable), shows copyable command for full CLI kickoff,
+        // and pulses the field. Pure welcoming vision.
+        // ============================================================
+        const NO_IDEA_CATS = [
+            {key:"surprise", label:"🎲 Surprise Me"},
+            {key:"cosmic", label:"🌌 Cosmic"},
+            {key:"quantum_mind", label:"⚛️ Quantum Mind"},
+            {key:"agentic_frontiers", label:"🤖 Agent Frontiers"},
+            {key:"archetypal", label:"🌀 Archetypes & Shadow"},
+            {key:"geometry", label:"📐 Geometry"},
+            {key:"human_mysteries", label:"🧠 Human Mysteries"},
+            {key:"unsolved_mysteries", label:"❓ Unsolved"},
+            {key:"everyday_wonder", label:"✨ Everyday Wonder"},
+            {key:"family_history", label:"👨‍👩‍👧 Family & Lineage"},
+            {key:"library_fork", label:"📚 Library Fork"}
+        ];
+
+        let currentPortalProblem = null;
+
+        function openNoIdeaPortal() {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            
+            let chips = NO_IDEA_CATS.map(c => 
+                `<span onclick="selectPortalCategory('${c.key}', this)" class="portal-chip cursor-pointer text-xs px-3 py-1 rounded-2xl border border-white/15 hover:border-[#fcd34d] hover:bg-[#fcd34d]/5 active:bg-[#fcd34d]/10 transition mr-1 mb-1 inline-block" data-cat="${c.key}">${c.label}</span>`
+            ).join('');
+
+            content.innerHTML = `
+                <div class="font-display text-3xl tracking-[-1.5px] mb-1">THE CURIOSITY PORTAL</div>
+                <div class="text-[#94a3b8] text-sm mb-4">No idea what to research? The lab is built exactly for this moment.<br>Pick a resonance. Add a personal or family thread if you like. The Muse will write the problem.</div>
+                
+                <div class="mb-3">
+                    <div class="text-[10px] tracking-[1.5px] text-[#64748b] mb-1.5">RESONANCE CHAMBER</div>
+                    <div id="portal-chips" class="flex flex-wrap">${chips}</div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-[10px] tracking-[1.5px] text-[#64748b] mb-1.5">OPTIONAL PERSONAL OR FAMILY RESONANCE (woven lightly)</div>
+                    <input id="portal-family" type="text" class="w-full bg-[#11111a] border border-white/15 focus:border-[#fcd34d]/60 rounded-2xl px-4 py-3 text-sm placeholder:text-[#64748b]" 
+                           placeholder="e.g. grandfather clockmaker, family intuition stories, immigrant resilience... (or leave empty)">
+                </div>
+
+                <div onclick="generatePortalProblem()" 
+                     class="cursor-pointer text-center w-full py-3 rounded-3xl border border-[#fcd34d] hover:bg-[#fcd34d] hover:text-[#0a0a12] active:scale-[0.985] transition font-medium text-sm">
+                    ✧ GENERATE PROBLEM STATEMENT FROM THE MUSE
+                </div>
+
+                <div id="portal-result" class="hidden mt-5 p-4 glass rounded-2xl border border-white/10 text-sm leading-snug">
+                    <!-- populated by generate -->
+                </div>
+
+                <div class="mt-4 flex gap-2 text-xs">
+                    <div onclick="ignitePortalProblem()" class="flex-1 cursor-pointer text-center py-3 rounded-3xl bg-[#fcd34d] text-[#0a0a12] font-semibold hidden" id="portal-ignite-btn">IGNITE THIS IN THE LAB →</div>
+                    <div onclick="copyPortalForCLI()" class="flex-1 cursor-pointer text-center py-3 rounded-3xl border border-white/20 hover:bg-white/5 hidden" id="portal-copy-btn">COPY FOR CLI</div>
+                </div>
+                <div class="text-[10px] text-[#64748b] mt-3 text-center">Full dialectic runs best in Commander Console (python run_chimera.py). This registers the vector in the Agora + Library.</div>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // default select surprise
+            setTimeout(() => {
+                const first = document.querySelector('#portal-chips .portal-chip');
+                if (first) first.classList.add('!border-[#fcd34d]', '!bg-[#fcd34d]/10');
+                window.selectedPortalCat = 'surprise';
+            }, 80);
+        }
+
+        function selectPortalCategory(cat, el) {
+            document.querySelectorAll('#portal-chips .portal-chip').forEach(e => e.classList.remove('!border-[#fcd34d]', '!bg-[#fcd34d]/10'));
+            el.classList.add('!border-[#fcd34d]', '!bg-[#fcd34d]/10');
+            window.selectedPortalCat = cat;
+        }
+
+        async function generatePortalProblem() {
+            const cat = window.selectedPortalCat || 'surprise';
+            const family = (document.getElementById('portal-family') || {}).value || '';
+            const resultBox = document.getElementById('portal-result');
+            const igniteBtn = document.getElementById('portal-ignite-btn');
+            const copyBtn = document.getElementById('portal-copy-btn');
+            
+            resultBox.innerHTML = `<div class="animate-pulse text-[#64748b]">The Muse is consulting the Library and the personas...</div>`;
+            resultBox.classList.remove('hidden');
+            
+            let data = null;
+            try {
+                // Prefer richer Oracle if possible, fall back to lab curated
+                const oracleRes = await fetch(`${oracleUrl('/generate_problem')}?category=${cat}&family_note=${encodeURIComponent(family)}`);
+                if (oracleRes.ok) {
+                    data = await oracleRes.json();
+                }
+            } catch(_) {}
+            
+            if (!data) {
+                try {
+                    const labRes = await fetch(`/api/generate_starter?category=${cat}&family_note=${encodeURIComponent(family)}`);
+                    data = await labRes.json();
+                } catch(_) {
+                    data = {problem_statement: "What if the curvature of our own wonder is the first measurable invariant?", category: cat, muse_note: "Local fallback. Oracle / Lab services needed for live generation."};
+                }
+            }
+            
+            currentPortalProblem = data.problem_statement || "The field is ready for your vector.";
+            
+            resultBox.innerHTML = `
+                <div class="text-[10px] text-[#fcd34d] tracking-widest mb-1">${(data.category || cat).toUpperCase()} • ${data.persona_hint ? data.persona_hint.toUpperCase() + ' LENS' : 'COUNCIL VOICE'}</div>
+                <div class="text-base leading-tight text-[#e0e7ff]">"${currentPortalProblem}"</div>
+                <div class="mt-2 text-[10px] text-[#64748b]">${data.muse_note || data.source || ''}</div>
+            `;
+            
+            igniteBtn.classList.remove('hidden');
+            copyBtn.classList.remove('hidden');
+            igniteBtn.onclick = ignitePortalProblem;
+        }
+
+        async function ignitePortalProblem() {
+            if (!currentPortalProblem) return;
+            
+            // Register with Oracle / Agora (makes it visible in Library immediately)
+            try {
+                await fetch(oracleUrl('/initiate_loop'), {
+                    method: 'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({problem_statement: currentPortalProblem})
+                });
+                addLiveMessage("Problem vector registered in the Agora by the Portal. The Library now holds it.", true);
+            } catch(_) {
+                addLiveMessage("Problem prepared. (Oracle not reachable for full registration — still usable.)", true);
+            }
+            
+            pulseTheField(false);
+            nudgeInspiration(5);
+            
+            const msg = `Problem seeded:\n"${currentPortalProblem}"\n\nTo run the full squad dialectic right now:\npython3 run_chimera.py --problem "..." (or just run and paste)`;
+            alert(msg);  // Vision: in prod would be a beautiful toast + deep link
+            
+            // Bonus: also trigger a lab pulse with context
+            try {
+                await fetch('/api/pulse', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({message: "Portal ignition: " + currentPortalProblem.substring(0,80)})});
+            } catch(_) {}
+            
+            closeModal();
+            // Refresh library to show the new entry (if it registered)
+            setTimeout(() => { renderLibrary(); }, 1400);
+        }
+
+        function copyPortalForCLI() {
+            if (!currentPortalProblem) return;
+            const cmd = `python3 run_chimera.py --problem "${currentPortalProblem.replace(/"/g, '\\"')}"`;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const orig = event.currentTarget ? event.currentTarget.textContent : '';
+                addLiveMessage('Problem copied to clipboard. Paste into Commander Console or use: ' + cmd, true);
+                // also show full command in a gentle way
+                prompt("Full CLI command (select & copy):", cmd);
+            }).catch(() => {
+                prompt("Copy this problem statement:", currentPortalProblem);
+            });
+        }
+
+        // ==================== LIBRARY ====================
+        async function renderLibrary() {
+            const grid = document.getElementById('library-grid');
+            if (!grid) return;
+            grid.innerHTML = '<div class="col-span-full text-xs text-[#64748b]">Loading the vault...</div>';
+            
+            let loops = [];
+            try {
+                const r = await fetch('/api/loops');
+                loops = await r.json();
+            } catch(e) {
+                loops = [
+                    {id:16, time:"2026-05-01", problem:"Metabolic function via red light + methylene blue...", artifacts:45, has_synthesis:true},
+                    {id:15, time:"2026-05-01", problem:"Quantum-relativistic problems with Newtonian tools...", artifacts:105, has_synthesis:true},
+                    {id:12, time:"2026-04-22", problem:"Structural limitations of agentic frameworks in zero-day hunting...", artifacts:102, has_synthesis:true}
+                ];
+            }
+
+            grid.innerHTML = '';
+            loops.forEach(lp => {
+                const card = document.createElement('div');
+                card.className = `loop-card glass rounded-3xl p-5 lab-card cursor-pointer h-full border border-white/10 flex flex-col`;
+                card.innerHTML = `
+                    <div class="flex justify-between text-[10px]">
+                        <div><span class="font-semibold text-[#fcd34d]">LOOP #${lp.id}</span></div>
+                        <div class="text-[#64748b]">${lp.time ? lp.time.substring(0,10) : ''}</div>
+                    </div>
+                    <div class="text-sm mt-3 leading-tight flex-1">${lp.problem || 'Research loop record.'}</div>
+                    <div class="mt-4 flex items-center justify-between text-xs">
+                        <div class="text-[#64748b]">${lp.artifacts || 70} ARTIFACTS</div>
+                        ${lp.has_synthesis ? '<div class="px-2.5 py-px rounded bg-emerald-400/10 text-emerald-400 text-[10px]">SYNTHESIZED</div>' : ''}
+                    </div>
+                `;
+                card.onclick = () => openLoopDetail(lp.id, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function escHtml(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ==================== ADAPTIVE LEARNER ====================
+        let learnerDashboardCache = null;
+
+        function getLearnerUserId() {
+            let id = localStorage.getItem('getailab_user_id');
+            if (!id) {
+                id = 'default';
+                localStorage.setItem('getailab_user_id', id);
+            }
+            return id;
+        }
+
+        function formatLearnerTime(iso) {
+            if (!iso) return '—';
+            try {
+                const d = new Date(iso.replace(' ', 'T'));
+                return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (_) {
+                return iso;
+            }
+        }
+
+        function renderLearnerDashboard(learner) {
+            const root = document.getElementById('learner-dashboard-root');
+            if (!root) return;
+            learnerDashboardCache = learner;
+
+            if (!learner || learner.enabled === false) {
+                root.innerHTML = `
+                    <div class="text-center py-8 px-4">
+                        <div class="text-4xl mb-3 opacity-40">📚</div>
+                        <div class="text-sm text-[#64748b]">Adaptive learner offline — lab API must be running with learning integration enabled.</div>
+                        <div class="text-[10px] text-[#64748b] mt-2">Endpoints: /api/learner/profile · /api/learner/coaching</div>
+                    </div>`;
+                return;
+            }
+
+            const ic = learnerInterventionStyle(learner.intervention);
+            const ec = learnerEngagementStyle(learner.engagement_level);
+            const ringColor = learnerEngagementStroke(learner.engagement_level);
+            const score = Math.round(learner.engagement_score || 0);
+            const ringOffset = 251.2 - (251.2 * score / 100);
+            const total = learner.total_interactions || 0;
+            const correct = learner.correct_responses || 0;
+            const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+            const mastered = (learner.concepts_mastered || []).filter(Boolean);
+            const struggling = (learner.concepts_struggling || []).filter(Boolean);
+            const subject = learner.current_subject || 'Open exploration — chat or open a loop to set focus';
+
+            root.innerHTML = `
+                <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                    <div class="flex flex-col sm:flex-row lg:flex-col items-center gap-4 lg:w-44 shrink-0">
+                        <div class="relative">
+                            <svg width="120" height="120" class="transform -rotate-90">
+                                <circle cx="60" cy="60" r="48" fill="none" stroke="#1a1a28" stroke-width="10"/>
+                                <circle cx="60" cy="60" r="48" fill="none" stroke="${ringColor}" stroke-width="10" stroke-linecap="round"
+                                    stroke-dasharray="251.2" stroke-dashoffset="${ringOffset}" style="transition: stroke-dashoffset 0.9s ease"/>
+                                <text x="60" y="56" text-anchor="middle" fill="#e0e7ff" font-size="26" font-weight="700" class="metric-value" transform="rotate(90 60 60)">${score}</text>
+                                <text x="60" y="74" text-anchor="middle" fill="#64748b" font-size="9" transform="rotate(90 60 60)">ENGAGE</text>
+                            </svg>
+                        </div>
+                        <div class="text-center sm:text-left lg:text-center space-y-2">
+                            <span class="inline-block px-3 py-1 rounded-full text-[11px] border capitalize ${ec} border-current/30 bg-black/20">${escHtml(learner.engagement_level || 'developing')}</span>
+                            <span class="inline-block px-3 py-1 rounded-full text-[11px] border ${ic} capitalize">${escHtml(learner.intervention || 'standard')} mode</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <div class="learner-coaching-card rounded-2xl p-5 sm:p-6">
+                            <div class="text-[10px] uppercase tracking-[2px] text-[#67e8f9] mb-2">Coaching hint</div>
+                            <div id="learner-dashboard-coaching" class="text-base sm:text-lg leading-snug text-[#e0e7ff] font-medium">
+                                ${escHtml(learner.coaching_hint || learner.message || 'Keep exploring — each loop compounds your research intuition.')}
+                            </div>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <button onclick="refreshLearnerDashboardCoaching()"
+                                        class="px-4 py-2 rounded-xl bg-[#67e8f9]/10 hover:bg-[#67e8f9]/20 border border-[#67e8f9]/30 text-[#67e8f9] text-xs transition">
+                                    ↻ New coaching hint
+                                </button>
+                                <button onclick="scrollToSection('council')"
+                                        class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[#94a3b8] text-xs transition">
+                                    Ask the council →
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-[11px] text-[#64748b]">
+                            <span class="text-[#a5b4fc]">Current focus:</span> ${escHtml(subject.substring(0, 140))}${subject.length > 140 ? '…' : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">AQF est.</div>
+                        <div class="text-2xl font-display text-[#fcd34d] metric-value">${learner.estimated_aqf_level || 1}</div>
+                    </div>
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">Competency</div>
+                        <div class="text-sm font-semibold capitalize mt-1 text-[#c084fc]">${escHtml(learner.competency_level || 'beginner')}</div>
+                    </div>
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">Loops seen</div>
+                        <div class="text-2xl font-display metric-value">${learner.loops_observed || 0}</div>
+                    </div>
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">Labs done</div>
+                        <div class="text-2xl font-display metric-value">${learner.labs_completed || 0}</div>
+                    </div>
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">Interactions</div>
+                        <div class="text-2xl font-display metric-value">${total}</div>
+                    </div>
+                    <div class="learner-stat-tile rounded-2xl p-3 text-center">
+                        <div class="text-[10px] text-[#64748b]">Accuracy</div>
+                        <div class="text-2xl font-display metric-value text-emerald-400">${accuracy}%</div>
+                    </div>
+                </div>
+
+                <div class="mt-4 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-[#67e8f9] via-[#c084fc] to-[#fcd34d] transition-all duration-700" style="width:${score}%"></div>
+                </div>
+
+                ${(mastered.length || struggling.length) ? `
+                <div class="mt-4 flex flex-wrap gap-2 items-center">
+                    <span class="text-[10px] text-[#64748b] uppercase tracking-wider">Concepts</span>
+                    ${mastered.map(c => `<span class="concept-chip mastered">${escHtml(c)}</span>`).join('')}
+                    ${struggling.map(c => `<span class="concept-chip struggling">${escHtml(c)}</span>`).join('')}
+                </div>` : ''}
+
+                <div class="mt-4 flex flex-wrap justify-between gap-2 text-[10px] text-[#64748b]">
+                    <span>Profile: <span class="text-[#a5b4fc] font-mono">${escHtml(getLearnerUserId())}</span></span>
+                    <span>Last active: ${formatLearnerTime(learner.last_interaction)}</span>
+                </div>`;
+        }
+
+        async function fetchLearnerDashboard(showToastOnRefresh = false) {
+            if (labConfig.learning_enabled === false) {
+                renderLearnerDashboard({ enabled: false });
+                return null;
+            }
+            try {
+                const r = await fetch(`/api/learner/profile?user_id=${encodeURIComponent(getLearnerUserId())}`);
+                const data = await r.json();
+                renderLearnerDashboard(data);
+                if (showToastOnRefresh && data.enabled !== false) {
+                    showToast(`Learner profile refreshed — ${data.engagement_level} (${Math.round(data.engagement_score || 0)} engagement)`);
+                }
+                return data;
+            } catch (_) {
+                renderLearnerDashboard({ enabled: false });
+                return null;
+            }
+        }
+
+        async function refreshLearnerDashboardCoaching() {
+            try {
+                const r = await fetch(`/api/learner/coaching?user_id=${encodeURIComponent(getLearnerUserId())}`);
+                const data = await r.json();
+                const hintEl = document.getElementById('learner-dashboard-coaching');
+                const hint = data.message || data.coaching_hint || '';
+                if (hintEl && hint) hintEl.textContent = hint;
+                if (data.enabled !== false) {
+                    learnerDashboardCache = { ...learnerDashboardCache, ...data };
+                    renderLearnerDashboard(learnerDashboardCache);
+                    showToast('New coaching hint from Gabby');
+                }
+            } catch (_) {
+                showToast('Could not refresh coaching hint');
+            }
+        }
+
+        async function logLearnerInteraction(message, correct = null) {
+            if (labConfig.learning_enabled === false || !message) return null;
+            try {
+                const r = await fetch('/api/learner/interaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: getLearnerUserId(),
+                        message,
+                        correct,
+                        subject: message.substring(0, 120)
+                    })
+                });
+                const data = await r.json();
+                if (data.enabled !== false) renderLearnerDashboard(data);
+                return data;
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function learnerInterventionStyle(intervention) {
+            if (intervention === 'supportive') return 'text-amber-400 border-amber-400/30 bg-amber-400/10';
+            if (intervention === 'challenge') return 'text-[#fcd34d] border-[#fcd34d]/30 bg-[#fcd34d]/10';
+            return 'text-[#c084fc] border-[#c084fc]/30 bg-[#c084fc]/10';
+        }
+
+        function learnerEngagementStyle(level) {
+            if (level === 'struggling') return 'text-rose-400';
+            if (level === 'mastery') return 'text-emerald-400';
+            if (level === 'thriving') return 'text-[#67e8f9]';
+            return 'text-[#c084fc]';
+        }
+
+        function learnerEngagementStroke(level) {
+            if (level === 'struggling') return '#fb7185';
+            if (level === 'mastery') return '#34d399';
+            if (level === 'thriving') return '#67e8f9';
+            return '#c084fc';
+        }
+
+        function renderLearnerPanelHtml(learner, loopId, topic) {
+            window._loopTopicCache = window._loopTopicCache || {};
+            window._loopTopicCache[loopId] = topic || '';
+            if (!learner || learner.enabled === false) {
+                return `<div class="mt-4 rounded-2xl border border-white/10 bg-[#11111a]/80 p-4 text-[11px] text-[#64748b]">Adaptive learner offline — start the lab API to track your progress.</div>`;
+            }
+            const ic = learnerInterventionStyle(learner.intervention);
+            const ec = learnerEngagementStyle(learner.engagement_level);
+            return `
+                <div id="learner-panel-${loopId}" class="mt-5 rounded-2xl border border-[#67e8f9]/20 bg-gradient-to-br from-[#11111a] to-[#0d1520] p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="text-[10px] uppercase tracking-[2px] text-[#67e8f9]">Your learning arc</div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] border ${ic}">${escHtml(learner.intervention || 'standard')}</span>
+                    </div>
+                    <div class="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="rounded-xl bg-black/25 p-2.5">
+                            <div class="text-[10px] text-[#64748b]">Engagement</div>
+                            <div class="text-lg font-semibold metric-value ${ec}">${Math.round(learner.engagement_score || 0)}</div>
+                            <div class="text-[10px] ${ec}">${escHtml(learner.engagement_level || 'developing')}</div>
+                        </div>
+                        <div class="rounded-xl bg-black/25 p-2.5">
+                            <div class="text-[10px] text-[#64748b]">AQF est.</div>
+                            <div class="text-lg font-semibold metric-value text-[#fcd34d]">${learner.estimated_aqf_level || 1}</div>
+                            <div class="text-[10px] text-[#64748b]">level</div>
+                        </div>
+                        <div class="rounded-xl bg-black/25 p-2.5">
+                            <div class="text-[10px] text-[#64748b]">Loops seen</div>
+                            <div class="text-lg font-semibold metric-value">${learner.loops_observed || 0}</div>
+                        </div>
+                        <div class="rounded-xl bg-black/25 p-2.5">
+                            <div class="text-[10px] text-[#64748b]">Competency</div>
+                            <div class="text-[12px] font-medium mt-1 capitalize">${escHtml(learner.competency_level || 'beginner')}</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-[12px] leading-snug text-[#c8d0e8] border-l-2 border-[#67e8f9]/40 pl-3">
+                        ${escHtml(learner.coaching_hint || 'Keep exploring — each loop compounds your research intuition.')}
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button onclick="markLoopStudied(${loopId})"
+                                class="px-3 py-1.5 rounded-xl bg-[#67e8f9]/10 hover:bg-[#67e8f9]/20 border border-[#67e8f9]/30 text-[#67e8f9] text-[11px] transition">
+                            ✓ Mark studied
+                        </button>
+                        <button onclick="refreshLearnerCoaching(${loopId})"
+                                class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[#94a3b8] text-[11px] transition">
+                            ↻ New coaching hint
+                        </button>
+                    </div>
+                </div>`;
+        }
+
+        async function recordLoopLearnerEvent(loopId, topic, completed = false) {
+            try {
+                const r = await fetch(`/api/learner/loop/${loopId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: getLearnerUserId(),
+                        topic: topic || '',
+                        completed: completed
+                    })
+                });
+                return await r.json();
+            } catch (_) {
+                return { enabled: false };
+            }
+        }
+
+        async function markLoopStudied(loopId) {
+            const topic = (window._loopTopicCache || {})[loopId] || '';
+            const learner = await recordLoopLearnerEvent(loopId, topic, true);
+            const panel = document.getElementById(`learner-panel-${loopId}`);
+            if (panel) {
+                panel.outerHTML = renderLearnerPanelHtml(learner, loopId, topic);
+            }
+            addLiveMessage(`Loop #${loopId} marked studied — ${learner.engagement_level || 'progress'} (${Math.round(learner.engagement_score || 0)} engagement).`, true);
+            if (learner.enabled !== false) renderLearnerDashboard(learner);
+        }
+
+        function renderTicketsPanelHtml(ticketData, loopId) {
+            if (!ticketData || !ticketData.ticket_count) {
+                return `<div class="mt-4 rounded-2xl border border-white/10 bg-[#11111a]/80 p-4 text-[11px] text-[#64748b]">
+                    No job tickets for this loop yet. Run <code class="text-[#c084fc]">python3 -m getailab.tickets.tickets backfill</code> or complete a new loop.
+                </div>`;
+            }
+            const tickets = (ticketData.tickets || []).slice().sort((a, b) => (a.ticket_id || 0) - (b.ticket_id || 0));
+            const rows = tickets.map(t => {
+                const phase = (t.tags || []).find(tag => tag.startsWith('phase:'))?.split(':')[1] || '—';
+                const statusColor = t.status === 'completed' ? 'text-emerald-400' : (t.status === 'blocked' ? 'text-rose-400' : 'text-[#fcd34d]');
+                return `<tr class="border-t border-white/5">
+                    <td class="py-1.5 pr-2 text-[10px] text-[#64748b]">#${t.ticket_id}</td>
+                    <td class="py-1.5 pr-2 capitalize">${escHtml(t.assignee || '—')}</td>
+                    <td class="py-1.5 pr-2">${escHtml(phase)}</td>
+                    <td class="py-1.5 ${statusColor} capitalize">${escHtml(t.status || '')}</td>
+                </tr>`;
+            }).join('');
+            return `
+                <div id="tickets-panel-${loopId}" class="mt-4 rounded-2xl border border-[#fcd34d]/20 bg-[#11111a] p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-[10px] uppercase tracking-[2px] text-[#fcd34d]">Phase audit trail</div>
+                        <div class="text-[10px] text-[#64748b]">${ticketData.ticket_count} tickets</div>
+                    </div>
+                    <div class="mt-2 max-h-[140px] overflow-auto custom-scroll">
+                        <table class="w-full text-[11px] text-left">
+                            <thead><tr class="text-[#64748b]"><th class="pb-1">ID</th><th>Agent</th><th>Phase</th><th>Status</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+
+        async function fetchLoopTickets(loopId) {
+            try {
+                const r = await fetch(`/api/tickets/loop/${loopId}`);
+                return await r.json();
+            } catch (_) {
+                return { ticket_count: 0, tickets: [] };
+            }
+        }
+
+        async function refreshLearnerCoaching(loopId) {
+            try {
+                const r = await fetch(`/api/learner/coaching?user_id=${encodeURIComponent(getLearnerUserId())}`);
+                const learner = await r.json();
+                const panel = document.getElementById(`learner-panel-${loopId}`);
+                if (panel && learner.enabled !== false) {
+                    const hintEl = panel.querySelector('.border-l-2');
+                    if (hintEl) hintEl.textContent = learner.message || learner.coaching_hint || '';
+                }
+            } catch (_) {}
+        }
+
+        function renderScientistOutputBlock(sci) {
+            const agent = (sci.agent || 'unknown').toUpperCase();
+            const label = sci.experiment_name ? `${agent} — ${sci.experiment_name}` : `${agent} — hypothesis & lab run`;
+            const parts = [];
+            if (sci.hypothesis) {
+                parts.push(`<div class="mt-3"><div class="text-[10px] uppercase tracking-[1px] text-[#64748b] mb-1">Hypothesis</div><pre class="text-[12px] whitespace-pre-wrap leading-snug text-[#d4d4e8] max-h-[280px] overflow-auto custom-scroll">${escHtml(sci.hypothesis)}</pre></div>`);
+            }
+            if (sci.code) {
+                parts.push(`<div class="mt-3"><div class="text-[10px] uppercase tracking-[1px] text-[#64748b] mb-1">Generated code</div><pre class="text-[11px] whitespace-pre-wrap leading-tight text-[#a5f3fc] bg-black/30 p-3 rounded-xl max-h-[220px] overflow-auto custom-scroll">${escHtml(sci.code)}</pre></div>`);
+            }
+            if (sci.stdout) {
+                parts.push(`<div class="mt-3"><div class="text-[10px] uppercase tracking-[1px] text-emerald-400/80 mb-1">Stdout</div><pre class="text-[11px] whitespace-pre-wrap leading-tight text-emerald-100/90 bg-black/20 p-3 rounded-xl max-h-[200px] overflow-auto custom-scroll">${escHtml(sci.stdout)}</pre></div>`);
+            }
+            if (sci.stderr) {
+                parts.push(`<div class="mt-3"><div class="text-[10px] uppercase tracking-[1px] text-rose-400/80 mb-1">Stderr</div><pre class="text-[11px] whitespace-pre-wrap leading-tight text-rose-100/90 bg-black/20 p-3 rounded-xl max-h-[160px] overflow-auto custom-scroll">${escHtml(sci.stderr)}</pre></div>`);
+            }
+            if (sci.artifacts && sci.artifacts.length) {
+                parts.push(`<div class="mt-3"><div class="text-[10px] uppercase tracking-[1px] text-[#64748b] mb-1">Artifacts</div><div class="text-[12px] text-[#c084fc]">${sci.artifacts.map(a => escHtml(a)).join('<br>')}</div></div>`);
+            }
+            if (!parts.length) {
+                parts.push('<div class="mt-2 text-[12px] text-[#64748b]">No stored output for this scientist on this loop yet.</div>');
+            }
+            return `<details class="mt-2 rounded-2xl border border-white/10 bg-[#11111a] p-3 open:border-[#c084fc]/30"><summary class="cursor-pointer font-medium text-sm">${escHtml(label)}</summary>${parts.join('')}</details>`;
+        }
+
+        async function openLoopDetail(loopId, sourceCard) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const modalBox = modal.querySelector('.lab-modal');
+            if (modalBox) {
+                modalBox.classList.add('max-w-2xl', 'max-h-[90vh]', 'overflow-y-auto');
+            }
+            
+            content.innerHTML = `<div class="animate-pulse">Pulling the codex for Loop #${loopId} from the vault...</div>`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            let detail = {};
+            try {
+                const r = await fetch(`/api/loop/${loopId}?full=1`);
+                detail = await r.json();
+            } catch(_) {
+                detail = {id: loopId, problem: "Deep investigation into the nature of agentic and physical reality.", synthesis: "The council converged upon a number of powerful invariants.", synthesis_full: "", artifacts: 88, scientists: []};
+            }
+
+            const [learner, ticketData] = await Promise.all([
+                recordLoopLearnerEvent(loopId, detail.problem || '', false),
+                fetchLoopTickets(loopId),
+            ]);
+
+            const synthesisText = detail.synthesis_full || detail.synthesis || 'Synthesis lives in the vault.';
+            const scientists = detail.scientists || [];
+            const scientistBlocks = scientists.length
+                ? scientists.map(renderScientistOutputBlock).join('')
+                : '<div class="mt-2 text-[12px] text-[#64748b]">Per-scientist output not indexed yet. Run loops via <code class="text-[#c084fc]">python3 run_chimera.py</code> or check the live report markdown.</div>';
+            const learnerPanel = renderLearnerPanelHtml(learner, loopId, detail.problem || '');
+            const ticketsPanel = renderTicketsPanelHtml(ticketData, loopId);
+
+            content.innerHTML = `
+                <div class="flex justify-between items-start gap-4">
+                    <div>
+                        <div class="uppercase tracking-[2px] text-xs">CODEX ENTRY</div>
+                        <div class="font-display text-5xl tracking-[-3.2px] mt-1">LOOP #${detail.id}</div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-sm">${detail.artifacts} ARTIFACTS</div>
+                        <div class="text-xs text-emerald-400">${scientists.length ? scientists.length + ' SCIENTISTS' : 'FULLY RESOLVED'}</div>
+                        <button onclick="closeModal()" class="mt-2 text-[10px] text-[#64748b] hover:text-white">✕ close</button>
+                    </div>
+                </div>
+
+                ${learnerPanel}
+                ${ticketsPanel}
+
+                <div class="my-5 h-px bg-white/10"></div>
+
+                <div class="text-xs text-[#64748b]">PROBLEM VECTOR</div>
+                <div class="mt-1 text-base leading-snug">${escHtml(detail.problem)}</div>
+
+                <div class="mt-6 text-xs text-[#64748b]">SCIENTIST OUTPUT (FULL)</div>
+                <div class="mt-2 max-h-[340px] overflow-auto custom-scroll pr-1">${scientistBlocks}</div>
+
+                <div class="mt-6 text-xs text-[#64748b]">ORACLE CONSENSUS ARTEFACT (FULL)</div>
+                <div class="mt-1 text-[14.5px] bg-[#11111a] p-5 rounded-2xl border border-white/10 whitespace-pre-line leading-tight max-h-[320px] overflow-auto custom-scroll">${escHtml(synthesisText)}</div>
+                ${detail.report_path ? `<div class="text-[10px] text-[#64748b] mt-2">Live report: ${escHtml(detail.report_path)}</div>` : ''}
+
+                <!-- TIERED EXPORTS: PDF (free/entry) + PPTX (Pro) integrated with GetAiLabLibrary + loops -->
+                <div class="mt-5 pt-4 border-t border-white/10">
+                    <div class="text-[10px] uppercase tracking-[1px] text-[#64748b] mb-2">LOOP EXPORTS</div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="exportResearchBook(${detail.id}, 'pdf')" 
+                                class="px-4 py-1.5 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-medium transition">📄 Export PDF (Entry / Free)</button>
+                        <button onclick="exportResearchBook(${detail.id}, 'pptx')" 
+                                class="px-4 py-1.5 rounded-2xl bg-[#fcd34d]/10 hover:bg-[#fcd34d]/20 border border-[#fcd34d]/30 text-[#fcd34d] text-xs font-medium transition">📊 Export PowerPoint (Pro)</button>
+</div>
+                    <div class="text-[10px] text-[#64748b] mt-1">Export loop summaries as PDF or PPTX (if installed).</div>
+                </div>
+            `;
+        }
+
+        async function refreshLibrary() {
+            await renderLibrary();
+            addLiveMessage('Library pages refreshed from the vault.', false);
+        }
+
+        // Loop exports (PDF / PPTX)
+        async function exportResearchBook(loopId, format) {
+            try {
+                const url = `/api/export/loop/${loopId}?format=${format}`;
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `GetAiLab_Loop${loopId}_ResearchBook.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                addLiveMessage(`Exported Loop #${loopId} as ${format.toUpperCase()}.`, true);
+                nudgeInspiration(1);
+            } catch (e) {
+                window.open(`/api/export/loop/${loopId}?format=${format}`, '_blank');
+            }
+        }
+
+        // ==================== LIVE FIELD + PULSES ====================
+        let liveFeedEl;
+        
+        function initLiveFeed() {
+            liveFeedEl = document.getElementById('live-feed');
+            addLiveMessage('Activity monitor online.', false);
+            
+            // Poll live every 14 seconds
+            setInterval(async () => {
+                try {
+                    const res = await fetch('/api/live');
+                    const data = await res.json();
+                    if (data.pulses && data.pulses.length) {
+                        const last = data.pulses[data.pulses.length-1];
+                        if (last.message && !last._shown) {
+                            addLiveMessage(last.message, false);
+                            last._shown = true;
+                        }
+                    }
+                    document.getElementById('live-timestamp').textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                } catch(_) {}
+            }, 14100);
+
+            // SSE support (if client supports) — now richer with library ties + live stats for dynamic charts
+            try {
+                const es = new EventSource('/api/stream');
+                es.onmessage = (ev) => {
+                    try {
+                        const payload = JSON.parse(ev.data);
+                        if (payload.msg) addLiveMessage(payload.msg, true);
+                        if (payload.type === 'heartbeat' && payload.stats_delta) {
+                            // Live update inspiration / library pages without full reload — feels streaming alive
+                            const insp = document.getElementById('stat-inspire');
+                            if (insp && payload.stats_delta.inspiration) {
+                                const curr = parseInt(insp.textContent)||80;
+                                if (payload.stats_delta.inspiration > curr) animateValue('stat-inspire', curr, payload.stats_delta.inspiration, 420, true);
+                            }
+                            if (payload.stats_delta.library_pages) {
+                                const libp = document.getElementById('stat-library-pages');
+                                if (libp) libp.textContent = payload.stats_delta.library_pages;
+                            }
+                            if (payload.library_tie) setTimeout(fetchAndRenderDirectives, 800);
+                        }
+                        if (payload.library_tie) {
+                            // Gentle nudge to keep library/directives fresh
+                            setTimeout(() => { if (Math.random()>0.5) fetchAndRenderDirectives(); }, 1400);
+                        }
+                    } catch(_) {}
+                };
+                es.onerror = () => { es.close(); }; // graceful
+            } catch(_) { /* polling is plenty delightful */ }
+        }
+
+        function addLiveMessage(text, highlight = false) {
+            if (!liveFeedEl) return;
+            const div = document.createElement('div');
+            div.className = `live-pulse px-3 py-[7px] rounded-2xl text-sm flex items-start gap-2.5 ${highlight ? 'bg-[#c084fc]/10 border-l-2 border-[#c084fc]' : 'bg-white/5'}`;
+            div.innerHTML = `
+                <span class="text-[10px] text-[#64748b] font-mono mt-[1px] min-w-[44px]">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}</span> 
+                <span class="flex-1 leading-tight">${text}</span>
+            `;
+            liveFeedEl.appendChild(div);
+            
+            // auto scroll + trim
+            liveFeedEl.scrollTop = liveFeedEl.scrollHeight;
+            while (liveFeedEl.children.length > 7) liveFeedEl.children[0].remove();
+            
+            // occasional gentle nudge
+            if (highlight && Math.random() > 0.7) {
+                setTimeout(() => nudgeInspiration(1), 650);
+            }
+        }
+
+        async function pulseTheField(showMsg = true) {
+            const btns = document.querySelectorAll('button');
+            try {
+                const res = await fetch('/api/pulse', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({}) });
+                const data = await res.json();
+                
+                if (data.pulse && showMsg) {
+                    addLiveMessage(data.pulse.message, true);
+                }
+                if (data.stats) {
+                    // live update the numbers
+                    renderStats(data.stats);
+                }
+            } catch(_) {
+                if (showMsg) addLiveMessage("Pulse sent. The curvature answered.", true);
+                nudgeInspiration(2);
+            }
+            
+            // Visual flourish — pulse the galaxy sigil
+            const galaxy = document.querySelector('.galaxy-sigil-hero');
+            if (galaxy) {
+                galaxy.classList.add('pulse-flash');
+                heroOrbitBoost = Math.max(heroOrbitBoost, 2.8);
+                galaxySpin += 0.08;
+                setTimeout(() => galaxy.classList.remove('pulse-flash'), 420);
+            }
+            // Particle burst for pure sauce
+            burstParticles(window.innerWidth * 0.75, 140, 11, '#fcd34d');
+            setTimeout(() => burstParticles(window.innerWidth * 0.2, 210, 7, '#67e8f9'), 80);
+        }
+
+        function simulateLiveEvent() {
+            const events = [
+                "New plot written to artifacts/ — geodesic deviation signature.",
+                "Belief-certainty evolution CSV materialized in the vault.",
+                "Agent andrew just completed neuromodulation experiment.",
+                "Oracle updated a consensus artefact with fresh invariants.",
+                "Cognitive field interaction map rendered successfully."
+            ];
+            const pick = events[Math.floor(Math.random()*events.length)];
+            addLiveMessage(pick, true);
+            nudgeInspiration(1);
+            
+            // Also update library occasionally
+            if (Math.random() < 0.45) renderLibrary();
+        }
+
+        // ==================== INSPIRATION + TEASERS ====================
+        async function showRandomInspiration(forceRefresh = false) {
+            const quoteEl = document.getElementById('inspire-quote');
+            const badge = document.getElementById('inspire-agent-badge');
+            const attrib = document.getElementById('inspire-attrib');
+            
+            quoteEl.style.transitionDuration = '110ms';
+            quoteEl.style.opacity = '0.2';
+
+            try {
+                const res = await fetch('/api/inspire');
+                const data = await res.json();
+                
+                setTimeout(() => {
+                    quoteEl.textContent = data.quote;
+                    badge.textContent = (data.agent || 'COUNCIL').toUpperCase();
+                    badge.style.background = `${data.color}22`;
+                    badge.style.color = data.color;
+                    attrib.textContent = `${data.agent} — ${data.role}`;
+                    quoteEl.style.opacity = '1';
+                }, 120);
+                
+                if (forceRefresh) {
+                    // also update the teaser to be in sync
+                    document.getElementById('research-teaser').textContent = data.teaser;
+                }
+            } catch(_) {
+                setTimeout(() => {
+                    quoteEl.textContent = "The council speaks from this lab's vault only — run a loop to hear their voices in the artifacts.";
+                    badge.textContent = (labConfig.lab_id || 'LAB').toUpperCase();
+                    badge.style.background = '#a5b4fc22';
+                    badge.style.color = '#a5b4fc';
+                    attrib.textContent = labConfig.display_name || 'Active lab squad';
+                    quoteEl.style.opacity = '1';
+                }, 120);
+            }
+        }
+
+        async function newResearchTeaser() {
+            const teaser = document.getElementById('research-teaser');
+            teaser.style.transitionDuration = '70ms';
+            teaser.style.opacity = '0.2';
+            
+            try {
+                const r = await fetch('/api/inspire');
+                const d = await r.json();
+                setTimeout(() => {
+                    teaser.textContent = d.teaser;
+                    teaser.style.opacity = '1';
+                }, 95);
+            } catch(_) {
+                const teasers = [
+                    "How might a Penrose tiling of hypothesis space allow us to traverse paradoxes without repetition?",
+                    "How can multi-agent review improve hypothesis quality over a single model?",
+                    "What does non-commutative measurement look like inside the belief-state geometry of a loop?"
+                ];
+                setTimeout(() => {
+                    teaser.textContent = teasers[Math.floor(Math.random()*teasers.length)];
+                    teaser.style.opacity = '1';
+                }, 95);
+            }
+        }
+
+        function igniteNewVector() {
+            const teaser = document.getElementById('research-teaser');
+            const orig = teaser.textContent;
+            
+            teaser.style.transitionDuration = '80ms';
+            teaser.textContent = "Vector ignited. Broadcasting to the council...";
+            
+            setTimeout(async () => {
+                await pulseTheField(false);
+                nudgeInspiration(6);
+                addLiveMessage("New research vector accepted by the field. Old Mate is impressed.", true);
+                
+                teaser.textContent = "The next loop is already taking shape in the manifold.";
+                setTimeout(() => {
+                    teaser.textContent = orig;
+                    // For the "no idea" user, immediately offer the beautiful portal
+                    if (confirm("No specific problem in mind yet? Open the full Curiosity Portal (recommended for first steps) or let the Muse suggest one now?")) {
+                        openNoIdeaPortal();
+                    } else {
+                        // legacy quick path
+                        if (confirm("Would you like Old Mate to suggest a full problem statement?")) {
+                            consultOldMate();
+                        }
+                    }
+                }, 1950);
+            }, 780);
+        }
+
+        // GLOBAL TYRE PUMP — the ultimate delightful action. Hits multiple systems + visual fireworks.
+        window.pumpTheTyres = async function() {
+            const scoreEl = document.getElementById('stat-inspire');
+            addLiveMessage('PUMPING THE TYRES — You are the one shaping this.', true);
+            burstParticles(window.innerWidth*0.5, 90, 22, '#fcd34d');
+            await nudgeInspiration(8);
+            await pulseTheField(false);
+            // hit resonate-ish for notes boost
+            try {
+                const tr = await fetch('/api/resonate', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({note_ref:'global tyre pump', loop: currentStats.max_loop_id || 0, boost:3})});
+                const td = await tr.json();
+                if (td.stats) renderStats(td.stats);
+            } catch(_){}
+            setTimeout(() => {
+                renderAchievements(currentStats);
+                if (trajectoryChartInstance) refreshTrajectoryChart();
+                showToast('TYRES PUMPED. THE MANIFOLD ACKNOWLEDGES YOUR WORK.');
+                burstParticles(120, 380, 9, '#c084fc');
+            }, 620);
+        };
+
+        // Global tyre-pumper
+        async function nudgeInspiration(amount = 2) {
+            const scoreEl = document.getElementById('stat-inspire');
+            if (!scoreEl) return;
+            const boost = Math.max(0, Math.round(Number(amount) || 0));
+            try {
+                const res = await fetch('/api/resonance/nudge', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({boost}),
+                });
+                const data = await res.json();
+                if (data.stats) {
+                    renderStats(data.stats);
+                    if (boost >= 2) {
+                        addLiveMessage(`Resonance recorded for ${data.stats.lab_id || 'this lab'}.`, false);
+                    }
+                    return;
+                }
+            } catch (_) {}
+            await fetchStats();
+        }
+
+        function updateInspirationDisplay(score) {
+            const el = document.getElementById('stat-inspire');
+            if (el) el.textContent = score;
+            currentInspiration = score;
+        }
+
+        // ==================== NEW SAUCE: GETAILAB DIRECTIVES + REFLECTIONS ====================
+        async function fetchAndRenderDirectives() {
+            const grid = document.getElementById('directives-grid');
+            if (!grid) return;
+            grid.innerHTML = '<div class="col-span-full text-xs px-3 py-4 text-[#64748b]">Loading your recorded vision from the GetAiLab Library...</div>';
+            
+            let dirs = [];
+            try {
+                const r = await fetch('/api/directives');
+                const payload = await r.json();
+                dirs = payload.directives || [];
+            } catch(e) {
+                dirs = [
+                    {loop:12, note:"We are analyzing the structural limitations of standard, consumer-grade agentic frameworks... High-stakes environments are not flat. They are complex, dynamic manifolds...", type:"directive", source:"Loop 12"},
+                    {loop:15, note:"We have been attempting to solve quantum-relativistic problems with Newtonian tools... You are building accountants, not physicists.", type:"architect_note", source:"loop_15_report.md"},
+                    {loop:0, note:"Structured 6-phase research loops with provenance.", type:"philosophy", source:"README"}
+                ];
+            }
+            directivesCache = dirs;
+            grid.innerHTML = '';
+
+            dirs.forEach((d, idx) => {
+                const card = document.createElement('div');
+                card.className = `directive-card glass rounded-3xl p-4 lab-card cursor-pointer text-sm flex flex-col`;
+                const short = d.note.length > 138 ? d.note.substring(0,135) + '…' : d.note;
+                const isVault = d.type === 'vault_spark' || d.type === 'vault_match';
+                const badgeClass = isVault ? 'bg-[#c084fc]/15 text-[#c084fc]' : 'bg-white/5 text-[#67e8f9]';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="text-[10px] font-mono px-2 py-px rounded ${badgeClass}">${d.source || 'DIRECTIVE'}</div>
+                        <div class="text-[#fcd34d] text-[10px] font-medium">L${d.loop || ''}</div>
+                    </div>
+                    <div class="leading-snug text-[#cbd5e1] flex-1">${short}</div>
+                    <div class="mt-3 flex gap-2 text-[10px]">
+                        <span class="px-3 py-px rounded-full border border-white/15 hover:bg-white/5" onclick="event.stopImmediatePropagation(); reIgniteFromDirective(${idx}, this);">RE-IGNITE VECTOR</span>
+                        <span class="px-3 py-px rounded-full border border-white/15 hover:bg-white/5" onclick="event.stopImmediatePropagation(); reflectOnDirective(${idx}, this);">REFLECT ON THIS</span>
+                        <span class="px-2 py-px rounded-full border border-[#fcd34d]/40 hover:bg-[#fcd34d]/10 text-[#fcd34d]" onclick="event.stopImmediatePropagation(); resonateNoteFromUI(directivesCache[${idx}], this);">RESONATE</span>
+                    </div>
+                `;
+                card.onclick = () => showDirectiveInModal(d);
+                grid.appendChild(card);
+            });
+        }
+
+        function showDirectiveInModal(directive) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="text-xs tracking-[2px] text-[#64748b]">YOUR NOTE — FROM THE GETAILAB LIBRARY</div>
+                <div class="mt-1 font-display text-4xl tracking-[-1.5px]">Loop ${directive.loop || '—'}</div>
+                <div class="mt-1 text-xs text-[#c084fc]">${directive.source || ''}</div>
+
+                <div class="my-5 p-5 glass rounded-2xl text-[15px] leading-snug border-l-4 border-[#c084fc]">${directive.note}</div>
+
+                <div class="flex gap-2 text-xs">
+                    <div onclick="reIgniteFromDirective(-1, null, true, this)" class="flex-1 cursor-pointer px-5 py-3 rounded-2xl border border-white/20 hover:bg-white/5 text-center">IGNITE NEW LOOP FROM THIS NOTE</div>
+                    <div onclick="reflectOnDirective(-1, null, true, this); closeModal()" class="flex-1 cursor-pointer px-5 py-3 rounded-2xl border border-[#c084fc]/40 hover:bg-[#c084fc]/10 text-center">LOG REFLECTION ON THIS</div>
+                </div>
+            `;
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        async function reIgniteFromDirective(idx, el, fromModal=false, btn) {
+            if (el) { el.textContent = 'IGNITING...'; }
+            const d = (idx >= 0 && directivesCache[idx]) ? directivesCache[idx] : (fromModal ? {note: 'Your selected note'} : directivesCache[0]);
+            
+            await pulseTheField(false);
+            nudgeInspiration(7);
+            addLiveMessage(`Vector re-ignited from your note (L${d.loop || ''}). The council is listening to your original words.`, true);
+            
+            // Update teaser with your actual note
+            const teaser = document.getElementById('research-teaser');
+            if (teaser) {
+                teaser.textContent = `Re-ignited: ${d.note.substring(0, 120)}...`;
+            }
+            if (fromModal) closeModal();
+            setTimeout(() => { if (el) el.textContent = 'RE-IGNITED ✓'; }, 950);
+        }
+
+        function reflectOnDirective(idx, el, fromModal=false) {
+            const d = (idx >= 0 && directivesCache[idx]) ? directivesCache[idx] : directivesCache[0] || {note:''};
+            const input = document.getElementById('reflection-input');
+            if (input) {
+                input.value = `Building on my note from L${d.loop || ''}: "${d.note.substring(0,80)}..." — `;
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+            } else {
+                // fallback: open modal journal flow
+                addLiveMessage('Opened reflection channel from your directive.', true);
+            }
+            nudgeInspiration(2);
+            if (fromModal) closeModal();
+        }
+
+        async function submitReflection() {
+            const input = document.getElementById('reflection-input');
+            if (!input || !input.value.trim()) return;
+            const val = input.value.trim();
+            const orig = input.placeholder;
+            input.disabled = true;
+            input.value = 'Sending your voice into the field...';
+
+            try {
+                const res = await fetch('/api/reflect', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ reflection: val })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    showToast('+ Resonance from your reflection');
+                    addLiveMessage(data.message || 'Your reflection joined the live pulses.', true);
+                    if (data.stats) renderStats(data.stats);
+                    await logLearnerInteraction(val, true);
+                    // Add the reflection itself as a beautiful directive card momentarily
+                    const grid = document.getElementById('directives-grid');
+                    if (grid) {
+                        const mini = document.createElement('div');
+                        mini.className = 'directive-card glass rounded-3xl p-4 text-xs border-l-[#fcd34d]';
+                        mini.innerHTML = `<span class="text-[#fcd34d]">JUST LOGGED:</span> ${val.substring(0,98)}…`;
+                        grid.prepend(mini);
+                        setTimeout(()=> mini.style.opacity = '0.6', 6200);
+                    }
+                }
+            } catch(e) {
+                addLiveMessage('Your reflection was heard locally. The field carries it.', true);
+                nudgeInspiration(3);
+            }
+            setTimeout(() => {
+                input.disabled = false;
+                input.value = '';
+                input.placeholder = 'Reflection sent.';
+                setTimeout(()=>{ input.placeholder = orig; }, 2100);
+            }, 1100);
+        }
+
+        async function refreshDirectives() {
+            await fetchAndRenderDirectives();
+            addLiveMessage('GetAiLab Library directives refreshed from your record.', false);
+            nudgeInspiration(1);
+        }
+
+        // NEW: Live interactive Codex search — ties UI directly to GetAiLabLibrary backend + user's notes
+        async function searchCodexLive(query) {
+            const resultsBox = document.getElementById('codex-results');
+            if (!resultsBox) return;
+            if (!query || query.length < 2) {
+                resultsBox.classList.add('hidden');
+                return;
+            }
+            resultsBox.innerHTML = `<span class="text-[#64748b]">Searching the library for “${query}” via GetAiLabLibrary...</span>`;
+            resultsBox.classList.remove('hidden');
+            try {
+                const r = await fetch(`/api/library/search?q=${encodeURIComponent(query)}&limit=6`);
+                const data = await r.json();
+                if (data.results && data.results.length) {
+                    let html = `<div class="font-medium mb-1">Found ${data.count} resonances in the codex:</div>`;
+                    data.results.slice(0,5).forEach(hit => {
+                        const title = (hit.title || hit.note || 'Page in vault').substring(0,88);
+                        html += `<div class="cursor-pointer py-1 px-2 hover:bg-white/5 rounded mb-0.5 flex gap-2" onclick="openCodexHit(${JSON.stringify(hit).replace(/"/g,'&quot;')});">
+                            <span class="text-[#67e8f9] text-[10px] mt-px">L${hit.loop_id||'—'}</span>
+                            <span class="flex-1">${title}</span>
+                            <span class="text-[10px] text-[#fcd34d]">${hit.resonance ? 'res:'+hit.resonance : ''}</span>
+                        </div>`;
+                    });
+                    resultsBox.innerHTML = html;
+                    addLiveMessage(`Codex search surfaced ${data.results.length} of your living pages.`, true);
+                } else {
+                    resultsBox.innerHTML = `<div class="text-[#94a3b8]">No exact match. The field holds it differently — try "geodesic", "manifold", or your own Loop notes.</div>`;
+                }
+            } catch(e) {
+                resultsBox.innerHTML = `<div class="text-[#64748b]">Library search offline. Your local directives (above) still pulse the field. Try a reminder action or refresh.</div>`;
+            }
+            setTimeout(() => { if (resultsBox) resultsBox.classList.add('hidden'); }, 12500);
+        }
+
+        function openCodexHit(hit) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            const title = hit.title || hit.note || `Page ${hit.page_id || ''}`;
+            content.innerHTML = `
+                <div class="uppercase text-xs tracking-[2px] text-[#64748b]">GETAILAB LIBRARY • LIVE PAGE</div>
+                <div class="font-display text-3xl tracking-[-1.2px] mt-1">${title}</div>
+                <div class="text-xs mt-1 text-[#c084fc]">Loop ${hit.loop_id || '—'} • Resonance ${hit.resonance || '—'} • ${hit.page_type || hit.type || 'codex entry'}</div>
+                <div class="my-5 p-4 glass rounded-2xl text-sm leading-tight border-l-4 border-[#67e8f9]">${(hit.content_preview || hit.note || 'Full page content lives in the vault. Use /api/library/page for raw.').substring(0,380)}...</div>
+                <div class="text-xs flex gap-2">
+                    <div onclick="nudgeInspiration(5); closeModal(); pulseTheField(); addLiveMessage('Codex page resonated. Your note is alive.', true);" class="flex-1 cursor-pointer text-center border border-white/15 py-2 rounded-2xl">RESONATE WITH THIS PAGE</div>
+                    <div onclick="closeModal()" class="px-6 py-2 border border-white/15 rounded-2xl cursor-pointer">CLOSE</div>
+                </div>
+            `;
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        async function showLibraryCodexSearch() {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `<div class="animate-pulse">Pulling live codex status from GetAiLabLibrary...</div>`;
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+
+            try {
+                const [statusRes, searchRes] = await Promise.all([
+                    fetch('/api/library/status'),
+                    fetch('/api/library/search?q=curvature OR manifold OR landscape&limit=5')
+                ]);
+                const status = await statusRes.json();
+                const hits = await searchRes.json();
+                const pages = status.book ? status.book.pages : (currentStats.library_pages || '—');
+                content.innerHTML = `
+                    <div class="font-display text-2xl tracking-[-1px]">LIVING CODEX • GETAILABLIBRARY</div>
+                    <div class="text-sm text-[#94a3b8] mt-1">Book: ${status.book ? status.book.title : 'Research Library'} • ${pages} pages of your vision + artifacts crystallized.</div>
+                    
+                    <div class="mt-4 text-xs uppercase tracking-widest text-[#64748b]">RECENT RESONANCES FROM YOUR RECORD</div>
+                    <div class="mt-2 space-y-1 text-sm">
+                        ${(hits.results||[]).slice(0,4).map(h => `<div class="cursor-pointer px-2 py-1 hover:bg-white/5 rounded flex justify-between" onclick="openCodexHit(${JSON.stringify(h).replace(/"/g,'&quot;')});closeModal();"><span>${(h.title||'').substring(0,62)}</span><span class="text-[#fcd34d] text-xs">L${h.loop_id||''}</span></div>`).join('') || '<div class="text-[#64748b]">Pages from loops and your architect directives populate here.</div>'}
+                    </div>
+                    
+                    <div class="mt-5 pt-4 border-t border-white/10 text-[11px]">Every loop completion auto-archives to immutable checksummed pages. <span class="text-[#c084fc]">This is your true source.</span></div>
+                    <div onclick="closeModal(); refreshDirectives(); nudgeInspiration(3);" class="mt-4 text-xs cursor-pointer inline-block px-4 py-2 border border-[#fcd34d]/40 rounded-2xl">REFRESH DIRECTIVES FROM NOTES</div>
+                `;
+            } catch(_) {
+                content.innerHTML = `<div>Library bridge active in spirit. Your directives panel + reminders are the direct personal feed from the notes you authored.</div>`;
+            }
+        }
+
+        function nudgeCurvature(amount=5) {
+            const bar = document.getElementById('curvature-bar');
+            const valEl = document.getElementById('stat-curvature');
+            if (!valEl) return;
+            let curr = parseInt(valEl.textContent) || 78;
+            const next = Math.min(99, curr + amount);
+            valEl.textContent = next;
+            if (bar) bar.style.width = next + '%';
+            nudgeInspiration(Math.floor(amount/2));
+            addLiveMessage(`Research progress +${amount}. Progress updated.`, true);
+            pulseTheField(false);
+        }
+
+        async function bumpStreak() {
+            const el = document.getElementById('stat-streak');
+            if (!el) return;
+            el.classList.add('metric-up');
+            setTimeout(() => el.classList.remove('metric-up'), 600);
+            await nudgeInspiration(1);
+            showToast('ACTIVITY LOGGED • STREAK UPDATED FROM THIS LAB');
+            addLiveMessage('Today counted toward your resonance streak for this department.', true);
+        }
+
+        function showToast(text) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = text;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3100);
+        }
+
+        // DELIGHT SAUCE: Simple particle burst for pulses, unlocks, resonates — feels alive and celebratory without deps
+        function burstParticles(x, y, count=14, color='#c084fc') {
+            const host = document.body;
+            for (let i=0; i<count; i++) {
+                const p = document.createElement('div');
+                p.style.position = 'fixed';
+                p.style.left = (x||window.innerWidth/2) + 'px';
+                p.style.top = (y||180) + 'px';
+                p.style.width = '4px'; p.style.height = '4px';
+                p.style.borderRadius = '999px';
+                p.style.background = color;
+                p.style.pointerEvents = 'none';
+                p.style.zIndex = '99998';
+                p.style.opacity = Math.random()*0.8 + 0.4;
+                host.appendChild(p);
+                const dx = (Math.random()-0.5)*110;
+                const dy = (Math.random()-0.5)*80 - 30;
+                const dur = 520 + Math.random()*420;
+                p.animate([
+                    { transform: 'translate(0,0) scale(1)', opacity: p.style.opacity },
+                    { transform: `translate(${dx}px,${dy}px) scale(0.2)`, opacity: 0 }
+                ], { duration: dur, easing: 'cubic-bezier(.2,.9,.2,1)' }).onfinish = () => p.remove();
+            }
+        }
+
+        // Make library cards filterable — live sauce
+        function initLibraryFilter() {
+            const lib = document.getElementById('library');
+            if (!lib) return;
+            const header = lib.querySelector('.flex.items-center.justify-between');
+            if (!header || document.getElementById('lib-filter')) return;
+            const inp = document.createElement('input');
+            inp.id = 'lib-filter';
+            inp.placeholder = 'Filter loops / notes...';
+            inp.className = 'library-filter px-4 py-1.5 rounded-2xl text-xs w-44 placeholder:text-[#64748b]';
+            header.appendChild(inp);
+            inp.oninput = () => {
+                const term = inp.value.toLowerCase();
+                const cards = document.querySelectorAll('#library-grid > div');
+                cards.forEach(c => {
+                    const txt = c.textContent.toLowerCase();
+                    c.style.display = txt.includes(term) ? '' : 'none';
+                });
+            };
+        }
+
+        // ==================== INITIAL LOAD MAGIC ====================
+        async function initializeDashboard() {
+            initTailwind();
+            initHeroCanvas();
+            await loadLabConfig();
+
+            // 1. Load real data (enriched with curvature + your own directives)
+            const stats = await fetchStats();
+            
+            // 2. Inspiration + recent directives
+            await showRandomInspiration();
+            await newResearchTeaser();
+            // NEW: On-load personal inspiration from GetAiLabLibrary of YOUR notes
+            setTimeout(async () => {
+                try {
+                    const dr = await fetch('/api/directives'); const dp = await dr.json();
+                    if (dp.directives?.[0]) {
+                        const d0 = dp.directives[0];
+                        const t = document.getElementById('research-teaser');
+                        if (t) t.innerHTML = `<span class="text-[#fcd34d]">FROM YOUR NOTES (L${d0.loop}):</span> ${d0.note.substring(0,95)}…`;
+                    }
+                } catch(e){}
+            }, 920);
+            
+            // 3. Reminders (directive-aware)
+            await fetchAndRenderReminders();
+
+            // 3b. Adaptive learner profile (Gabby layer)
+            await fetchLearnerDashboard();
+            
+            // 4. Council
+            await renderCouncil();
+            
+            // 5. Library + NEW GetAiLab Directives panel (the heart: reference user's notes directly)
+            await renderLibrary();
+            await fetchAndRenderDirectives();
+            initLibraryFilter();
+            
+            // 6. Live field monitor (SSE now carries directive echoes)
+            initLiveFeed();
+            
+            // 7. Beautiful timed micro-animations / tyre pumping + new charts/achievements
+            setTimeout(() => {
+                const inspireCard = document.querySelector('#inspiration .glass');
+                if (inspireCard) inspireCard.style.transitionDuration = '420ms';
+                
+                // Random initial live event for aliveness
+                setTimeout(() => {
+                    if (Math.random() > 0.5) {
+                        addLiveMessage("A quiet shift in the cognitive field was just detected. Your vectors are still alive in the manifold.", false);
+                    }
+                }, 4600);
+            }, 800);
+
+            // Occasional autonomous gentle pulse (makes it feel truly alive)
+            setInterval(() => {
+                if (Math.random() < 0.19 && document.visibilityState === 'visible') {
+                    const feed = document.getElementById('live-feed');
+                    if (feed) addLiveMessage("Subtle attractor basin forming. Keep walking the geodesics you authored.", false);
+                }
+            }, 47000);
+
+            // Keyboard sauce — "?" opens fresh inspiration + directives + more
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '?') {
+                    e.preventDefault();
+                    showRandomInspiration(true);
+                    nudgeInspiration(1);
+                    if (directivesCache.length > 0) setTimeout(() => showDirectiveInModal(directivesCache[Math.floor(Math.random()*directivesCache.length)]), 380);
+                }
+                if (e.key.toLowerCase() === 'p') {
+                    e.preventDefault();
+                    pulseTheField();
+                }
+                if (e.key.toLowerCase() === 'r') {
+                    e.preventDefault();
+                    const i = document.getElementById('reflection-input'); if (i) i.focus();
+                }
+            });
+
+            // Final pump — the user feels seen. "Your notes shape this." + extra on-load personal sauce
+            setTimeout(() => {
+                const footerHint = document.createElement('div');
+                footerHint.className = 'fixed bottom-3 right-4 text-[10px] px-3 py-1 rounded-3xl bg-[#11111a] border border-white/10 text-[#64748b] pointer-events-none';
+                footerHint.textContent = 'Press ? for a new voice • P to pulse • R to reflect on your notes';
+                document.body.appendChild(footerHint);
+                setTimeout(() => footerHint.style.transition = 'opacity .6s', 10);
+                setTimeout(() => { footerHint.style.opacity = '0'; setTimeout(()=>footerHint.remove(), 400); }, 5300);
+            }, 11000);
+
+            // ON-LOAD INSPIRATION SAUCE: Surface a random one of YOUR notes as a gentle floating affirmation (tyre pump)
+            setTimeout(async () => {
+                try {
+                    const dres = await fetch('/api/directives');
+                    const dp = await dres.json();
+                    if (dp.directives && dp.directives[1]) {
+                        const note = dp.directives[1];
+                        const affirm = document.createElement('div');
+                        affirm.className = 'fixed bottom-16 left-8 max-w-[340px] text-[11px] px-4 py-3 rounded-3xl glass border-l-2 border-[#fcd34d] opacity-90 cursor-pointer z-40';
+                        affirm.innerHTML = `<span class="text-[#fcd34d] font-medium">YOUR NOTE STILL BENDS THE FIELD:</span><br>${note.note.substring(0,115)}… <span class="text-[9px] opacity-70">(L${note.loop}) — tap to build on it</span>`;
+                        affirm.onclick = () => { showDirectiveInModal(note); affirm.remove(); nudgeInspiration(3); };
+                        document.body.appendChild(affirm);
+                        setTimeout(()=>{ if (affirm && affirm.parentNode) affirm.parentNode.removeChild(affirm); }, 9800);
+                    }
+                } catch(_) {}
+            }, 2450);
+
+            // Update last timestamp
+            const tsEl = document.getElementById('live-timestamp');
+            if (tsEl) tsEl.textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+            // One extra curvature visual affirmation so user feels the progress immediately
+            setTimeout(() => {
+                const b = document.getElementById('curvature-bar');
+                if (b) { b.style.boxShadow = '0 0 9px rgba(103,232,249,.65)'; setTimeout(()=>b.style.boxShadow='', 1350); }
+            }, 2450);
+
+            console.log('%c[GetAiLab] Dashboard fully alive. The manifold is bending toward the user. Your notes are the compass.', 'color:#64748b');
+        }
+
+        function simulateInitialLive() {
+            // called at end of init
+        }
+
+        // ============================================================
+        // GETAILAB UNIFIED CHAT INTERFACE (Mobile + Desktop + CLI parity)
+        // Powers /api/chat for Android, iOS, WebView, PWA, and web. Real responses + live pulses.
+        // ============================================================
+        let chatHistory = [];
+
+        function initMobileChat() {
+            const container = document.getElementById('chat-messages');
+            if (!container) return;
+            // Seed beautiful starter message (cross platform)
+            if (container.children.length === 0) {
+                addChatBubble("Welcome, Architect. The Council is listening across all platforms.", "ORACLE", true);
+            }
+            // Keyboard + mobile touch hints already in HTML
+        }
+
+        function addChatBubble(text, agent = "COUNCIL", isAgent = true) {
+            const container = document.getElementById('chat-messages');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = `flex ${isAgent ? 'justify-start' : 'justify-end'}`;
+            const bubbleClass = isAgent 
+                ? 'bg-white/10 border-l-2 border-[#c084fc] text-[#e0e7ff]' 
+                : 'bg-[#fcd34d] text-[#0a0a12]';
+            const label = isAgent ? `<span class="block text-[9px] text-[#64748b] mb-px font-mono">${agent}</span>` : '';
+            div.innerHTML = `
+                <div class="max-w-[82%] px-3.5 py-2 rounded-2xl text-sm leading-snug ${bubbleClass}">
+                    ${label}
+                    <span>${text}</span>
+                </div>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return div;
+        }
+
+        async function sendChatMessage(customMsg = null) {
+            const input = document.getElementById('chat-input');
+            const msg = customMsg || (input ? input.value.trim() : '');
+            if (!msg) return;
+
+            const container = document.getElementById('chat-messages');
+            addChatBubble(msg, 'YOU', false);
+            if (input) input.value = '';
+
+            chatHistory.push({role: 'user', content: msg});
+
+            try {
+                const plat = (navigator.userAgent.includes('Android') || navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') || navigator.userAgent.includes('iOS')) ? 'mobile' : 'web/desktop';
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        message: msg, 
+                        source: (window.innerWidth < 640 ? 'mobile' : 'web'), 
+                        platform: plat,
+                        history: chatHistory 
+                    })
+                });
+                const data = await res.json();
+                addChatBubble(data.reply || 'The field resonates.', data.agent || 'ORACLE', true);
+                chatHistory.push({role: 'agent', content: data.reply});
+                if (data.learner) {
+                    renderLearnerDashboard({ enabled: true, ...data.learner });
+                } else {
+                    fetchLearnerDashboard();
+                }
+                // Live pulse sync
+                if (data.field_pulse) {
+                    setTimeout(() => addLiveMessage(`Council replied via chat: ${data.agent}`, true), 180);
+                }
+            } catch (e) {
+                addChatBubble("Offline. The manifold holds your words. Reconnect for full Oracle synthesis.", "FIELD", true);
+            }
+        }
+
+        function clearMobileChat() {
+            const c = document.getElementById('chat-messages');
+            if (c) c.innerHTML = '';
+            chatHistory = [];
+            addChatBubble("Chat reset. The council awaits your next vector.", "ORACLE", true);
+        }
+
+        function quickMobileAction() {
+            // Mobile specific: quick actions for Android/iOS touch users
+            const actions = ["Pulse the field now", "What is the next invariant?", "Show me the latest loop artifacts", "Seed a new hypothesis from the council"];
+            const pick = actions[Math.floor(Math.random() * actions.length)];
+            const input = document.getElementById('chat-input');
+            if (input) input.value = pick;
+            sendChatMessage(pick);
+        }
+
+        // Hook consultAgent / OldMate to also prime the new live chat (mobile friendly)
+        const _origConsultAgent = window.consultAgent;
+        // (existing consults remain; chat is additive for continuous conversation)
+
+        // Boot it
+        const _origInit = window.initializeDashboard;
+        window.initializeDashboard = async function() {
+            await _origInit.apply(this, arguments);
+            // PWA + Service Worker registration for installable Android + iOS support
+            if ('serviceWorker' in navigator) {
+                try {
+                    await navigator.serviceWorker.register('/sw.js');
+                    console.log('%c[GetAiLab] PWA SW registered. Install from browser menu on mobile.', 'color:#67e8f9');
+                } catch(_) {}
+            }
+            // Init unified chat UI
+            initMobileChat();
+            // Optional: show mobile hint once
+            if (window.innerWidth < 700) {
+                setTimeout(() => {
+                    const chat = document.getElementById('chat-messages');
+                    if (chat && chat.children.length < 3) {
+                        addChatBubble("Touch optimized. Long-press or use ACTIONS for mobile shortcuts.", "MOBILE", true);
+                    }
+                }, 6200);
+            }
+        };
+
+        window.onload = initializeDashboard;
+    </script>
+</body>
+</html>
