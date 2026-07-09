@@ -99,11 +99,25 @@ CLI shows **four headers** (implement + execute share Phase 2). Details: [`docs/
 
 ---
 
-## Scope
+## Configure your LLM
 
-**In (public repo):** Engine, Lab Forge, example lab, boot tooling, self-host, SQLite/file vaults.
+After `cp .env.example .env`, pick a provider — **your keys, your machine**:
 
-**Out (your local workspace):** Operator-tuned squad YAML, loop reports, outreach, investor/competitive docs, large vault bulk.
+| Provider | Set in `.env` |
+|----------|----------------|
+| **Ollama** (default) | `LLM_PROVIDER=ollama` + `LLM_ENDPOINT=http://localhost:11434` |
+| **OpenAI** | `LLM_PROVIDER=openai` + `OPENAI_API_KEY` + `LLM_MODEL` |
+| **Google** | `LLM_PROVIDER=google` + `GOOGLE_API_KEY` + `LLM_MODEL` |
+| **Anthropic** | `LLM_PROVIDER=anthropic` + `ANTHROPIC_API_KEY` + `LLM_MODEL` |
+| **Auto** | `LLM_PROVIDER=auto` — Ollama if reachable, else first cloud key found |
+
+Nothing is hard-wired to CryptO'Brien's stack. See commented blocks in [`.env.example`](.env.example).
+
+---
+
+## What's in this repo
+
+Engine, Lab Forge, example lab, boot/Docker tooling, docs, and self-hosted SQLite/file vaults. Your loop output and forged labs live under `data/labs/<lab_id>/` on disk after you run — not pre-shipped.
 
 **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
