@@ -3,13 +3,40 @@
 [![CI](https://github.com/deadlylab/getailab/actions/workflows/ci.yml/badge.svg)](https://github.com/deadlylab/getailab/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-**Self-hosted research operating system + lab forge.** Clone this repo to run the engine and build **your own** multi-agent research division.
+**Self-hosted research operating system + lab forge.** Clone this repo, run it on **your** hardware, and build **your own** multi-agent research division.
 
 GetAiLab is a **method**, not a chatbot: hypothesis → implement → execute → synthesize → pick next direction. Each stage is ticketed; artifacts land in your isolated vault.
 
-> **What ships here:** the **engine**, a minimal **example lab**, and the **Lab Forge** so you can spin up custom squads. A mature operational deployment might accumulate thousands of loop reports and vault pages locally — that output is yours, not part of this builder repo. See [`docs/BUILDER_REPO.md`](docs/BUILDER_REPO.md).
-
 **Status (8 July 2026):** Engine proven. Example lab + Lab Forge ready for testers.
+
+---
+
+## Your data. Your model. Your choice.
+
+GetAiLab is **local-first and sovereign by design**:
+
+- **Runs on your machine** — lab, oracle, scientists, vault, and loop reports stay under your project directory unless *you* point inference elsewhere.
+- **Default: local Ollama** — no vendor account required to boot the example lab. Prompts and artifacts never leave the host if you keep `LLM_PROVIDER=ollama`.
+- **Or plug in what you already trust** — OpenAI, Google Gemini, or Anthropic via `.env`. Same engine; you supply the API key and model name. Switch anytime.
+- **No baked-in cloud** — this repo does not ship CryptO'Brien API keys or a mandatory SaaS backend. You control cost, retention, and compliance.
+
+That combination matters for research teams, air-gapped labs, and anyone who wants multi-agent rigour **without** handing hypotheses, code, and vault bulk to a black box.
+
+```bash
+cp .env.example .env
+# Local (default):  LLM_PROVIDER=ollama
+# Or your stack:    LLM_PROVIDER=openai | google | anthropic
+```
+
+| Provider | Typical use | Data leaves your machine? |
+|----------|-------------|---------------------------|
+| **Ollama** (default) | Local or LAN models, air-gap friendly | **No** — inference stays on host |
+| **OpenAI** | GPT-4o and familiar OpenAI stack | Only prompts you send to the API |
+| **Google** | Gemini | Only prompts you send to the API |
+| **Anthropic** | Claude | Only prompts you send to the API |
+| **Auto** | Ollama if up, else first cloud key in `.env` | Depends on what connects |
+
+Full variable reference: [`.env.example`](.env.example) · peer-review notes: [`docs/peer-review/FAQ.md`](docs/peer-review/FAQ.md)
 
 ---
 
@@ -99,25 +126,9 @@ CLI shows **four headers** (implement + execute share Phase 2). Details: [`docs/
 
 ---
 
-## Configure your LLM
-
-After `cp .env.example .env`, pick a provider — **your keys, your machine**:
-
-| Provider | Set in `.env` |
-|----------|----------------|
-| **Ollama** (default) | `LLM_PROVIDER=ollama` + `LLM_ENDPOINT=http://localhost:11434` |
-| **OpenAI** | `LLM_PROVIDER=openai` + `OPENAI_API_KEY` + `LLM_MODEL` |
-| **Google** | `LLM_PROVIDER=google` + `GOOGLE_API_KEY` + `LLM_MODEL` |
-| **Anthropic** | `LLM_PROVIDER=anthropic` + `ANTHROPIC_API_KEY` + `LLM_MODEL` |
-| **Auto** | `LLM_PROVIDER=auto` — Ollama if reachable, else first cloud key found |
-
-Nothing is hard-wired to CryptO'Brien's stack. See commented blocks in [`.env.example`](.env.example).
-
----
-
 ## What's in this repo
 
-Engine, Lab Forge, example lab, boot/Docker tooling, docs, and self-hosted SQLite/file vaults. Your loop output and forged labs live under `data/labs/<lab_id>/` on disk after you run — not pre-shipped.
+The **engine**, a minimal **example lab**, Lab Forge, boot/Docker tooling, and docs. Loop output and forged vaults are generated on **your** disk under `data/labs/<lab_id>/` when you run — not pre-shipped. Maintainer notes: [`docs/BUILDER_REPO.md`](docs/BUILDER_REPO.md).
 
 **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
