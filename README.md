@@ -28,13 +28,15 @@ cp .env.example .env
 # Or your stack:    LLM_PROVIDER=openai | google | anthropic
 ```
 
-| Provider | Typical use | Data leaves your machine? |
-|----------|-------------|---------------------------|
-| **Ollama** (default) | Local or LAN models, air-gap friendly | **No** — inference stays on host |
-| **OpenAI** | GPT-4o and familiar OpenAI stack | Only prompts you send to the API |
-| **Google** | Gemini | Only prompts you send to the API |
-| **Anthropic** | Claude | Only prompts you send to the API |
-| **Auto** | Ollama if up, else first cloud key in `.env` | Depends on what connects |
+| Provider | Typical use | Data leaves your machine? | Get started (official) |
+|----------|-------------|---------------------------|-------------------------|
+| **Ollama** (default) | Local or LAN models, air-gap friendly | **No** — inference stays on host | [ollama.com](https://ollama.com/) |
+| **OpenAI** | GPT-4o and familiar OpenAI stack | Only prompts you send to the API | [API keys](https://platform.openai.com/api-keys) |
+| **Google** | Gemini | Only prompts you send to the API | [AI Studio keys](https://aistudio.google.com/apikey) |
+| **Anthropic** | Claude | Only prompts you send to the API | [Console keys](https://console.anthropic.com/settings/keys) |
+| **Auto** | Ollama if up, else first cloud key in `.env` | Depends on what connects | — |
+
+Links above go to each vendor's own site — GetAiLab is not affiliated with or endorsed by those providers; you create accounts and accept their terms separately.
 
 Full variable reference: [`.env.example`](.env.example) · peer-review notes: [`docs/peer-review/FAQ.md`](docs/peer-review/FAQ.md)
 
