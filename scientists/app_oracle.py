@@ -90,14 +90,52 @@ def initiate_loop():
 def synthesize():
     loop_id = request.json.get('loop_id')
     raw_data = request.json.get('raw_data', '')
-    prompt = "Synthesize this raw experiment data and discussion into a final Consensus Artefact:\n" + raw_data
+    # Authoritative problem from agora (if available) — keeps synthesis on THIS loop
+    problem_stmt = ""
+    try:
+        _conn = sqlite3.connect(DB_PATH, timeout=5)
+        _row = _conn.execute(
+            "SELECT problem_statement FROM agora_loops WHERE loop_id = ?",
+            (loop_id,),
+        ).fetchone()
+        _conn.close()
+        if _row and _row[0]:
+            problem_stmt = str(_row[0])
+    except Exception:
+        problem_stmt = str(request.json.get("problem_statement") or "")
+    try:
+        from getailab.loop_focus import oracle_synthesis_addon, get_loop_mode
+        mode_note = oracle_synthesis_addon()
+        mode = get_loop_mode()
+    except Exception:
+        mode_note, mode = "", "research"
+    prompt = (
+        f"Synthesize this raw experiment data into a final Consensus Artefact "
+        f"for lab '{_LAB_ID}' loop_id={loop_id} (loop_mode={mode}).\n"
+        + mode_note
+        + f"\nAUTHORITATIVE LOOP ID: {loop_id}\n"
+        f"You MUST title the artefact with this exact loop number "
+        f"(e.g. 'Loop {loop_id} Synthesis'). NEVER invent a different loop number "
+        f"(do not write Loop 16/26 when this is loop {loop_id}).\n"
+        f"\nTHIS LOOP'S PROBLEM STATEMENT:\n{(problem_stmt or '(see raw data)')[:3000]}\n"
+        "\nRULES:\n"
+        "- Ground claims ONLY in the RAW DATA below for THIS loop.\n"
+        "- Do not rewrite history from older loops as if they were this loop's results.\n"
+        "- If you mention prior loops, label them clearly as prior context, not this loop's scoreboard.\n"
+        "- Prefer concrete paths under product/ and artifacts/ when present.\n"
+        "- Preserve dissent and RESULT PASS/FAIL honestly.\n"
+        + "\nRAW DATA:\n"
+        + raw_data
+    )
     
     try:
         synthesis_text = oracle_adapter.generate(
             prompt=prompt,
             system_prompt=(
                 "You are Oracle synthesizing a research loop. Output markdown prose only. "
-                "Never emit <tool_call>, shell commands, or JSON tool blocks."
+                "Never emit <tool_call>, shell commands, or JSON tool blocks. "
+                "Preserve dissent. Prefer concrete next engineering steps when experiments produced artifacts. "
+                f"This is loop_id={loop_id} — use that number in the title; never misnumber the loop."
             ),
         )
         try:
@@ -195,7 +233,7 @@ Produce a Consensus Review Artefact with these sections:
 
 ## Working Question Assessment
 (If a working question was provided: is it well-posed, too broad, or ready for a dialectic loop?
-Offer 1-2 refined problem-statement candidates suitable for `run_chimera.py --problem`.)
+Offer 1-2 refined problem-statement candidates suitable for `run_lab.py --problem`.)
 
 ## Suggested Next Command
 (One line the researcher can paste — e.g. a refined problem statement or `python3 scripts/collaborative_review.py --files ...`)
@@ -295,16 +333,116 @@ def _fallback_directions(synthesis: str, problem_statement: str = "") -> dict:
     }
 
 
-def generate_next_directions(synthesis: str, *, problem_statement: str = "", user_comment: str = "") -> dict:
+def _squad_scientist_names() -> list:
+    """Active lab scientists only (exclude oracle). Never hardcode Chimera names.
+
+    Prefer PERSONAS_YAML / lab squad via get_squad_names(); fall back to lab_config
+    scientists map; last resort ai_dev-style default so leads never leak foreign squads.
+    """
+    names: list = []
+    try:
+        from personas.loader import get_squad_names
+        names = [n for n in (get_squad_names() or []) if n and str(n).lower() != "oracle"]
+    except Exception:
+        names = []
+    if not names:
+        try:
+            from getailab.lab_config import load_lab_config, get_lab_id
+            cfg = load_lab_config(get_lab_id())
+            sci = cfg.get("scientists") or {}
+            names = [str(k).lower() for k in sci.keys() if str(k).lower() != "oracle"]
+        except Exception:
+            names = []
+    if not names:
+        names = ["hinton", "bengio", "lecun", "hopfield", "linus"]
+    # de-dupe preserve order
+    seen = set()
+    out = []
+    for n in names:
+        k = str(n).strip().lower()
+        if k and k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
+
+
+def _sanitize_leads(raw_leads, allowed: list | None = None) -> list:
+    """Keep only names that belong to this lab's squad (max 3)."""
+    allowed = allowed if allowed is not None else _squad_scientist_names()
+    allow = {a.lower() for a in allowed}
+    cleaned = []
+    for x in raw_leads or []:
+        name = str(x).strip().lower()
+        if name in allow and name not in cleaned:
+            cleaned.append(name)
+        if len(cleaned) >= 3:
+            break
+    return cleaned
+
+
+def _clean_direction_text(text: str, *, is_title: bool = False) -> str:
+    """Strip menu/report markdown junk so next-loop problems stay clean."""
+    s = str(text or "").strip()
+    # drop leading markdown headers / list markers / stars from UI paste
+    s = re.sub(r"^#{1,6}\s*", "", s)
+    s = re.sub(r"^\d+[\.)]\s*", "", s)
+    s = re.sub(r"[★☆✦]\s*", "", s)
+    s = s.replace("**", "").strip()
+    if is_title:
+        # one line, no trailing period spam
+        s = s.split("\n")[0].strip().strip(".").strip()
+        if len(s) > 80:
+            s = s[:77] + "…"
+    else:
+        # problem_statement: plain prose only
+        s = re.sub(r"\n{3,}", "\n\n", s).strip()
+        if s.startswith("###") or s.startswith("##"):
+            s = re.sub(r"^#+\s*", "", s)
+    return s
+
+
+def _default_leads_for_index(i: int, squad: list) -> list:
+    """Stable lead assignment when model returns empty/foreign names."""
+    if not squad:
+        return []
+    # rotate pairs through the squad
+    a = squad[(i - 1) % len(squad)]
+    b = squad[i % len(squad)]
+    return [a] if a == b else [a, b]
+
+
+def generate_next_directions(
+    synthesis: str,
+    *,
+    problem_statement: str = "",
+    user_comment: str = "",
+    loop_id: str | int | None = None,
+) -> dict:
     """Return three research directions + Oracle's preferred pick."""
-    prompt = f"""You are Oracle for a multi-agent research lab.
+    try:
+        from getailab.loop_focus import oracle_directions_addon, get_loop_mode
+        dir_addon = oracle_directions_addon()
+        mode = get_loop_mode()
+    except Exception:
+        dir_addon, mode = "", "research"
+    squad = _squad_scientist_names()
+    squad_csv = ", ".join(squad)
+    example_leads = squad[:2] if len(squad) >= 2 else (squad or ["hinton"])
+    lid = str(loop_id) if loop_id is not None else "?"
+    prompt = f"""You are Oracle for multi-agent research lab '{_LAB_ID}' (loop_mode={mode}).
 
-A dialectic loop just completed. Propose exactly THREE distinct next research directions.
+THIS LOOP ID: {lid}
+Active squad (ONLY these names may appear as lead_scientists): {squad_csv}
 
-ORIGINAL PROBLEM:
+A dialectic loop just completed. Propose exactly THREE distinct next research directions
+that CONTINUE THIS LOOP'S THREAD — not random older topics.
+
+{dir_addon}
+
+ORIGINAL PROBLEM (this loop):
 {problem_statement[:3000] if problem_statement else '(not provided)'}
 
-SYNTHESIS (consensus artefact):
+SYNTHESIS (this loop's consensus artefact only):
 {synthesis[:12000]}
 
 RESEARCHER NOTES (optional — may be empty):
@@ -315,10 +453,10 @@ Return ONLY valid JSON (no markdown prose outside the JSON):
   "directions": [
     {{
       "id": 1,
-      "title": "Short direction name (5-10 words)",
-      "problem_statement": "One clear problem statement for the next loop (1-3 sentences)",
+      "title": "Short direction name (5-10 words, no markdown, no stars)",
+      "problem_statement": "One clear plain-text problem for the next loop (1-3 sentences). NO markdown headers, NO leading numbers, NO star characters.",
       "rationale": "Why this direction matters now (1 sentence)",
-      "lead_scientists": ["albert", "brian"]
+      "lead_scientists": {example_leads!r}
     }},
     {{ "id": 2, ... }},
     {{ "id": 3, ... }}
@@ -329,9 +467,14 @@ Return ONLY valid JSON (no markdown prose outside the JSON):
 
 Rules:
 - Three directions must be genuinely different (not minor rephrasings).
-- problem_statement fields must be ready to paste into a new research loop.
-- oracle_pick must be 1, 2, or 3.
-- lead_scientists: 0-3 squad names from albert, bohr, heisenberg, roger, carl, neil, brian, emmy, alan, andrew.
+- problem_statement must be paste-ready as the NEXT loop problem (plain sentences only).
+- Do NOT prefix problem_statement with '###', '1.', or '★'.
+- Ground directions in THIS problem + synthesis. Do not suddenly switch to unrelated prior threads
+  (e.g. do not invent SpectralNorm energy work unless this loop's synthesis actually about that).
+- oracle_pick must be integer 1, 2, or 3.
+- lead_scientists: 1-3 names ONLY from: {squad_csv}
+- NEVER invent foreign lab names (albert, bohr, heisenberg, emmy, alan, andrew, chimera).
+- id fields must be integers 1, 2, 3.
 """
     try:
         raw = oracle_adapter.generate(prompt=prompt)
@@ -341,14 +484,24 @@ Rules:
             raise ValueError("expected 3 directions")
         cleaned = []
         for i, d in enumerate(directions[:3], start=1):
+            leads = _sanitize_leads(d.get("lead_scientists") or [], squad)
+            if not leads:
+                leads = _default_leads_for_index(i, squad)
+            title = _clean_direction_text(d.get("title") or f"Direction {i}", is_title=True)
+            stmt = _clean_direction_text(d.get("problem_statement") or "", is_title=False)
+            if not stmt:
+                stmt = title  # last resort, already cleaned
             cleaned.append({
-                "id": i,
-                "title": str(d.get("title") or f"Direction {i}").strip(),
-                "problem_statement": str(d.get("problem_statement") or "").strip(),
-                "rationale": str(d.get("rationale") or "").strip(),
-                "lead_scientists": d.get("lead_scientists") or [],
+                "id": i,  # always int — UI star match depends on this
+                "title": title or f"Direction {i}",
+                "problem_statement": stmt,
+                "rationale": _clean_direction_text(d.get("rationale") or "", is_title=False),
+                "lead_scientists": leads,
             })
-        pick = int(parsed.get("oracle_pick") or 1)
+        try:
+            pick = int(parsed.get("oracle_pick") or 1)
+        except (TypeError, ValueError):
+            pick = 1
         if pick not in (1, 2, 3):
             pick = 1
         rationale = str(parsed.get("oracle_rationale") or "").strip()
@@ -368,19 +521,24 @@ def recommend_next():
     synthesis = data.get('synthesis', '')
     user_comment = data.get('user_comment', '')
     problem_statement = data.get('problem_statement', '')
+    loop_id = data.get('loop_id')
 
     try:
         result = generate_next_directions(
             synthesis,
             problem_statement=problem_statement,
             user_comment=user_comment,
+            loop_id=loop_id,
         )
     except Exception as e:
         print(f"[ERROR] Oracle Recommendation API Failure: {e}")
         return jsonify({'error': f'API Failure: {str(e)}'}), 500
 
     directions = result.get("directions", [])
-    pick = int(result.get("oracle_pick") or 1)
+    try:
+        pick = int(result.get("oracle_pick") or 1)
+    except (TypeError, ValueError):
+        pick = 1
     pick = pick if pick in (1, 2, 3) else 1
     chosen = directions[pick - 1] if directions else {}
     recommendation_text = chosen.get("problem_statement") or result.get("oracle_rationale") or ""
@@ -390,6 +548,7 @@ def recommend_next():
         'directions': directions,
         'oracle_pick': pick,
         'oracle_rationale': result.get("oracle_rationale", ""),
+        'loop_id': loop_id,
     })
 
 
@@ -408,7 +567,8 @@ def _get_persona_lens(name: str) -> str:
     except Exception:
         return f"Researcher specializing in {name}."
 
-PERSONA_LENSES = {k: _get_persona_lens(k) for k in ["albert","bohr","heisenberg","roger","carl","neil","brian","emmy","alan","andrew"]}
+# Built from active lab squad (PERSONAS_YAML / lab_config) — not Chimera hardcodes.
+PERSONA_LENSES = {k: _get_persona_lens(k) for k in _squad_scientist_names()}
 
 def _sample_library_resonances(limit=4):
     """Pull real past problems from the Agora/Library for resonance."""

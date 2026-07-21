@@ -16,9 +16,12 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, redirect, make_response
 import random
 import math
+import hmac
+import hashlib
+import base64
 from collections import defaultdict
 from flask_cors import CORS
 from playwright.async_api import async_playwright
@@ -134,6 +137,164 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DASHBOARD_DIR = os.path.join(os.path.dirname(BASE_DIR), 'dashboard', 'frontend')
 ROOT_DIR = os.path.dirname(BASE_DIR)  # for loading user notes / loop reports
 
+# ---------------------------------------------------------------------------
+# Dashboard gate — hide the frontend wankfest until product wiring is ready.
+# Set GETAILAB_DASHBOARD_PASSWORD in .env to enable. Empty = open (local only).
+#
+# Applies to EVERY lab: chimera, university, example, old_mate, rf_research, …
+# all boot the same lab/app_lab.py. Machine dialectic routes stay open so a
+# dashboard password never 401's /execute or /literature (product-lab Loop 1).
+# Restart the lab process after changing this module.
+# ---------------------------------------------------------------------------
+DASHBOARD_PASSWORD = (os.getenv("GETAILAB_DASHBOARD_PASSWORD") or "").strip()
+DASHBOARD_USER = (os.getenv("GETAILAB_DASHBOARD_USER") or "getailab").strip()
+DASHBOARD_GATE_SECRET = (
+    os.getenv("GETAILAB_DASHBOARD_GATE_SECRET")
+    or os.getenv("GETAILAB_DASHBOARD_PASSWORD")
+    or "getailab-dev-gate"
+).strip()
+DASHBOARD_COOKIE = "getailab_gate"
+# HTML UI only — dialectic machine endpoints stay open so run_lab / scientists
+# are not 401'd by the public dashboard password (Loop 1 university failure mode).
+_GATE_OPEN_PATHS = {
+    "/health",
+    "/gate",
+    "/gate/login",
+    "/gate/logout",
+    "/favicon.ico",
+}
+# Prefixes used by run_lab.py + agents — never require browser cookie/basic.
+# Keep in sync with create_lab / run_*.sh comments; shared by all lab_ids.
+_GATE_OPEN_PREFIXES = (
+    "/execute",
+    "/develop/",
+    "/literature/",
+    "/vision/",
+    "/web/",
+)
+
+
+def _gate_enabled() -> bool:
+    return bool(DASHBOARD_PASSWORD)
+
+
+def _gate_token() -> str:
+    raw = f"{DASHBOARD_USER}:{DASHBOARD_PASSWORD}".encode()
+    dig = hmac.new(DASHBOARD_GATE_SECRET.encode(), raw, hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(dig).decode().rstrip("=")
+
+
+def _gate_ok() -> bool:
+    if not _gate_enabled():
+        return True
+    # HTTP Basic (easy for curl / API clients)
+    auth = request.authorization
+    if auth and auth.username == DASHBOARD_USER and auth.password == DASHBOARD_PASSWORD:
+        return True
+    # Cookie after form login
+    cookie = request.cookies.get(DASHBOARD_COOKIE, "")
+    if cookie and hmac.compare_digest(cookie, _gate_token()):
+        return True
+    return False
+
+
+def _gate_landing_html(error: str = "") -> str:
+    err = (
+        f'<p style="color:#f87171;margin:0 0 1rem;font-size:0.9rem">{error}</p>'
+        if error
+        else ""
+    )
+    return f"""<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GetAiLab — Authorized Access</title>
+<style>
+  html,body{{margin:0;min-height:100%;background:#0a0a12;color:#e0e7ff;
+    font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center}}
+  .card{{width:min(420px,92vw);padding:2rem;border:1px solid #1e1e2e;border-radius:16px;
+    background:linear-gradient(160deg,#11111a,#0a0a12);box-shadow:0 0 60px rgba(192,132,252,.08)}}
+  h1{{font-family:Georgia,serif;font-style:italic;font-weight:500;font-size:1.5rem;margin:0 0 .5rem;color:#e8e4dc}}
+  p.sub{{color:#94a3b8;font-size:.9rem;line-height:1.5;margin:0 0 1.5rem}}
+  label{{display:block;font-size:.75rem;color:#64748b;margin:0 0 .35rem;letter-spacing:.04em;text-transform:uppercase}}
+  input{{width:100%;box-sizing:border-box;padding:.75rem .9rem;border-radius:10px;border:1px solid #2a2a3d;
+    background:#0a0a12;color:#e0e7ff;margin-bottom:1rem;font-size:1rem}}
+  input:focus{{outline:none;border-color:#c084fc}}
+  button{{width:100%;padding:.8rem;border:none;border-radius:10px;background:#fcd34d;color:#0a0a12;
+    font-weight:600;font-size:.95rem;cursor:pointer}}
+  button:hover{{filter:brightness(1.05)}}
+  .tag{{display:inline-block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+    color:#67e8f9;border:1px solid #164e63;padding:.2rem .5rem;border-radius:999px;margin-bottom:1rem}}
+</style></head><body>
+<div class="card">
+  <div class="tag">Private · Contract preview</div>
+  <h1>GetAiLab</h1>
+  <p class="sub">Public UI is gated while we finish product wiring.
+  Authorized operators only — the research OS is not the landing page wankfest.</p>
+  {err}
+  <form method="post" action="/gate/login">
+    <label for="user">User</label>
+    <input id="user" name="user" autocomplete="username" value="{DASHBOARD_USER}"/>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required autofocus/>
+    <button type="submit">Enter lab</button>
+  </form>
+</div>
+</body></html>"""
+
+
+@app.before_request
+def _dashboard_gate():
+    if not _gate_enabled():
+        return None
+    path = request.path or "/"
+    if path in _GATE_OPEN_PATHS or path.startswith("/gate/"):
+        return None
+    # Dialectic OS endpoints — open (sandbox, lit, Sauron). Gate is for HTML UI only.
+    if any(path == p or path.startswith(p) for p in _GATE_OPEN_PREFIXES):
+        return None
+    # Authenticated operator — full access including /api/* dashboard JSON
+    if _gate_ok():
+        return None
+    # Unauthenticated: JSON APIs get 401 JSON; pages get the login HTML
+    if path.startswith("/api/"):
+        return jsonify({
+            "error": "dashboard_gate",
+            "message": "Set GETAILAB_DASHBOARD_PASSWORD cookie or HTTP Basic auth.",
+        }), 401
+    return make_response(_gate_landing_html(), 401)
+
+
+@app.route("/gate", methods=["GET"])
+@app.route("/gate/login", methods=["GET", "POST"])
+def gate_login():
+    if not _gate_enabled():
+        return redirect("/")
+    if request.method == "GET":
+        if _gate_ok():
+            return redirect("/")
+        return make_response(_gate_landing_html(), 200)
+    user = (request.form.get("user") or "").strip()
+    password = request.form.get("password") or ""
+    if user == DASHBOARD_USER and password == DASHBOARD_PASSWORD:
+        resp = make_response(redirect("/"))
+        resp.set_cookie(
+            DASHBOARD_COOKIE,
+            _gate_token(),
+            httponly=True,
+            samesite="Lax",
+            max_age=60 * 60 * 24 * 14,  # 14 days
+        )
+        return resp
+    return make_response(_gate_landing_html("Wrong password. Try again."), 401)
+
+
+@app.route("/gate/logout", methods=["GET", "POST"])
+def gate_logout():
+    resp = make_response(redirect("/gate"))
+    resp.set_cookie(DASHBOARD_COOKIE, "", expires=0)
+    return resp
+
+
 
 def _resolve_lab_paths() -> tuple:
     """Per-lab sandbox DB + artifacts — the example lab uses lab/; forged labs use data/labs/<id>/."""
@@ -151,18 +312,21 @@ def _resolve_lab_paths() -> tuple:
 DB_PATH, ARTIFACTS_DIR = _resolve_lab_paths()
 
 try:
-    from getailab.lab_config import get_lab_id, is_chimera_lab, lab_reports_dir, resolve_lab_paths
+    from getailab.lab_config import get_lab_id, is_chimera_clone_lab, is_chimera_lab, lab_reports_dir, resolve_lab_paths
     ACTIVE_LAB_ID = get_lab_id()
     LAB_PATHS = resolve_lab_paths(ACTIVE_LAB_ID)
 except Exception:
     ACTIVE_LAB_ID = os.getenv("LAB_ID", "example").strip() or "example"
+    _is_clone = ACTIVE_LAB_ID in ("chimera_clone", "chimera")
     LAB_PATHS = {
         "lab_id": ACTIVE_LAB_ID,
         "artifacts": ARTIFACTS_DIR,
         "results_db": DB_PATH,
-        "is_chimera": ACTIVE_LAB_ID == "chimera",
+        "is_chimera_clone": _is_clone,
+        "is_chimera": _is_clone,
     }
-    is_chimera_lab = lambda lab_id=None: (lab_id or ACTIVE_LAB_ID) == "chimera"  # type: ignore
+    is_chimera_clone_lab = lambda lab_id=None: (lab_id or ACTIVE_LAB_ID) in ("chimera_clone", "chimera")  # type: ignore
+    is_chimera_lab = is_chimera_clone_lab  # type: ignore
     lab_reports_dir = lambda lab_id=None: ROOT_DIR  # type: ignore
 
 # Lab DB alias fix (existing _query_lab_db referenced undefined LAB_DB)
@@ -171,6 +335,59 @@ LAB_DB = DB_PATH
 # Ensure the lab has a physical workspace for data
 os.makedirs(ARTIFACTS_DIR, exist_ok=True)
 os.makedirs(DASHBOARD_DIR, exist_ok=True)
+
+
+def _lab_ops_log_path() -> str:
+    """Durable ops log for implement/execute (not Flask access logs)."""
+    vault = (os.getenv("GETAILAB_LAB_ROOT") or "").strip()
+    if vault and os.path.isdir(vault):
+        log_dir = os.path.join(vault, "logs")
+    else:
+        log_dir = os.path.join(os.path.dirname(ARTIFACTS_DIR), "logs")
+    os.makedirs(log_dir, exist_ok=True)
+    return os.path.join(log_dir, "lab_ops.jsonl")
+
+
+def _append_lab_ops(event: dict) -> None:
+    """Append one JSON line to lab_ops.jsonl; never raise into request path."""
+    try:
+        payload = dict(event or {})
+        payload.setdefault("ts", datetime.utcnow().isoformat() + "Z")
+        payload.setdefault("lab_id", ACTIVE_LAB_ID)
+        with open(_lab_ops_log_path(), "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(payload, default=str) + "\n")
+    except Exception:
+        pass
+
+
+def _evaluate_execute_success(returncode: int, stdout: str) -> tuple:
+    """Honor RESULT PASS/FAIL lines — exit 0 alone is not enough.
+
+    Returns (success: bool, verdict: str).
+    Match only line-leading RESULT tokens (avoid 'no result line' false positives).
+    """
+    text = stdout or ""
+    last_fail_idx = -1
+    last_pass_idx = -1
+    for i, line in enumerate(text.splitlines()):
+        s = line.strip().upper()
+        if re.match(r"^RESULT\s*:\s*FAIL\b", s) or re.match(r"^RESULT\s+FAIL\b", s):
+            last_fail_idx = i
+        elif re.match(r"^RESULT\s*:\s*PASS\b", s) or re.match(r"^RESULT\s+PASS\b", s):
+            last_pass_idx = i
+
+    if last_fail_idx >= 0 and last_fail_idx >= last_pass_idx:
+        return False, "result_fail"
+
+    if returncode != 0:
+        return False, "nonzero_exit"
+
+    if last_pass_idx >= 0:
+        return True, "result_pass"
+
+    # No clear RESULT line: keep process exit as authority (prompt now requires
+    # RESULT PASS/FAIL + sys.exit). Ops log records missing_result for coaching.
+    return True, "missing_result_line"
 
 def init_db():
     try:
@@ -197,31 +414,69 @@ def init_db():
         conn.close()
 
 class SauronVision:
+    """Lab /vision/extract endpoint — fast HTTP+text by default (matches sauron_vision.py)."""
+
     def __init__(self):
         self.adapter = create_default_adapter()
 
     async def extract(self, url, user_query):
+        import os
+        import requests as _req
+
+        use_browser = os.getenv("SAURON_BROWSER", "").lower() in ("1", "true", "yes", "on")
+        use_vision = os.getenv("SAURON_VISION", "").lower() in ("1", "true", "yes", "on")
+        text_chars = int(os.getenv("SAURON_TEXT_CHARS", "6000"))
         markdown_text = ""
         screenshot_bytes = None
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True, args=["--no-sandbox"])
-            context = await browser.new_context(viewport={"width": 1920, "height": 1080})
-            page = await context.new_page()
+
+        if use_browser:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(
+                    headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"]
+                )
+                context = await browser.new_context(viewport={"width": 1280, "height": 800})
+                page = await context.new_page()
+                try:
+                    await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+                    try:
+                        await page.wait_for_load_state("networkidle", timeout=5000)
+                    except Exception:
+                        pass
+                    content = await page.content()
+                    soup = BeautifulSoup(content, "lxml")
+                    for tag in soup(["script", "style", "nav", "footer", "noscript"]):
+                        tag.decompose()
+                    markdown_text = md(str(soup))
+                    if use_vision:
+                        screenshot_bytes = await page.screenshot(full_page=False, type="jpeg", quality=60)
+                finally:
+                    await browser.close()
+        else:
             try:
-                await page.goto(url, wait_until="networkidle", timeout=45000)
-                content = await page.content()
-                soup = BeautifulSoup(content, 'lxml')
-                for tag in soup(['script', 'style', 'nav', 'footer']):
+                resp = _req.get(
+                    url,
+                    headers={"User-Agent": "Mozilla/5.0 (compatible; GetAiLab-Sauron/1.0)"},
+                    timeout=int(os.getenv("SAURON_HTTP_TIMEOUT", "15")),
+                )
+                resp.raise_for_status()
+                soup = BeautifulSoup(resp.text, "lxml")
+                for tag in soup(["script", "style", "nav", "footer", "noscript", "iframe"]):
                     tag.decompose()
                 markdown_text = md(str(soup))
-                screenshot_bytes = await page.screenshot(full_page=True)
-            finally:
-                await browser.close()
+            except Exception as e:
+                return json.dumps({
+                    "error": "capture_failed",
+                    "hint": f"HTTP fetch failed ({e}). Set SAURON_BROWSER=1 for JS-heavy pages.",
+                    "llm": self.adapter.get_info(),
+                })
 
         data = extract_with_adapter(
-            self.adapter, user_query,
-            image_bytes=screenshot_bytes,
-            text_context=markdown_text,
+            self.adapter,
+            user_query,
+            image_bytes=screenshot_bytes if use_vision else None,
+            text_context=markdown_text[:text_chars] if markdown_text else None,
+            max_text_chars=text_chars,
+            fast=not use_vision,
         )
         if data:
             return json.dumps(data)
@@ -1338,61 +1593,514 @@ def health_check():
         'workspace': ARTIFACTS_DIR
     })
 
+def _sandbox_sanitize_text(text: str, limit: int = 80_000) -> str:
+    """Keep report-safe stdout/stderr (strip NULs / lone surrogates from binary noise)."""
+    if not text:
+        return ""
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="replace")
+    # NULs break markdown / some editors treat file as binary
+    text = text.replace("\x00", "")
+    text = text.encode("utf-8", errors="replace").decode("utf-8", errors="replace")
+    if len(text) > limit:
+        text = text[:limit] + "\n...[truncated by lab sandbox]...\n"
+    return text
+
+
+def _sandbox_rewrite_code(code: str) -> str:
+    """
+    Light rewrites for recurring LLM code smells that fail in the sandbox.
+    Does NOT change science logic — only broken imports / path constants.
+    """
+    if not code:
+        return code
+    out = code
+    # sympy: commutator lives under physics.quantum
+    out = re.sub(
+        r"from\s+sympy\s+import\s+\(([^)]*)\)",
+        lambda m: _rewrite_sympy_import_paren(m.group(0), m.group(1)),
+        out,
+        flags=re.DOTALL,
+    )
+    out = re.sub(
+        r"from\s+sympy\s+import\s+([^\n#]+)",
+        lambda m: _rewrite_sympy_import_flat(m.group(0), m.group(1)),
+        out,
+    )
+    out = out.replace(
+        "from sympy import commutator",
+        "from sympy.physics.quantum import Commutator as commutator",
+    )
+    out = out.replace(
+        "from sympy import Commutator",
+        "from sympy.physics.quantum import Commutator",
+    )
+    out = out.replace(
+        "from sympy import commutation",
+        "from sympy.physics.quantum import Commutator as commutation",
+    )
+    # common LLM typos — scipy has no commutor
+    out = re.sub(
+        r"from\s+scipy\.linalg\s+import\s+commutor\b",
+        "def commutor(A, B):\n    import numpy as _np\n    A, B = _np.asarray(A), _np.asarray(B)\n    return A @ B - B @ A",
+        out,
+    )
+    out = re.sub(
+        r"from\s+scipy\s+import\s+commutor\b",
+        "def commutor(A, B):\n    import numpy as _np\n    A, B = _np.asarray(A), _np.asarray(B)\n    return A @ B - B @ A",
+        out,
+    )
+    out = re.sub(r"\bweightsnorm\b", "weights_norm", out)
+    # hard-coded chimera / absolute workspaces → relative sandbox (loop workspace)
+    out = re.sub(
+        r"['\"]/(?:home/[^'\"]+/)?chimera/artifacts(?:/[^'\"]*)?['\"]",
+        "'.'",
+        out,
+    )
+    out = re.sub(
+        r"['\"]/chimera/artifacts(?:/[^'\"]*)?['\"]",
+        "'.'",
+        out,
+    )
+    # /home/.../chimera_workspace (Loop 9 escape hatch)
+    out = re.sub(
+        r"['\"]/home/[^'\"]+/chimera_workspace(?:/[^'\"]*)?['\"]",
+        "'.'",
+        out,
+    )
+    out = re.sub(
+        r"['\"][^'\"]*chimera_workspace[^'\"]*['\"]",
+        "'.'",
+        out,
+    )
+    out = re.sub(
+        r"(OUTPUT_DIR|workspace|WORKSPACE|ARTIFACT_DIR|out_dir|OUT_DIR)\s*=\s*['\"]/[^'\"]+['\"]",
+        r"\1 = '.'",
+        out,
+    )
+    out = re.sub(
+        r"(OUTPUT_DIR|workspace|WORKSPACE|ARTIFACT_DIR|out_dir|OUT_DIR)\s*=\s*['\"][^'\"]*chimera[^'\"]*['\"]",
+        r"\1 = '.'",
+        out,
+    )
+    return out
+
+
+def _rewrite_sympy_import_flat(full: str, names: str) -> str:
+    parts = [p.strip() for p in names.split(",") if p.strip()]
+    keep, need_comm = [], False
+    for p in parts:
+        base = p.split(" as ")[0].strip()
+        if base in ("commutator", "Commutator", "commutation"):
+            need_comm = True
+        else:
+            keep.append(p)
+    lines = []
+    if keep:
+        lines.append("from sympy import " + ", ".join(keep))
+    if need_comm:
+        lines.append("from sympy.physics.quantum import Commutator as commutator")
+        lines.append("Commutator = commutator  # noqa: F841")
+    return "\n".join(lines) if lines else full
+
+
+def _rewrite_sympy_import_paren(full: str, names: str) -> str:
+    return _rewrite_sympy_import_flat(full, names.replace("\n", " "))
+
+
+_SANDBOX_PRELUDE = r'''# --- GetAiLab sandbox prelude (auto-injected; do not edit) ---
+import os as _os, sys as _sys, json as _json, pathlib as _pathlib, builtins as _builtins
+_WORK = _pathlib.Path(_os.environ.get("GETAILAB_ARTIFACT_DIR", ".")).resolve()
+_os.chdir(_WORK)
+_os.makedirs(_WORK, exist_ok=True)
+for _sub in ("jungian_analysis", "artifacts", "output", "results", "data", "experiment_outputs"):
+    _os.makedirs(_WORK / _sub, exist_ok=True)
+# Alias legacy absolute paths → this loop workspace (so open/write stays in the vault)
+for _legacy in (
+    "/chimera/artifacts",
+    "/home/deadly/x/chimera/artifacts",
+    "/home/deadly/x/chimera_workspace",
+    str(_pathlib.Path.home() / "chimera" / "artifacts"),
+    str(_pathlib.Path.home() / "chimera_workspace"),
+):
+    try:
+        parent = _os.path.dirname(_legacy) or "/"
+        _os.makedirs(parent, exist_ok=True)
+        if _os.path.islink(_legacy) or _os.path.exists(_legacy):
+            continue
+        _os.symlink(_WORK, _legacy, target_is_directory=True)
+    except Exception:
+        pass
+# Auto-create parent dirs on write (fixes open("subdir/file.json","w") without makedirs)
+_orig_open = _builtins.open
+def _smart_open(file, mode="r", *a, **k):
+    try:
+        if isinstance(file, (str, _pathlib.Path)) and any(m in str(mode) for m in ("w", "a", "x")):
+            parent = _pathlib.Path(file).parent
+            if str(parent) not in ("", "."):
+                parent.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+    return _orig_open(file, mode, *a, **k)
+_builtins.open = _smart_open
+# JSON safety for numpy / sympy / complex
+_orig_dump, _orig_dumps = _json.dump, _json.dumps
+def _json_default(o):
+    try:
+        import numpy as _np
+        if isinstance(o, (_np.bool_,)):
+            return bool(o)
+        if isinstance(o, (_np.integer,)):
+            return int(o)
+        if isinstance(o, (_np.floating,)):
+            return float(o)
+        if isinstance(o, (_np.complexfloating, complex)):
+            return {"re": float(o.real), "im": float(o.imag)}
+        if isinstance(o, _np.ndarray):
+            return o.tolist()
+    except Exception:
+        pass
+    try:
+        import sympy as _sp
+        if isinstance(o, _sp.Basic):
+            try:
+                return float(o)
+            except Exception:
+                return str(o)
+    except Exception:
+        pass
+    if isinstance(o, complex):
+        return {"re": o.real, "im": o.imag}
+    return str(o)
+def _dump(obj, fp, *a, **k):
+    k.setdefault("default", _json_default)
+    return _orig_dump(obj, fp, *a, **k)
+def _dumps(obj, *a, **k):
+    k.setdefault("default", _json_default)
+    return _orig_dumps(obj, *a, **k)
+_json.dump, _json.dumps = _dump, _dumps
+# Common science stack — fail loud only if venv is broken
+import numpy, scipy, matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: F401
+import pandas as pd  # noqa: F401
+import sympy  # noqa: F401
+try:
+    from sympy.physics.quantum import Commutator as _Commutator
+    if not hasattr(sympy, "commutator"):
+        sympy.commutator = _Commutator
+except Exception:
+    pass
+# scipy.linalg.commutor typo shim (LLMs invent this name)
+try:
+    import scipy.linalg as _sla
+    if not hasattr(_sla, "commutor"):
+        def _commutor(A, B):
+            A, B = numpy.asarray(A), numpy.asarray(B)
+            return A @ B - B @ A
+        _sla.commutor = _commutor
+except Exception:
+    pass
+# --- end prelude ---
+'''
+
+
+@app.route("/develop/scaffold", methods=["POST"])
+def develop_scaffold():
+    """Multi-file product scaffold (Engineering / Barry's crew DNA) — not single-file experiments."""
+    data = request.get_json() or {}
+    kind = (data.get("kind") or data.get("surface") or "web").strip()
+    name = (data.get("name") or "project").strip()
+    description = (data.get("description") or data.get("brief") or "").strip()
+    agent = (data.get("agent_name") or data.get("agent") or "dev_shed").strip()
+    do_zip = data.get("package", True)
+    try:
+        from getailab.develop import (
+            create_build_manifest,
+            create_project,
+            list_project_files,
+            package_project,
+            write_files,
+        )
+        from getailab.develop.scaffolds import scaffold_for
+
+        files = scaffold_for(kind, name, description=description)
+        lab_id = os.environ.get("LAB_ID", "dev_shed")
+        project = create_project(name, lab_id=lab_id)
+        wr = write_files(files, project)
+        create_build_manifest(
+            project,
+            agent=agent,
+            build_type=kind,
+            brief=description or name,
+            extra={"kind": kind},
+        )
+        out = {
+            "success": wr.get("success", False),
+            "project_dir": str(project),
+            "files_written": wr.get("files_written", []),
+            "errors": wr.get("errors", []),
+            "file_tree": list_project_files(project)[:100],
+        }
+        if do_zip and wr.get("success"):
+            out["package"] = package_project(project, name)
+        return jsonify(out), 200 if out["success"] else 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/develop/write_project", methods=["POST"])
+def develop_write_project():
+    """Write arbitrary multi-file dict into a new project dir (relative paths only)."""
+    data = request.get_json() or {}
+    name = (data.get("name") or "project").strip()
+    files = data.get("files") or {}
+    agent = (data.get("agent_name") or "dev_shed").strip()
+    if not isinstance(files, dict) or not files:
+        return jsonify({"success": False, "error": "files dict required"}), 400
+    try:
+        from getailab.develop import (
+            create_build_manifest,
+            create_project,
+            list_project_files,
+            package_project,
+            write_files,
+            write_to_product,
+        )
+
+        lab_id = os.environ.get("LAB_ID", "dev_shed")
+        # Production line: land under product SoR when land_product=true
+        if data.get("land_product") or data.get("to_product"):
+            clean = {str(k): (v if isinstance(v, str) else str(v)) for k, v in files.items()}
+            out = write_to_product(
+                name,
+                clean,
+                source_lab=data.get("source_lab") or lab_id,
+                agent=agent,
+                overwrite=bool(data.get("overwrite", True)),
+            )
+            return jsonify(out), 200 if out.get("success") else 400
+
+        project = create_project(name, lab_id=lab_id)
+        # stringify values
+        clean = {str(k): (v if isinstance(v, str) else str(v)) for k, v in files.items()}
+        wr = write_files(clean, project)
+        create_build_manifest(project, agent=agent, build_type="custom", brief=name)
+        out = {
+            "success": wr.get("success", False),
+            "project_dir": str(project),
+            "files_written": wr.get("files_written", []),
+            "errors": wr.get("errors", []),
+            "file_tree": list_project_files(project)[:100],
+        }
+        if data.get("package", True) and wr.get("success"):
+            out["package"] = package_project(project, name)
+        # optional promote to product SoR after build
+        if data.get("promote_to_product") and wr.get("success"):
+            from getailab.develop import promote_build_to_product
+
+            out["product"] = promote_build_to_product(
+                project, name, source_lab=data.get("source_lab") or lab_id, agent=agent
+            )
+        return jsonify(out), 200 if out["success"] else 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/develop/write_product", methods=["POST"])
+def develop_write_product():
+    """Write multi-file package straight into product SoR (Engineering)."""
+    data = request.get_json() or {}
+    name = (data.get("name") or data.get("package") or "package").strip()
+    files = data.get("files") or {}
+    agent = (data.get("agent_name") or data.get("agent") or "dev_shed").strip()
+    if not isinstance(files, dict) or not files:
+        return jsonify({"success": False, "error": "files dict required"}), 400
+    try:
+        from getailab.develop import write_to_product
+
+        clean = {str(k): (v if isinstance(v, str) else str(v)) for k, v in files.items()}
+        out = write_to_product(
+            name,
+            clean,
+            source_lab=data.get("source_lab") or os.environ.get("LAB_ID"),
+            agent=agent,
+            overwrite=bool(data.get("overwrite", True)),
+        )
+        return jsonify(out), 200 if out.get("success") else 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/develop/review_product", methods=["POST", "GET"])
+def develop_review_product():
+    """Oracle / commander: test & review packages under product SoR."""
+    data = request.get_json(silent=True) or {}
+    if request.method == "GET":
+        data = {**request.args.to_dict(), **data}
+    package = (data.get("package") or data.get("name") or "").strip()
+    run_smoke = str(data.get("run_smoke", "1")).lower() not in ("0", "false", "no")
+    run_tests = str(data.get("run_tests", "1")).lower() not in ("0", "false", "no")
+    try:
+        from getailab.develop import (
+            list_product_packages,
+            review_all_products,
+            review_product_package,
+            product_root,
+        )
+
+        if package:
+            out = review_product_package(
+                package,
+                source_lab=data.get("source_lab"),
+                run_smoke=run_smoke,
+                run_tests=run_tests,
+            )
+        elif data.get("list_only"):
+            out = list_product_packages(source_lab=data.get("source_lab"))
+        else:
+            out = review_all_products(
+                source_lab=data.get("source_lab"),
+                run_smoke=run_smoke,
+                run_tests=run_tests,
+            )
+        out["product_root"] = out.get("product_root") or str(product_root())
+        return jsonify(out), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route('/execute', methods=['POST'])
 def execute():
-    data = request.get_json()
+    data = request.get_json() or {}
     code = data.get('code', '')
     agent_name = data.get('agent_name', 'unknown')
     loop_id = str(data.get('loop_id', 'global'))
-    
-    # Create a specific folder for this loop's data
+
     loop_workspace = os.path.join(ARTIFACTS_DIR, loop_id)
     os.makedirs(loop_workspace, exist_ok=True)
 
     if not code:
         return jsonify({'error': 'No code provided'}), 400
 
-    # Write the code to the workspace
+    rewritten = _sandbox_rewrite_code(code)
+    # Inject prelude once (idempotent)
+    if "GetAiLab sandbox prelude" not in rewritten:
+        final_code = _SANDBOX_PRELUDE + "\n" + rewritten
+    else:
+        final_code = rewritten
+
+    # Script stays at loop root so reports/synthesis still find exp_{agent}.py
     script_path = os.path.join(loop_workspace, f"exp_{agent_name}.py")
-    with open(script_path, 'w') as f:
-        f.write(code)
+    with open(script_path, 'w', encoding='utf-8') as f:
+        f.write(final_code)
+
+    # Per-agent artifact isolation: prevent multi-agent stomping of results.csv etc.
+    safe_agent = re.sub(r"[^\w.\-]+", "_", str(agent_name).strip()) or "unknown"
+    agent_workspace = os.path.join(loop_workspace, safe_agent)
+    os.makedirs(agent_workspace, exist_ok=True)
+
+    env = os.environ.copy()
+    env["GETAILAB_ARTIFACT_DIR"] = agent_workspace  # prelude chdirs here
+    env["GETAILAB_LOOP_ID"] = str(loop_id)
+    env["GETAILAB_AGENT"] = str(agent_name)
+    env["GETAILAB_LOOP_WORKSPACE"] = loop_workspace
+    env["MPLBACKEND"] = "Agg"
+    # Prefer product packages on PYTHONPATH when vault has product/ next to artifacts/
+    vault_root = os.path.dirname(ARTIFACTS_DIR)
+    product_root = os.path.join(vault_root, "product")
+    if os.path.isdir(product_root):
+        env["GETAILAB_PRODUCT_ROOT"] = product_root
+        env["PYTHONPATH"] = product_root + os.pathsep + env.get("PYTHONPATH", "")
+    # Prefer the same interpreter that runs the lab (venv with scipy)
+    python_exe = sys.executable
 
     start_time = time.time()
+    proc_returncode = None
     try:
-        # TIMEOUT UPGRADE: 600 seconds (10 minutes) for heavy simulations
         result = subprocess.run(
-            [sys.executable, script_path], 
-            capture_output=True, 
-            text=True, 
-            timeout=1200, 
-            cwd=loop_workspace
+            [python_exe, script_path],
+            capture_output=True,
+            text=True,
+            timeout=1200,
+            cwd=agent_workspace,
+            env=env,
         )
-        success = result.returncode == 0
-        stdout, stderr = result.stdout, result.stderr
+        proc_returncode = result.returncode
+        stdout = _sandbox_sanitize_text(result.stdout)
+        stderr = _sandbox_sanitize_text(result.stderr)
+        success, result_verdict = _evaluate_execute_success(result.returncode, stdout)
     except subprocess.TimeoutExpired:
         success, stdout, stderr = False, "", "CRITICAL: Execution timed out (1200s limit exceeded)."
+        result_verdict = "timeout"
     except Exception as e:
-        success, stdout, stderr = False, "", str(e)
-            
+        success, stdout, stderr = False, "", _sandbox_sanitize_text(str(e))
+        result_verdict = "exception"
+
     exec_time = int((time.time() - start_time) * 1000)
 
-    # Check for artifacts (newly created files in the loop workspace)
-    artifacts = os.listdir(loop_workspace)
-    artifacts = [f for f in artifacts if f != os.path.basename(script_path)]
+    # List artifacts relative to loop_workspace so paths stay unique: {agent}/results.csv
+    artifacts = []
+    script_basename = os.path.basename(script_path)
+    if os.path.isdir(agent_workspace):
+        for root, _dirs, files in os.walk(agent_workspace):
+            for name in files:
+                full = os.path.join(root, name)
+                rel = os.path.relpath(full, loop_workspace)
+                artifacts.append(rel)
+    # Optionally include loop-level files that belong to this agent (not exp scripts)
+    for name in os.listdir(loop_workspace):
+        full = os.path.join(loop_workspace, name)
+        if not os.path.isfile(full):
+            continue
+        if name == script_basename or (name.startswith("exp_") and name.endswith(".py")):
+            continue
+        # Skip other agents' private dirs (already walked our own above)
+        if name == safe_agent:
+            continue
+        # Only surface top-level non-agent files if they look agent-tagged
+        if safe_agent in name or str(agent_name) in name:
+            rel = os.path.relpath(full, loop_workspace)
+            if rel not in artifacts:
+                artifacts.append(rel)
+    artifacts.sort()
 
     conn = sqlite3.connect(DB_PATH)
-    conn.execute("INSERT INTO lab_experiments (loop_id, agent_name, code, stdout, stderr, success, execution_time_ms, artifacts_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", 
-                 (loop_id, agent_name, code, stdout, stderr, success, exec_time, json.dumps(artifacts)))
+    conn.execute(
+        "INSERT INTO lab_experiments (loop_id, agent_name, code, stdout, stderr, success, execution_time_ms, artifacts_json) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (loop_id, agent_name, code, stdout, stderr, success, exec_time, json.dumps(artifacts)),
+    )
     conn.commit()
     conn.close()
 
+    _append_lab_ops({
+        "event": "execute",
+        "loop_id": loop_id,
+        "agent": agent_name,
+        "success": bool(success),
+        "result_verdict": result_verdict,
+        "execution_time_ms": exec_time,
+        "returncode": proc_returncode,
+        "stderr_head": (stderr or "")[:300],
+        "stdout_tail": (stdout or "")[-200:],
+        "artifact_count": len(artifacts),
+    })
+
     return jsonify({
-        'success': success, 
-        'stdout': stdout, 
-        'stderr': stderr, 
+        'success': success,
+        'stdout': stdout,
+        'stderr': stderr,
         'execution_time_ms': exec_time,
         'artifacts': artifacts,
-        'workspace_path': loop_workspace
+        'workspace_path': loop_workspace,
+        'agent_workspace_path': agent_workspace,
+        'result_verdict': result_verdict,
+        'sandbox': {
+            'python': python_exe,
+            'prelude': True,
+            'rewritten': rewritten != code,
+        },
     })
 
 @app.route('/api/llm/status')
@@ -1409,7 +2117,7 @@ def api_llm_status():
 
 @app.route('/vision/extract', methods=['POST'])
 def vision_extract():
-    """Sauron extraction endpoint used by scientists and run_chimera.py."""
+    """Sauron extraction endpoint used by scientists and run_lab.py."""
     data = request.get_json() or {}
     url = data.get('url', '')
     query = data.get('query', 'Extract key technical data')
@@ -1438,7 +2146,7 @@ def web_read():
 
 @app.route('/literature/search', methods=['POST'])
 def literature_search():
-    """Crow-style literature grounding — PubMed, arXiv, Semantic Scholar."""
+    """Loop grounding — lab library/diary first; external APIs only if enabled."""
     data = request.get_json() or {}
     query = str(data.get('query') or data.get('problem_statement') or '').strip()
     if not query:
@@ -1446,35 +2154,75 @@ def literature_search():
     sources = data.get('sources')
     max_per = int(data.get('max_per_source', 5))
     try:
-        from getailab.literature_search import search_literature
-        result = search_literature(query, sources=sources, max_per_source=max_per)
+        # Hot-reload so lab process picks up literature_search fixes without full reboot
+        import importlib
+        import getailab.literature_search as _lit
+        importlib.reload(_lit)
+        result = _lit.search_literature(query, sources=sources, max_per_source=max_per)
+        ok = bool(result.get("success") or result.get("total", 0) > 0)
         return jsonify({
-            'success': result['total'] > 0 or not result['errors'],
-            'query': result['query'],
-            'total': result['total'],
-            'papers': result['papers'],
-            'results': result['results'],
-            'formatted': result['formatted'],
-            'errors': result['errors'],
+            'success': ok,
+            'query': result.get('query'),
+            'total': result.get('total', 0),
+            'papers': result.get('papers', []),
+            'results': result.get('results', {}),
+            'formatted': result.get('formatted', ''),
+            'errors': result.get('errors', []),
+            'soft_warnings': result.get('soft_warnings', []),
+            'sources_ok': result.get('sources_ok', []),
+            'sources_attempted': result.get('sources_attempted', []),
+            'mode': result.get('mode'),
+            'prefer_library': result.get('prefer_library'),
+            'allow_external': result.get('allow_external'),
+            'real': True,
         })
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e), 'real': True}), 500
 
 
 # ============================================
 # DASHBOARD ROUTES + LIVE PULSE ENGINE
 # ============================================
 
+# Classroom / university education API (curriculum, marking, web-started loops)
+try:
+    from getailab.classroom.web_api import bp as classroom_api_bp
+    app.register_blueprint(classroom_api_bp)
+except Exception as _classroom_api_err:
+    print(f"  ⚠️  classroom API not loaded: {_classroom_api_err}")
+
+
 @app.route('/')
 @app.route('/dashboard')
 @app.route('/lab')
 def serve_dashboard():
-    """Serve the living GetAiLab interactive frontend. Pure sauce, no copies."""
+    """Serve education-first dashboard (legacy research UI: /index.research.html)."""
     try:
         return send_from_directory(DASHBOARD_DIR, 'index.html')
     except Exception:
         # Graceful inline if file missing at boot (will be written by UI agent)
         return '<!doctype html><html><head><title>GetAiLab — Dashboard Loading</title></head><body style="background:#0a0a12;color:#e0e7ff;font-family:monospace;padding:40px"><h1 style="font-family:Georgia,serif;font-style:italic;color:#e8e4dc">e<sup>iπ</sup>+1=0</h1><p>GetAiLab Dashboard materializing. Refresh shortly.</p><p><a href="/api/stats" style="color:#fcd34d">Inspect live stats API</a></p></body></html>'
+
+
+@app.route('/index.research.html')
+def serve_research_dashboard():
+    """Previous cosmic research UI (optional)."""
+    try:
+        return send_from_directory(DASHBOARD_DIR, 'index.research.html')
+    except Exception:
+        return jsonify({'error': 'Legacy UI not found'}), 404
+
+
+@app.route('/manifest.json')
+@app.route('/sw.js')
+@app.route('/mobile_chat_stub.html')
+def serve_dashboard_static():
+    """PWA / mobile stubs next to the education dashboard."""
+    name = request.path.lstrip('/')
+    try:
+        return send_from_directory(DASHBOARD_DIR, name)
+    except Exception:
+        return jsonify({'error': 'Not found'}), 404
 
 @app.route('/api/config')
 def api_config():
@@ -1580,10 +2328,10 @@ def api_ignite_muse():
         "problem": problem[:200],
         "category": category,
         "family_note": family_note[:60] if family_note else None,
-        "note": "Run: python run_chimera.py --problem \"...\" or POST to Oracle /initiate_loop"
+        "note": "Run: python run_lab.py --problem \"...\" or POST to Oracle /initiate_loop"
     }
 
-    cli_cmd = f'python3 run_chimera.py --problem "{problem.replace(chr(34), chr(92)+chr(34))}"'
+    cli_cmd = f'python3 run_lab.py --problem "{problem.replace(chr(34), chr(92)+chr(34))}"'
     return jsonify({
         "ok": True,
         "problem": problem,
@@ -1972,7 +2720,7 @@ def api_mobile_status():
         "dashboard": "/",
         "pwa_installable": True,
         "stubs": "mobile_chat_stub.html + JS bridges for native",
-        "how_to_run_note": "Use host python run_chimera.py --support for platform-specific commands. All clients identical."
+        "how_to_run_note": "Use host python run_lab.py --support for platform-specific commands. All clients identical."
     })
 
 # End of GetAiLab chat + mobile cross-platform additions
